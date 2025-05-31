@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       content: {
         Row: {
           author: string | null
@@ -16,11 +40,19 @@ export type Database = {
           content_type: string
           created_at: string
           description: string | null
+          downloads_count: number | null
           file_name: string | null
           file_size: number | null
           file_type: string | null
           file_url: string | null
           id: string
+          is_featured: boolean | null
+          rating: number | null
+          software_compatibility:
+            | Database["public"]["Enums"]["software_type"][]
+            | null
+          status: string | null
+          tags: string[] | null
           thumbnail_url: string | null
           title: string
           updated_at: string
@@ -32,11 +64,19 @@ export type Database = {
           content_type: string
           created_at?: string
           description?: string | null
+          downloads_count?: number | null
           file_name?: string | null
           file_size?: number | null
           file_type?: string | null
           file_url?: string | null
           id?: string
+          is_featured?: boolean | null
+          rating?: number | null
+          software_compatibility?:
+            | Database["public"]["Enums"]["software_type"][]
+            | null
+          status?: string | null
+          tags?: string[] | null
           thumbnail_url?: string | null
           title: string
           updated_at?: string
@@ -48,11 +88,19 @@ export type Database = {
           content_type?: string
           created_at?: string
           description?: string | null
+          downloads_count?: number | null
           file_name?: string | null
           file_size?: number | null
           file_type?: string | null
           file_url?: string | null
           id?: string
+          is_featured?: boolean | null
+          rating?: number | null
+          software_compatibility?:
+            | Database["public"]["Enums"]["software_type"][]
+            | null
+          status?: string | null
+          tags?: string[] | null
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
@@ -117,6 +165,38 @@ export type Database = {
         }
         Relationships: []
       }
+      downloads: {
+        Row: {
+          content_id: string | null
+          downloaded_at: string | null
+          id: string
+          user_agent: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          content_id?: string | null
+          downloaded_at?: string | null
+          id?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          content_id?: string | null
+          downloaded_at?: string | null
+          id?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "downloads_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       table_name: {
         Row: {
           data: Json | null
@@ -146,10 +226,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_download_count: {
+        Args: { content_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      content_category:
+        | "overlays"
+        | "luts"
+        | "presets"
+        | "sfx"
+        | "transitions"
+        | "templates"
+        | "other"
+      software_type:
+        | "premiere_pro"
+        | "after_effects"
+        | "davinci_resolve"
+        | "final_cut_pro"
+        | "photoshop"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -264,6 +361,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      content_category: [
+        "overlays",
+        "luts",
+        "presets",
+        "sfx",
+        "transitions",
+        "templates",
+        "other",
+      ],
+      software_type: [
+        "premiere_pro",
+        "after_effects",
+        "davinci_resolve",
+        "final_cut_pro",
+        "photoshop",
+        "other",
+      ],
+    },
   },
 } as const

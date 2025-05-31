@@ -3,72 +3,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Eye, Star, Play, Layers, Palette, Music, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useMaterials } from "@/hooks/useMaterials";
+import { useCategories } from "@/hooks/useCategories";
+import MaterialCard from "./MaterialCard";
 
 const FeaturedMaterials = () => {
-  const categories = [
-    {
-      title: "Video Overlays",
-      description: "Professional overlays for stunning visual effects",
-      icon: Layers,
-      count: "150+ Items",
-      color: "from-blue-500 to-cyan-500",
-      items: ["Light Leaks", "Film Grain", "Dust Particles", "Bokeh Effects"]
-    },
-    {
-      title: "Color LUTs",
-      description: "Cinematic color grading presets",
-      icon: Palette,
-      count: "80+ Presets",
-      color: "from-purple-500 to-pink-500",
-      items: ["Cinematic", "Vintage", "Modern", "Film Emulation"]
-    },
-    {
-      title: "Sound Effects",
-      description: "High-quality audio for your projects",
-      icon: Music,
-      count: "200+ Sounds",
-      color: "from-green-500 to-teal-500",
-      items: ["Whooshes", "Impacts", "Ambient", "Musical Stingers"]
-    },
-    {
-      title: "Transitions",
-      description: "Smooth transitions for seamless editing",
-      icon: Zap,
-      count: "120+ Effects",
-      color: "from-orange-500 to-red-500",
-      items: ["Wipes", "Zooms", "Slides", "Creative"]
-    }
-  ];
+  const { materials: featuredMaterials, loading: materialsLoading } = useMaterials(true);
+  const { categories, loading: categoriesLoading } = useCategories();
 
-  const featuredItems = [
-    {
-      title: "Cinematic LUTs Pack Vol.3",
-      description: "Professional color grading for films",
-      downloads: "2.1K",
-      rating: 4.9,
-      image: "bg-gradient-to-br from-purple-600 to-blue-600",
-      price: "Free",
-      software: ["Premiere Pro", "DaVinci Resolve"]
-    },
-    {
-      title: "Light Leak Overlays",
-      description: "Premium light effects collection",
-      downloads: "3.5K",
-      rating: 4.8,
-      image: "bg-gradient-to-br from-yellow-500 to-orange-600",
-      price: "Free",
-      software: ["After Effects", "Premiere Pro"]
-    },
-    {
-      title: "Cinematic Transitions",
-      description: "Hollywood-style transition effects",
-      downloads: "1.8K",
-      rating: 5.0,
-      image: "bg-gradient-to-br from-red-500 to-pink-600",
-      price: "Free",
-      software: ["Final Cut Pro", "Premiere Pro"]
-    }
-  ];
+  const iconMap: { [key: string]: any } = {
+    'layers': Layers,
+    'palette': Palette,
+    'music': Music,
+    'zap': Zap,
+    'settings': Zap,
+    'file-text': Layers
+  };
+
+  const colorMap: { [key: string]: string } = {
+    'Video Overlays': 'from-blue-500 to-cyan-500',
+    'Color LUTs': 'from-purple-500 to-pink-500',
+    'Sound Effects': 'from-green-500 to-teal-500',
+    'Transitions': 'from-orange-500 to-red-500',
+    'Presets': 'from-yellow-500 to-orange-500',
+    'Templates': 'from-indigo-500 to-purple-500'
+  };
+
+  if (materialsLoading || categoriesLoading) {
+    return (
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-white dark:bg-slate-900">
@@ -88,34 +60,31 @@ const FeaturedMaterials = () => {
 
         {/* Categories Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {categories.map((category, index) => {
-            const IconComponent = category.icon;
+          {categories.slice(0, 4).map((category, index) => {
+            const IconComponent = iconMap[category.icon] || Layers;
+            const colorClass = colorMap[category.name] || 'from-gray-500 to-gray-600';
+            const materialCount = featuredMaterials.filter(m => m.category === category.name).length;
+            
             return (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover bg-white dark:bg-slate-800">
+              <Card key={category.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover bg-white dark:bg-slate-800">
                 <CardHeader className="text-center">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                  <div className={`w-16 h-16 bg-gradient-to-r ${colorClass} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{category.title}</CardTitle>
+                  <CardTitle className="text-xl">{category.name}</CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-300">
                     {category.description}
                   </CardDescription>
                   <Badge variant="secondary" className="w-fit mx-auto">
-                    {category.count}
+                    {materialCount} Items
                   </Badge>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {category.items.map((item, idx) => (
-                      <div key={idx} className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <Button variant="outline" className="w-full mt-4 hover:bg-gray-50 dark:hover:bg-slate-700">
-                    Browse Category
-                  </Button>
+                  <Link to="/materials">
+                    <Button variant="outline" className="w-full hover:bg-gray-50 dark:hover:bg-slate-700">
+                      Browse Category
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             );
@@ -134,69 +103,24 @@ const FeaturedMaterials = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredItems.map((item, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800">
-                <div className={`h-48 ${item.image} flex items-center justify-center relative`}>
-                  <Play className="w-12 h-12 text-white/80 hover:text-white transition-colors cursor-pointer" />
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-white/20 text-white border-0">
-                      {item.price}
-                    </Badge>
-                  </div>
-                </div>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{item.title}</CardTitle>
-                      <CardDescription className="text-gray-600 dark:text-gray-300">
-                        {item.description}
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center space-x-1">
-                      <Download className="w-4 h-4" />
-                      <span>{item.downloads}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span>{item.rating}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {item.software.map((soft, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {soft}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex space-x-2">
-                    <Button className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {featuredMaterials.slice(0, 3).map((material) => (
+              <MaterialCard key={material.id} material={material} />
             ))}
           </div>
         </div>
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="px-8 py-4 text-lg border-2 hover:bg-gray-50 dark:hover:bg-slate-800"
-          >
-            View All Materials
-            <span className="ml-2">→</span>
-          </Button>
+          <Link to="/materials">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="px-8 py-4 text-lg border-2 hover:bg-gray-50 dark:hover:bg-slate-800"
+            >
+              View All Materials
+              <span className="ml-2">→</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
