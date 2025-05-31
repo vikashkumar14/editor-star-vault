@@ -1,33 +1,26 @@
 
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Upload, 
-  Users, 
-  Download, 
-  BarChart3,
-  Settings,
-  Eye
-} from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { useMaterials } from "@/hooks/useMaterials";
-import { useCategories } from "@/hooks/useCategories";
-import { supabase } from '@/integrations/supabase/client';
-import { Material } from '@/types/database';
+import { Plus, Edit, Trash2, Download, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Material } from "@/types/database";
+import { toast } from "sonner";
+
+type SoftwareType = "premiere_pro" | "after_effects" | "davinci_resolve" | "final_cut_pro" | "photoshop" | "other";
 
 const AdminDashboard = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -36,17 +29,80 @@ const AdminDashboard = () => {
     file_url: '',
     thumbnail_url: '',
     youtube_url: '',
-    tags: '',
-    software_compatibility: '',
+    tags: [] as string[],
+    software_compatibility: [] as SoftwareType[],
     is_featured: false
   });
 
-  const { materials, loading: materialsLoading } = useMaterials();
-  const { categories, loading: categoriesLoading } = useCategories();
+  useEffect(() => {
+    fetchMaterials();
+    fetchCategories();
+  }, []);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
+  const fetchMaterials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('content')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMaterials(data || []);
+    } catch (error) {
+      console.error('Error fetching materials:', error);
+      toast.error('Failed to fetch materials');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const dataToSubmit = {
+        ...formData,
+        author: 'The Editor Star',
+        updated_at: new Date().toISOString()
+      };
+
+      if (isEditing && selectedMaterial) {
+        const { error } = await supabase
+          .from('content')
+          .update(dataToSubmit)
+          .eq('id', selectedMaterial.id);
+
+        if (error) throw error;
+        toast.success('Material updated successfully');
+      } else {
+        const { error } = await supabase
+          .from('content')
+          .insert([dataToSubmit]);
+
+        if (error) throw error;
+        toast.success('Material added successfully');
+      }
+
+      resetForm();
+      fetchMaterials();
+    } catch (error) {
+      console.error('Error saving material:', error);
+      toast.error('Failed to save material');
+    }
   };
 
   const handleEdit = (material: Material) => {
@@ -59,70 +115,28 @@ const AdminDashboard = () => {
       file_url: material.file_url || '',
       thumbnail_url: material.thumbnail_url || '',
       youtube_url: material.youtube_url || '',
-      tags: material.tags?.join(', ') || '',
-      software_compatibility: material.software_compatibility?.join(', ') || '',
+      tags: material.tags || [],
+      software_compatibility: (material.software_compatibility || []) as SoftwareType[],
       is_featured: material.is_featured || false
     });
     setIsEditing(true);
   };
 
-  const handleSave = async () => {
-    try {
-      const updateData = {
-        title: formData.title,
-        description: formData.description,
-        content_type: formData.content_type,
-        category: formData.category,
-        file_url: formData.file_url,
-        thumbnail_url: formData.thumbnail_url,
-        youtube_url: formData.youtube_url,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        software_compatibility: formData.software_compatibility.split(',').map(sw => sw.trim()).filter(sw => sw),
-        is_featured: formData.is_featured,
-        updated_at: new Date().toISOString()
-      };
-
-      if (selectedMaterial) {
-        const { error } = await supabase
-          .from('content')
-          .update(updateData)
-          .eq('id', selectedMaterial.id);
-
-        if (error) throw error;
-        alert('Material updated successfully!');
-      } else {
-        const { error } = await supabase
-          .from('content')
-          .insert([{ ...updateData, author: 'The Editor Star' }]);
-
-        if (error) throw error;
-        alert('Material created successfully!');
-      }
-
-      setIsEditing(false);
-      setSelectedMaterial(null);
-      window.location.reload();
-    } catch (error) {
-      console.error('Error saving material:', error);
-      alert('Error saving material. Please try again.');
-    }
-  };
-
-  const handleDelete = async (materialId: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this material?')) return;
 
     try {
       const { error } = await supabase
         .from('content')
         .delete()
-        .eq('id', materialId);
+        .eq('id', id);
 
       if (error) throw error;
-      alert('Material deleted successfully!');
-      window.location.reload();
+      toast.success('Material deleted successfully');
+      fetchMaterials();
     } catch (error) {
       console.error('Error deleting material:', error);
-      alert('Error deleting material. Please try again.');
+      toast.error('Failed to delete material');
     }
   };
 
@@ -135,314 +149,265 @@ const AdminDashboard = () => {
       file_url: '',
       thumbnail_url: '',
       youtube_url: '',
-      tags: '',
-      software_compatibility: '',
+      tags: [],
+      software_compatibility: [],
       is_featured: false
     });
     setSelectedMaterial(null);
     setIsEditing(false);
   };
 
-  const totalDownloads = materials.reduce((sum, material) => sum + (material.downloads_count || 0), 0);
-  const featuredCount = materials.filter(material => material.is_featured).length;
+  const softwareOptions: SoftwareType[] = [
+    'premiere_pro',
+    'after_effects', 
+    'davinci_resolve',
+    'final_cut_pro',
+    'photoshop',
+    'other'
+  ];
+
+  const getSoftwareDisplayName = (software: SoftwareType) => {
+    const names: Record<SoftwareType, string> = {
+      'premiere_pro': 'Premiere Pro',
+      'after_effects': 'After Effects',
+      'davinci_resolve': 'DaVinci Resolve',
+      'final_cut_pro': 'Final Cut Pro',
+      'photoshop': 'Photoshop',
+      'other': 'Other'
+    };
+    return names[software];
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Admin Dashboard
-            </h1>
-            <Button 
-              onClick={() => { resetForm(); setIsEditing(true); }}
-              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Material
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-300">Manage your editing materials and content</p>
+        </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <Tabs defaultValue="materials" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="materials">Materials</TabsTrigger>
+            <TabsTrigger value="add-material">Add Material</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="materials">
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Total Materials</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{materials.length}</p>
-                  </div>
-                  <Upload className="w-8 h-8 text-red-500" />
+              <CardHeader>
+                <CardTitle>All Materials ({materials.length})</CardTitle>
+                <CardDescription>Manage your editing materials</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {materials.map((material) => (
+                    <div key={material.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{material.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{material.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline">{material.category}</Badge>
+                          <Badge variant="secondary">
+                            <Download className="w-3 h-3 mr-1" />
+                            {material.downloads_count}
+                          </Badge>
+                          {material.is_featured && (
+                            <Badge className="bg-yellow-500">Featured</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(material)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDelete(material.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          <TabsContent value="add-material">
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Total Downloads</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalDownloads.toLocaleString()}</p>
-                  </div>
-                  <Download className="w-8 h-8 text-red-500" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Featured Materials</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{featuredCount}</p>
-                  </div>
-                  <BarChart3 className="w-8 h-8 text-red-500" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Categories</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{categories.length}</p>
-                  </div>
-                  <Settings className="w-8 h-8 text-red-500" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Tabs defaultValue="materials" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="materials">Materials</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="materials">
-              {isEditing ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{selectedMaterial ? 'Edit Material' : 'Add New Material'}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Title</label>
-                        <Input
-                          value={formData.title}
-                          onChange={(e) => setFormData({...formData, title: e.target.value})}
-                          placeholder="Material title"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Content Type</label>
-                        <Input
-                          value={formData.content_type}
-                          onChange={(e) => setFormData({...formData, content_type: e.target.value})}
-                          placeholder="e.g., luts, overlays, transitions"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Category</label>
-                        <select
-                          className="w-full px-3 py-2 border rounded-md bg-white dark:bg-slate-800"
-                          value={formData.category}
-                          onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        >
-                          <option value="">Select Category</option>
-                          {categories.map((cat) => (
-                            <option key={cat.id} value={cat.name}>{cat.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">File URL</label>
-                        <Input
-                          value={formData.file_url}
-                          onChange={(e) => setFormData({...formData, file_url: e.target.value})}
-                          placeholder="Download link"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Thumbnail URL</label>
-                        <Input
-                          value={formData.thumbnail_url}
-                          onChange={(e) => setFormData({...formData, thumbnail_url: e.target.value})}
-                          placeholder="Image URL"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">YouTube URL</label>
-                        <Input
-                          value={formData.youtube_url}
-                          onChange={(e) => setFormData({...formData, youtube_url: e.target.value})}
-                          placeholder="Preview video URL"
-                        />
-                      </div>
+              <CardHeader>
+                <CardTitle>{isEditing ? 'Edit Material' : 'Add New Material'}</CardTitle>
+                <CardDescription>
+                  {isEditing ? 'Update the material details' : 'Add a new editing material to your collection'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Title</label>
+                      <Input
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        required
+                      />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium mb-2">Description</label>
-                      <Textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        placeholder="Material description"
-                        rows={3}
+                      <label className="block text-sm font-medium mb-2">Content Type</label>
+                      <Input
+                        value={formData.content_type}
+                        onChange={(e) => setFormData({ ...formData, content_type: e.target.value })}
+                        placeholder="e.g., luts, overlays, presets"
+                        required
                       />
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Tags (comma separated)</label>
-                        <Input
-                          value={formData.tags}
-                          onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                          placeholder="tag1, tag2, tag3"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Software (comma separated)</label>
-                        <Input
-                          value={formData.software_compatibility}
-                          onChange={(e) => setFormData({...formData, software_compatibility: e.target.value})}
-                          placeholder="premiere_pro, after_effects"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="featured"
-                        checked={formData.is_featured}
-                        onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Category</label>
+                      <Input
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        placeholder="Select or enter category"
                       />
-                      <label htmlFor="featured" className="text-sm font-medium">Featured Material</label>
                     </div>
-                    
-                    <div className="flex space-x-4">
-                      <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                        Save
-                      </Button>
-                      <Button variant="outline" onClick={() => setIsEditing(false)}>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">File URL</label>
+                      <Input
+                        value={formData.file_url}
+                        onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                        placeholder="Download link"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Thumbnail URL</label>
+                      <Input
+                        value={formData.thumbnail_url}
+                        onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
+                        placeholder="Image URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">YouTube Preview URL</label>
+                      <Input
+                        value={formData.youtube_url}
+                        onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
+                        placeholder="YouTube video URL"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Description</label>
+                    <Textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Software Compatibility</label>
+                    <div className="flex flex-wrap gap-2">
+                      {softwareOptions.map((software) => (
+                        <Button
+                          key={software}
+                          type="button"
+                          variant={formData.software_compatibility.includes(software) ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            const currentSoftware = formData.software_compatibility;
+                            if (currentSoftware.includes(software)) {
+                              setFormData({
+                                ...formData,
+                                software_compatibility: currentSoftware.filter(s => s !== software)
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                software_compatibility: [...currentSoftware, software]
+                              });
+                            }
+                          }}
+                        >
+                          {getSoftwareDisplayName(software)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_featured"
+                      checked={formData.is_featured}
+                      onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+                    />
+                    <label htmlFor="is_featured" className="text-sm font-medium">Featured Material</label>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button type="submit">
+                      {isEditing ? 'Update Material' : 'Add Material'}
+                    </Button>
+                    {isEditing && (
+                      <Button type="button" variant="outline" onClick={resetForm}>
                         Cancel
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-6">
-                  {materials.map((material) => (
-                    <Card key={material.id}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-4 mb-2">
-                              <h3 className="text-lg font-semibold">{material.title}</h3>
-                              {material.is_featured && (
-                                <Badge className="bg-yellow-100 text-yellow-800">Featured</Badge>
-                              )}
-                            </div>
-                            <p className="text-gray-600 dark:text-gray-300 mb-2">{material.description}</p>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              <Badge variant="secondary">{material.category}</Badge>
-                              <Badge variant="outline">{material.downloads_count} downloads</Badge>
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {material.tags?.slice(0, 3).map((tag, idx) => (
-                                <Badge key={idx} variant="outline" className="text-xs">{tag}</Badge>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(material.file_url, '_blank')}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEdit(material)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDelete(material.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            <TabsContent value="categories">
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Categories Management</CardTitle>
-                  <CardDescription>Manage content categories</CardDescription>
+                  <CardTitle>Total Materials</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4">
-                    {categories.map((category) => (
-                      <div key={category.id} className="flex justify-between items-center p-4 border rounded-lg">
-                        <div>
-                          <h3 className="font-semibold">{category.name}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">{category.description}</p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-3xl font-bold">{materials.length}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Downloads</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">
+                    {materials.reduce((sum, material) => sum + (material.downloads_count || 0), 0).toLocaleString()}
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
 
-            <TabsContent value="analytics">
-              <div className="grid gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Download Analytics</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {materials.slice(0, 5).map((material) => (
-                        <div key={material.id} className="flex justify-between items-center">
-                          <span>{material.title}</span>
-                          <Badge>{material.downloads_count} downloads</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <Footer />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Featured Materials</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">
+                    {materials.filter(material => material.is_featured).length}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
