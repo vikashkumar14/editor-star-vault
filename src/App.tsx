@@ -8,7 +8,8 @@ import Index from "./pages/Index";
 import Materials from "./pages/Materials";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./components/AdminLogin";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +25,8 @@ const App = () => (
           <Route path="/materials" element={<Materials />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<ProtectedAdminRoute />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

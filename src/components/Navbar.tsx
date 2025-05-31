@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Moon, Sun, Search, Menu, X } from "lucide-react";
+import { Moon, Sun, Search, Menu, X, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 interface NavbarProps {
@@ -64,6 +64,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Admin Button */}
+            <Link to="/admin-login">
+              <Button variant="outline" size="sm" className="hidden md:flex">
+                <Settings className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="icon"
@@ -111,6 +119,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Admin Button */}
+              <Link
+                to="/admin-login"
+                className="block px-3 py-2 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Settings className="h-4 w-4 inline mr-2" />
+                Admin
+              </Link>
               
               {/* Mobile Search */}
               <div className="px-3 py-2">

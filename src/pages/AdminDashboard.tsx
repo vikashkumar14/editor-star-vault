@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Download, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Download, Eye, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Material } from "@/types/database";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 type SoftwareType = "premiere_pro" | "after_effects" | "davinci_resolve" | "final_cut_pro" | "photoshop" | "other";
 
@@ -19,6 +19,8 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('materials');
+  const navigate = useNavigate();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -38,6 +40,12 @@ const AdminDashboard = () => {
     fetchMaterials();
     fetchCategories();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdmin');
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
 
   const fetchMaterials = async () => {
     try {
@@ -99,6 +107,7 @@ const AdminDashboard = () => {
 
       resetForm();
       fetchMaterials();
+      setActiveTab('materials'); // Switch back to materials tab after saving
     } catch (error) {
       console.error('Error saving material:', error);
       toast.error('Failed to save material');
@@ -120,6 +129,7 @@ const AdminDashboard = () => {
       is_featured: material.is_featured || false
     });
     setIsEditing(true);
+    setActiveTab('add-material'); // Switch to edit tab
   };
 
   const handleDelete = async (id: string) => {
@@ -157,6 +167,11 @@ const AdminDashboard = () => {
     setIsEditing(false);
   };
 
+  const handleAddNew = () => {
+    resetForm();
+    setActiveTab('add-material');
+  };
+
   const softwareOptions: SoftwareType[] = [
     'premiere_pro',
     'after_effects', 
@@ -191,23 +206,37 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-300">Manage your editing materials and content</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage your editing materials and content</p>
+          </div>
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
         </div>
 
-        <Tabs defaultValue="materials" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="materials">Materials</TabsTrigger>
-            <TabsTrigger value="add-material">Add Material</TabsTrigger>
+            <TabsTrigger value="add-material">
+              {isEditing ? 'Edit Material' : 'Add Material'}
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="materials">
             <Card>
-              <CardHeader>
-                <CardTitle>All Materials ({materials.length})</CardTitle>
-                <CardDescription>Manage your editing materials</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>All Materials ({materials.length})</CardTitle>
+                  <CardDescription>Manage your editing materials</CardDescription>
+                </div>
+                <Button onClick={handleAddNew}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Material
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
