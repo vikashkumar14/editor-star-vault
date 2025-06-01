@@ -1,8 +1,7 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Fire, Download, Eye, Star, Users } from "lucide-react";
+import { TrendingUp, Flame, Download, Eye, Star, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const TrendingSection = () => {
@@ -58,7 +57,7 @@ const TrendingSection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full px-6 py-2 mb-4">
-            <Fire className="w-4 h-4" />
+            <Flame className="w-4 h-4" />
             <span className="font-medium">Trending Now</span>
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -103,7 +102,7 @@ const TrendingSection = () => {
                   </Badge>
                   {item.isHot && (
                     <div className="flex items-center space-x-1 text-red-500">
-                      <Fire className="w-3 h-3" />
+                      <Flame className="w-3 h-3" />
                       <span className="text-xs font-medium">HOT</span>
                     </div>
                   )}
