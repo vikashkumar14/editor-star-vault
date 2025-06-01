@@ -1,15 +1,11 @@
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Download, Search, Play, Star, Users, Eye, Heart, Moon, Sun } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FeaturedMaterials from "@/components/FeaturedMaterials";
 import StatsSection from "@/components/StatsSection";
+import TrendingSection from "@/components/TrendingSection";
+import CreatorsShowcase from "@/components/CreatorsShowcase";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
@@ -27,7 +23,9 @@ const Index = () => {
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <Hero />
         <StatsSection />
+        <TrendingSection />
         <FeaturedMaterials />
+        <CreatorsShowcase />
         <Newsletter />
         <Footer />
       </div>

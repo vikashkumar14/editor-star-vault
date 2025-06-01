@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { Material } from "@/types/database";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "@/components/FileUpload";
+import MediaFireUpload from "@/components/MediaFireUpload";
 
 type SoftwareType = "premiere_pro" | "after_effects" | "davinci_resolve" | "final_cut_pro" | "photoshop" | "other";
 
@@ -229,8 +229,8 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
@@ -394,24 +394,37 @@ const AdminDashboard = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-6">
                     <FileUpload
-                      onFileUploaded={(url) => setFormData({ ...formData, thumbnail_url: url })}
+                      onFileUploaded={(url) => setFormData({...formData, thumbnail_url: url})}
                       accept="image/*"
                       bucket="material-thumbnails"
-                      maxSize={5 * 1024 * 1024}
                       label="Thumbnail Image"
                       currentFile={formData.thumbnail_url}
                     />
-
-                    <FileUpload
-                      onFileUploaded={(url) => setFormData({ ...formData, file_url: url })}
-                      accept=".zip,.rar,.json,.js,.ts,.css,.html,.py,.java,.c,.cpp,.pdf,image/*"
-                      bucket="material-files"
-                      maxSize={100 * 1024 * 1024}
-                      label="Material File"
-                      currentFile={formData.file_url}
+                    
+                    <MediaFireUpload
+                      onLinkAdded={(url) => setFormData({...formData, file_url: url})}
+                      label="Download File"
+                      description="Add MediaFire link for users to download the material"
+                      currentUrl={formData.file_url}
                     />
+                  </div>
+
+                  {/* Alternative File Upload */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Alternative: Direct File Upload</h3>
+                    <FileUpload
+                      onFileUploaded={(url) => setFormData({...formData, file_url: url})}
+                      accept="*/*"
+                      bucket="material-files"
+                      maxSize={100 * 1024 * 1024} // 100MB
+                      label="Upload File Directly"
+                      currentFile={formData.file_url?.includes('supabase') ? formData.file_url : ''}
+                    />
+                    <p className="text-sm text-gray-500 mt-2">
+                      Note: MediaFire links are recommended for larger files and better user experience
+                    </p>
                   </div>
 
                   <div>
