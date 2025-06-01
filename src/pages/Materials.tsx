@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,15 +25,24 @@ const Materials = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const filteredMaterials = materials.filter(material => {
-    const matchesSearch = material.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         material.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         material.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesCategory = !selectedCategory || material.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  // Enhanced search functionality
+  const filteredMaterials = useMemo(() => {
+    return materials.filter(material => {
+      const searchLower = searchTerm.toLowerCase();
+      
+      const matchesSearch = !searchTerm || 
+        material.title.toLowerCase().includes(searchLower) ||
+        material.description?.toLowerCase().includes(searchLower) ||
+        material.category?.toLowerCase().includes(searchLower) ||
+        material.author?.toLowerCase().includes(searchLower) ||
+        material.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        material.software_compatibility?.some(software => software.toLowerCase().includes(searchLower));
+      
+      const matchesCategory = !selectedCategory || material.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [materials, searchTerm, selectedCategory]);
 
   if (materialsLoading || categoriesLoading) {
     return (
@@ -68,14 +77,14 @@ const Materials = () => {
             </p>
           </div>
 
-          {/* Search and Filters */}
+          {/* Enhanced Search and Filters */}
           <Card className="mb-8">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search materials, tags, or descriptions..."
+                    placeholder="Search by title, category, tags, software, author..."
                     className="pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,14 +122,45 @@ const Materials = () => {
                   </Button>
                 </div>
               </div>
+              
+              {/* Search suggestions */}
+              {searchTerm && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="text-sm text-gray-500">Quick filters:</span>
+                  {['LUT', 'Template', 'Effect', 'Code', 'Sound'].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setSearchTerm(tag)}
+                      className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-xs rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Results Count */}
-          <div className="mb-6">
+          <div className="mb-6 flex justify-between items-center">
             <p className="text-gray-600 dark:text-gray-300">
               Showing {filteredMaterials.length} of {materials.length} materials
+              {searchTerm && ` for "${searchTerm}"`}
             </p>
+            
+            {/* Clear search */}
+            {(searchTerm || selectedCategory) && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategory('');
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
           </div>
 
           {/* Materials Grid */}
@@ -133,17 +173,22 @@ const Materials = () => {
           {/* No Results */}
           {filteredMaterials.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                No materials found matching your criteria.
-              </p>
+              <div className="mb-4">
+                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">
+                  No materials found matching your search criteria.
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  Try adjusting your search terms or browse all categories.
+                </p>
+              </div>
               <Button 
-                className="mt-4" 
                 onClick={() => {
                   setSearchTerm('');
                   setSelectedCategory('');
                 }}
               >
-                Clear Filters
+                Browse All Materials
               </Button>
             </div>
           )}

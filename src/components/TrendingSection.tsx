@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,8 @@ const TrendingSection = () => {
       downloads: "15.2K",
       trend: "+125%",
       type: "LUT",
-      isHot: true
+      isHot: true,
+      price: 299
     },
     {
       id: 2,
@@ -22,7 +24,8 @@ const TrendingSection = () => {
       downloads: "12.8K",
       trend: "+89%",
       type: "Template",
-      isHot: true
+      isHot: true,
+      price: 199
     },
     {
       id: 3,
@@ -31,7 +34,8 @@ const TrendingSection = () => {
       downloads: "9.5K",
       trend: "+67%",
       type: "Code",
-      isHot: false
+      isHot: false,
+      price: 399
     },
     {
       id: 4,
@@ -40,7 +44,8 @@ const TrendingSection = () => {
       downloads: "8.2K",
       trend: "+54%",
       type: "Effect",
-      isHot: false
+      isHot: false,
+      price: 149
     }
   ];
 
@@ -50,6 +55,10 @@ const TrendingSection = () => {
     { icon: Star, label: "Top Rated", value: "4.9★", color: "text-yellow-500" },
     { icon: Eye, label: "Views Today", value: "125K", color: "text-purple-500" }
   ];
+
+  const handleViewDetails = (item: any) => {
+    alert(`Viewing details for: ${item.title}\nCategory: ${item.category}\nPrice: ₹${item.price}\nDownloads: ${item.downloads}`);
+  };
 
   return (
     <section className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
@@ -111,6 +120,9 @@ const TrendingSection = () => {
                 <CardDescription className="text-gray-600 dark:text-gray-300">
                   {item.category}
                 </CardDescription>
+                <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                  ₹{item.price}
+                </div>
               </CardHeader>
               
               <CardContent className="pt-0">
@@ -125,7 +137,11 @@ const TrendingSection = () => {
                   </div>
                 </div>
                 
-                <Button variant="outline" className="w-full hover:bg-gray-50 dark:hover:bg-slate-700">
+                <Button 
+                  variant="outline" 
+                  className="w-full hover:bg-gray-50 dark:hover:bg-slate-700"
+                  onClick={() => handleViewDetails(item)}
+                >
                   View Details
                 </Button>
               </CardContent>
