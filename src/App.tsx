@@ -9,6 +9,7 @@ import Materials from "./pages/Materials";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import AdminLogin from "./components/AdminLogin";
+import UserLogin from "./components/UserLogin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/materials" element={<Materials />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<UserLogin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedAdminRoute />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,9 +1,8 @@
-
-import { useState, useMemo } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
-import { Moon, Sun, Search, Menu, X, Settings } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Search, Moon, Sun, Menu, X, User } from "lucide-react";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -11,155 +10,125 @@ interface NavbarProps {
 }
 
 const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Materials', path: '/materials' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
-  ];
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigate to materials page with search query
-      navigate(`/materials?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-    }
-  };
-
   return (
-    <nav className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">⭐</span>
-            </div>
-            <span className="text-xl font-bold gradient-text">The Editor Star</span>
-          </Link>
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <span className="font-bold text-xl text-red-500 dark:text-orange-500">
+                EditorStar
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === item.path
-                    ? 'text-red-500'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            <Link to="/materials" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+              Materials
+            </Link>
+            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+              About
+            </Link>
+            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+              Contact
+            </Link>
           </div>
 
-          {/* Enhanced Search Bar */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <form onSubmit={handleSearch} className="relative">
+          {/* Right side buttons */}
+          <div className="flex items-center space-x-4">
+            <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <Input
-                type="search"
-                placeholder="Search materials, categories, tags..."
-                className="pl-9 w-64"
+                type="text"
+                placeholder="Search materials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
               />
-            </form>
-          </div>
-
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Admin Button */}
-            <Link to="/admin-login">
-              <Button variant="outline" size="sm" className="hidden md:flex">
-                <Settings className="h-4 w-4 mr-2" />
-                Admin
-              </Button>
-            </Link>
-
+            </div>
+            
             <Button
               variant="ghost"
-              size="icon"
-              onClick={toggleDarkMode}
-              className="rounded-full"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
             >
-              {darkMode ? (
-                <Sun className="h-5 w-5 text-yellow-500" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              <User className="w-4 h-4 mr-2" />
+              Login
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleDarkMode}
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+            >
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
 
             {/* Mobile menu button */}
             <Button
               variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              size="sm"
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden text-gray-700 dark:text-gray-300"
             >
-              {isMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-700">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`block px-3 py-2 text-base font-medium rounded-md ${
-                    location.pathname === item.path
-                      ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
+        {isOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700">
               
-              {/* Mobile Admin Button */}
               <Link
-                to="/admin-login"
-                className="block px-3 py-2 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700"
-                onClick={() => setIsMenuOpen(false)}
+                to="/materials"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsOpen(false)}
               >
-                <Settings className="h-4 w-4 inline mr-2" />
-                Admin
+                Materials
+              </Link>
+              <Link
+                to="/about"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                to="/contact"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsOpen(false)}
+              >
+                Contact
               </Link>
               
-              {/* Mobile Search */}
-              <div className="px-3 py-2">
-                <form onSubmit={handleSearch} className="relative">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="search"
-                    placeholder="Search materials..."
-                    className="pl-9 w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </form>
-              </div>
+              <Link
+                to="/login"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsOpen(false)}
+              >
+                Login
+              </Link>
             </div>
           </div>
         )}
       </div>
+
+      {/* Search Results Dropdown */}
+      {searchQuery && (
+        <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+          {/* Implement search results here */}
+          <p className="px-4 py-2 text-gray-700 dark:text-gray-300">No results found for "{searchQuery}"</p>
+        </div>
+      )}
     </nav>
   );
 };

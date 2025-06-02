@@ -16,8 +16,8 @@ const AdminLogin = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple admin credentials check (in production, use proper authentication)
-    if (credentials.username === 'admin' && credentials.password === 'admin123') {
+    // Updated admin credentials
+    if (credentials.username === 'vikashkumar13228@gmail.com' && credentials.password === 'vikash@2004') {
       localStorage.setItem('isAdmin', 'true');
       toast.success('Admin login successful!');
       navigate('/admin');
@@ -38,12 +38,12 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Username</label>
+              <label className="block text-sm font-medium mb-2">Email</label>
               <Input
-                type="text"
+                type="email"
                 value={credentials.username}
                 onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-                placeholder="Enter admin username"
+                placeholder="Enter admin email"
                 required
               />
             </div>
@@ -67,8 +67,8 @@ const AdminLogin = () => {
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
             <p className="text-sm text-blue-700 dark:text-blue-300">
               <strong>Demo Credentials:</strong><br />
-              Username: admin<br />
-              Password: admin123
+              Email: vikashkumar13228@gmail.com<br />
+              Password: vikash@2004
             </p>
           </div>
         </CardContent>
