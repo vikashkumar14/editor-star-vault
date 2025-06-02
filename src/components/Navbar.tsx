@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Menu, X, User } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, User, Shield } from "lucide-react";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -61,6 +62,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               <User className="w-4 h-4 mr-2" />
               Login
             </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/admin-login')}
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Admin
+            </Button>
             
             <Button
               variant="ghost"
@@ -116,6 +127,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 onClick={() => setIsOpen(false)}
               >
                 Login
+              </Link>
+
+              <Link
+                to="/admin-login"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin Login
               </Link>
             </div>
           </div>
