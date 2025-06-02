@@ -63,14 +63,6 @@ const AdminLogin = () => {
               Login as Admin
             </Button>
           </form>
-          
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              <strong>Demo Credentials:</strong><br />
-              Email: vikashkumar13228@gmail.com<br />
-              Password: vikash@2004
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
