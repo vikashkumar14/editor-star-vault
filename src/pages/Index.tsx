@@ -24,9 +24,9 @@ const Index = () => {
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <Hero />
         <StatsSection />
+        <TrustedCreators />
         <TrendingSection />
         <FeaturedMaterials />
-        <TrustedCreators />
         <CreatorsShowcase />
         <Newsletter />
         <Footer />
