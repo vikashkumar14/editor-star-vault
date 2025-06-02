@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Download, LogOut, Upload, MessageSquare, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Download, LogOut, Upload, MessageSquare, Eye, DollarSign, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Material } from "@/types/database";
 import { toast } from "sonner";
@@ -35,7 +35,9 @@ const AdminDashboard = () => {
     youtube_url: '',
     tags: [] as string[],
     software_compatibility: [] as SoftwareType[],
-    is_featured: false
+    is_featured: false,
+    price: 0,
+    is_premium: false
   });
 
   useEffect(() => {
@@ -143,7 +145,9 @@ const AdminDashboard = () => {
       youtube_url: material.youtube_url || '',
       tags: material.tags || [],
       software_compatibility: (material.software_compatibility || []) as SoftwareType[],
-      is_featured: material.is_featured || false
+      is_featured: material.is_featured || false,
+      price: (material as any).price || 0,
+      is_premium: (material as any).is_premium || false
     });
     setIsEditing(true);
     setActiveTab('add-material');
@@ -178,7 +182,9 @@ const AdminDashboard = () => {
       youtube_url: '',
       tags: [],
       software_compatibility: [],
-      is_featured: false
+      is_featured: false,
+      price: 0,
+      is_premium: false
     });
     setSelectedMaterial(null);
     setIsEditing(false);
@@ -380,6 +386,49 @@ const AdminDashboard = () => {
                         placeholder="YouTube video URL"
                         className="focus:ring-red-500 focus:border-red-500"
                       />
+                    </div>
+                  </div>
+
+                  {/* Payment Settings Section */}
+                  <div className="border rounded-lg p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
+                    <div className="flex items-center gap-2 mb-4">
+                      <CreditCard className="w-5 h-5 text-green-600" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Payment Settings</h3>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="is_premium"
+                          checked={formData.is_premium}
+                          onChange={(e) => setFormData({ ...formData, is_premium: e.target.checked })}
+                          className="rounded border-gray-300 text-green-500 focus:ring-green-500"
+                        />
+                        <label htmlFor="is_premium" className="text-sm font-medium">Premium Material</label>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Price (₹)</label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                          <Input
+                            type="number"
+                            value={formData.price}
+                            onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                            placeholder="0"
+                            min="0"
+                            className="pl-9 focus:ring-green-500 focus:border-green-500"
+                            disabled={!formData.is_premium}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <Badge className={formData.is_premium ? "bg-yellow-500" : "bg-green-500"}>
+                          {formData.is_premium ? `Premium ₹${formData.price}` : "Free"}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
 

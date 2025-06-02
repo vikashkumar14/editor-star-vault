@@ -6,6 +6,7 @@ import FeaturedMaterials from "@/components/FeaturedMaterials";
 import StatsSection from "@/components/StatsSection";
 import TrendingSection from "@/components/TrendingSection";
 import CreatorsShowcase from "@/components/CreatorsShowcase";
+import TrustedCreators from "@/components/TrustedCreators";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
@@ -25,6 +26,7 @@ const Index = () => {
         <StatsSection />
         <TrendingSection />
         <FeaturedMaterials />
+        <TrustedCreators />
         <CreatorsShowcase />
         <Newsletter />
         <Footer />
