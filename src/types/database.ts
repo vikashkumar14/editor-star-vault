@@ -1,4 +1,3 @@
-
 export interface Material {
   id: string;
   title: string;
@@ -18,6 +17,7 @@ export interface Material {
   updated_at: string;
   price?: number;
   is_premium?: boolean;
+  status?: string;
 }
 
 export interface Category {
