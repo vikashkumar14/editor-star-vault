@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('materials');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -59,7 +60,10 @@ const AdminDashboard = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       setMaterials(data || []);
     } catch (error) {
       console.error('Error fetching materials:', error);
@@ -100,12 +104,36 @@ const AdminDashboard = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validation
+    if (!formData.title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    
+    if (!formData.content_type.trim()) {
+      toast.error('Content type is required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
     try {
       const dataToSubmit = {
-        ...formData,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        content_type: formData.content_type.trim(),
+        category: formData.category.trim(),
+        file_url: formData.file_url.trim(),
+        thumbnail_url: formData.thumbnail_url.trim(),
+        youtube_url: formData.youtube_url.trim(),
+        tags: formData.tags.filter(tag => tag.trim().length > 0),
+        software_compatibility: formData.software_compatibility,
+        is_featured: formData.is_featured,
         author: 'The Editor Star',
         updated_at: new Date().toISOString()
       };
+
+      console.log('Submitting data:', dataToSubmit);
 
       if (isEditing && selectedMaterial) {
         const { error } = await supabase
@@ -113,23 +141,44 @@ const AdminDashboard = () => {
           .update(dataToSubmit)
           .eq('id', selectedMaterial.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         toast.success('Material updated successfully');
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('content')
-          .insert([dataToSubmit]);
+          .insert([dataToSubmit])
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        
+        console.log('Insert successful:', data);
         toast.success('Material added successfully');
       }
 
       resetForm();
-      fetchMaterials();
+      await fetchMaterials();
       setActiveTab('materials');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving material:', error);
-      toast.error('Failed to save material');
+      
+      // More specific error messages
+      if (error.message?.includes('duplicate key')) {
+        toast.error('A material with this title already exists');
+      } else if (error.message?.includes('violates check constraint')) {
+        toast.error('Please check all required fields are filled correctly');
+      } else if (error.message?.includes('violates foreign key constraint')) {
+        toast.error('Invalid category selected');
+      } else {
+        toast.error(`Failed to save material: ${error.message || 'Unknown error'}`);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -348,17 +397,18 @@ const AdminDashboard = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Title</label>
+                      <label className="block text-sm font-medium mb-2">Title *</label>
                       <Input
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         required
                         className="focus:ring-red-500 focus:border-red-500"
+                        placeholder="Enter material title"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium mb-2">Content Type</label>
+                      <label className="block text-sm font-medium mb-2">Content Type *</label>
                       <Input
                         value={formData.content_type}
                         onChange={(e) => setFormData({ ...formData, content_type: e.target.value })}
@@ -534,13 +584,14 @@ const AdminDashboard = () => {
                   <div className="flex gap-2">
                     <Button 
                       type="submit"
-                      className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
+                      disabled={isSubmitting}
+                      className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 disabled:opacity-50"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      {isEditing ? 'Update Material' : 'Add Material'}
+                      {isSubmitting ? 'Saving...' : (isEditing ? 'Update Material' : 'Add Material')}
                     </Button>
                     {isEditing && (
-                      <Button type="button" variant="outline" onClick={resetForm}>
+                      <Button type="button" variant="outline" onClick={resetForm} disabled={isSubmitting}>
                         Cancel
                       </Button>
                     )}
