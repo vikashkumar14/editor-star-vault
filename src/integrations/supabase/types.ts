@@ -47,6 +47,8 @@ export type Database = {
           file_url: string | null
           id: string
           is_featured: boolean | null
+          is_premium: boolean | null
+          price: number | null
           rating: number | null
           software_compatibility:
             | Database["public"]["Enums"]["software_type"][]
@@ -71,6 +73,8 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_featured?: boolean | null
+          is_premium?: boolean | null
+          price?: number | null
           rating?: number | null
           software_compatibility?:
             | Database["public"]["Enums"]["software_type"][]
@@ -95,6 +99,8 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_featured?: boolean | null
+          is_premium?: boolean | null
+          price?: number | null
           rating?: number | null
           software_compatibility?:
             | Database["public"]["Enums"]["software_type"][]

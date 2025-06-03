@@ -14,12 +14,6 @@ interface MaterialCardProps {
 
 const MaterialCard = ({ material }: MaterialCardProps) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  
-  // Add price to material (in a real app, this would come from the database)
-  const materialWithPrice = {
-    ...material,
-    price: Math.floor(Math.random() * 400) + 100 // Random price between 100-500
-  };
 
   const handleDownload = () => {
     const fileName = `${material.title.replace(/\s+/g, '-').toLowerCase()}.zip`;
@@ -47,7 +41,9 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
     return names[software] || software;
   };
 
-  const isPremium = materialWithPrice.price > 200; // Materials over ₹200 are premium
+  // Use actual database values for price and premium status
+  const price = material.price || 0;
+  const isPremium = material.is_premium || price > 0;
 
   return (
     <>
@@ -70,7 +66,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           <div className="absolute top-4 right-4">
             {isPremium ? (
               <Badge className="bg-yellow-500 text-white border-0">
-                Premium ₹{materialWithPrice.price}
+                Premium ₹{price}
               </Badge>
             ) : (
               <Badge className="bg-green-500 text-white border-0">
@@ -126,7 +122,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
                 onClick={handlePremiumDownload}
               >
                 <CreditCard className="w-4 h-4 mr-2" />
-                Buy ₹{materialWithPrice.price}
+                Buy ₹{price}
               </Button>
             ) : (
               <Button 
@@ -146,11 +142,18 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
         </CardContent>
       </Card>
 
-      <PaymentModal 
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        material={materialWithPrice}
-      />
+      {isPremium && (
+        <PaymentModal 
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          material={{
+            id: material.id,
+            title: material.title,
+            price: price,
+            file_url: material.file_url
+          }}
+        />
+      )}
     </>
   );
 };

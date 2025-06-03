@@ -130,7 +130,9 @@ const AdminDashboard = () => {
         software_compatibility: formData.software_compatibility,
         is_featured: formData.is_featured,
         author: 'The Editor Star',
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        price: formData.price,
+        is_premium: formData.is_premium
       };
 
       console.log('Submitting data:', dataToSubmit);
@@ -195,8 +197,8 @@ const AdminDashboard = () => {
       tags: material.tags || [],
       software_compatibility: (material.software_compatibility || []) as SoftwareType[],
       is_featured: material.is_featured || false,
-      price: (material as any).price || 0,
-      is_premium: (material as any).is_premium || false
+      price: material.price || 0,
+      is_premium: material.is_premium || false
     });
     setIsEditing(true);
     setActiveTab('add-material');

@@ -16,6 +16,8 @@ export interface Material {
   author: string;
   created_at: string;
   updated_at: string;
+  price?: number;
+  is_premium?: boolean;
 }
 
 export interface Category {

@@ -39,6 +39,41 @@ export const useMaterials = (featured = false) => {
     };
 
     fetchMaterials();
+
+    // Set up real-time subscription for content changes
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'content'
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newMaterial = payload.new as Material;
+            if (newMaterial.status === 'published' && (!featured || newMaterial.is_featured)) {
+              setMaterials(prev => [newMaterial, ...prev]);
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedMaterial = payload.new as Material;
+            setMaterials(prev => prev.map(material => 
+              material.id === updatedMaterial.id ? updatedMaterial : material
+            ));
+          } else if (payload.eventType === 'DELETE') {
+            const deletedId = payload.old.id;
+            setMaterials(prev => prev.filter(material => material.id !== deletedId));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [featured]);
 
   return { materials, loading, error };
