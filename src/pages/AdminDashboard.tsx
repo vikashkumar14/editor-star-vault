@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Download, LogOut, Upload, MessageSquare, Eye, DollarSign, CreditCard } from "lucide-react";
+import { Plus, Edit, Trash2, Download, LogOut, Upload, MessageSquare, Eye, DollarSign, CreditCard, Code } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Material } from "@/types/database";
 import { toast } from "sonner";
@@ -39,7 +39,10 @@ const AdminDashboard = () => {
     software_compatibility: [] as SoftwareType[],
     is_featured: false,
     price: 0,
-    is_premium: false
+    is_premium: false,
+    html_code: '',
+    css_code: '',
+    js_code: ''
   });
 
   useEffect(() => {
@@ -133,7 +136,10 @@ const AdminDashboard = () => {
         author: 'The Editor Star',
         updated_at: new Date().toISOString(),
         price: formData.price,
-        is_premium: formData.is_premium
+        is_premium: formData.is_premium,
+        html_code: formData.html_code,
+        css_code: formData.css_code,
+        js_code: formData.js_code
       };
 
       console.log('Submitting data:', dataToSubmit);
@@ -199,7 +205,10 @@ const AdminDashboard = () => {
       software_compatibility: (material.software_compatibility || []) as SoftwareType[],
       is_featured: material.is_featured || false,
       price: material.price || 0,
-      is_premium: material.is_premium || false
+      is_premium: material.is_premium || false,
+      html_code: material.html_code || '',
+      css_code: material.css_code || '',
+      js_code: material.js_code || ''
     });
     setIsEditing(true);
     setActiveTab('add-material');
@@ -236,7 +245,10 @@ const AdminDashboard = () => {
       software_compatibility: [],
       is_featured: false,
       price: 0,
-      is_premium: false
+      is_premium: false,
+      html_code: '',
+      css_code: '',
+      js_code: ''
     });
     setSelectedMaterial(null);
     setIsEditing(false);
@@ -438,6 +450,29 @@ const AdminDashboard = () => {
                         onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
                         placeholder="YouTube video URL"
                         className="focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Code Preview Section */}
+                  <div className="border rounded-lg p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Code className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Code Content & Preview</h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Add HTML, CSS, and JavaScript code for materials that need live preview functionality.
+                      </p>
+                      
+                      <CodePreview
+                        htmlCode={formData.html_code}
+                        cssCode={formData.css_code}
+                        jsCode={formData.js_code}
+                        onHtmlChange={(code) => setFormData({ ...formData, html_code: code })}
+                        onCssChange={(code) => setFormData({ ...formData, css_code: code })}
+                        onJsChange={(code) => setFormData({ ...formData, js_code: code })}
                       />
                     </div>
                   </div>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Star, Play, CreditCard, Info, FileText } from "lucide-react";
+import { Download, Eye, Star, Play, CreditCard, Info, FileText, Code } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +36,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
     return names[software] || software;
   };
 
-  // Truncate description to show very short version
   const truncateDescription = (text: string, maxLength: number = 60) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
@@ -51,6 +50,36 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
                material.file_url?.toLowerCase().includes('.pdf') ||
                material.content_type?.toLowerCase().includes('pdf');
 
+  // Check if material has code content
+  const hasCodeContent = material.html_code || material.css_code || material.js_code;
+
+  // Generate code preview
+  const generateCodePreview = () => {
+    if (!hasCodeContent) return '';
+    
+    const combinedCode = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Preview</title>
+        <style>
+          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+          ${material.css_code || ''}
+        </style>
+      </head>
+      <body>
+        ${material.html_code || ''}
+        <script>
+          ${material.js_code || ''}
+        </script>
+      </body>
+      </html>
+    `;
+    return combinedCode;
+  };
+
   return (
     <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800">
       <div 
@@ -59,9 +88,9 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           backgroundImage: `url(${material.thumbnail_url})`,
           backgroundColor: '#f3f4f6'
         }}
-        onMouseEnter={() => isPDF && setShowPreview(true)}
-        onMouseLeave={() => isPDF && setShowPreview(false)}
-        onClick={isPDF ? () => setShowPreview(!showPreview) : undefined}
+        onMouseEnter={() => (isPDF || hasCodeContent) && setShowPreview(true)}
+        onMouseLeave={() => (isPDF || hasCodeContent) && setShowPreview(false)}
+        onClick={(isPDF || hasCodeContent) ? () => setShowPreview(!showPreview) : undefined}
       >
         {/* PDF Preview Overlay */}
         {isPDF && showPreview && material.file_url && (
@@ -77,8 +106,23 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         )}
 
+        {/* Code Preview Overlay */}
+        {hasCodeContent && showPreview && (
+          <div className="absolute inset-0 bg-white z-10 overflow-hidden">
+            <iframe
+              srcDoc={generateCodePreview()}
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin"
+              title="Code Preview"
+            />
+            <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
+              Code Preview
+            </div>
+          </div>
+        )}
+
         {/* YouTube Preview */}
-        {material.youtube_url && !isPDF && (
+        {material.youtube_url && !isPDF && !hasCodeContent && (
           <div 
             className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer hover:bg-black/30 transition-colors"
             onClick={handlePreview}
@@ -92,7 +136,17 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors">
             <FileText className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
             <span className="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
-              Click to Preview
+              Hover to Preview
+            </span>
+          </div>
+        )}
+
+        {/* Code Icon for code materials */}
+        {hasCodeContent && !showPreview && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors">
+            <Code className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
+            <span className="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
+              Hover to Preview
             </span>
           </div>
         )}

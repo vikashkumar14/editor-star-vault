@@ -21,6 +21,9 @@ export interface Material {
   status?: string;
   file_type?: string;
   file_size?: number;
+  html_code?: string;
+  css_code?: string;
+  js_code?: string;
 }
 
 export interface Category {
