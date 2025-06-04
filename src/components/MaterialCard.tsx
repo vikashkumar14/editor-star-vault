@@ -7,6 +7,7 @@ import { Download, Eye, Star, Play, CreditCard } from "lucide-react";
 import { Material } from "@/types/database";
 import { handleMaterialDownload } from "@/utils/download";
 import PaymentModal from "./PaymentModal";
+import MaterialInteractions from "./MaterialInteractions";
 
 interface MaterialCardProps {
   material: Material;
@@ -41,7 +42,13 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
     return names[software] || software;
   };
 
-  // Use actual database values for price and premium status
+  // Truncate description to show shorter version
+  const truncateDescription = (text: string, maxLength: number = 100) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   const price = material.price || 0;
   const isPremium = material.is_premium || price > 0;
 
@@ -76,12 +83,12 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         </div>
         
-        <CardHeader>
+        <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-lg">{material.title}</CardTitle>
               <CardDescription className="text-gray-600 dark:text-gray-300">
-                {material.description}
+                {truncateDescription(material.description || '', 80)}
               </CardDescription>
             </div>
           </div>
@@ -114,7 +121,8 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         </CardHeader>
         
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Download/Purchase Buttons */}
           <div className="flex space-x-2">
             {isPremium ? (
               <Button 
@@ -139,6 +147,9 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
               </Button>
             )}
           </div>
+
+          {/* Material Interactions */}
+          <MaterialInteractions materialId={material.id} />
         </CardContent>
       </Card>
 

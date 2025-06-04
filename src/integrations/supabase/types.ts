@@ -230,6 +230,44 @@ export type Database = {
         }
         Relationships: []
       }
+      material_interactions: {
+        Row: {
+          comment_text: string | null
+          created_at: string
+          id: string
+          interaction_type: string
+          material_id: string
+          rating_value: number | null
+          user_ip: string | null
+        }
+        Insert: {
+          comment_text?: string | null
+          created_at?: string
+          id?: string
+          interaction_type: string
+          material_id: string
+          rating_value?: number | null
+          user_ip?: string | null
+        }
+        Update: {
+          comment_text?: string | null
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          material_id?: string
+          rating_value?: number | null
+          user_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_interactions_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       table_name: {
         Row: {
           data: Json | null
