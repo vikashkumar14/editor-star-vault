@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Star, Play, CreditCard, Info } from "lucide-react";
+import { Download, Eye, Star, Play, CreditCard, Info, FileText } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,7 @@ interface MaterialCardProps {
 
 const MaterialCard = ({ material }: MaterialCardProps) => {
   const navigate = useNavigate();
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleViewDetails = () => {
     navigate(`/material/${material.id}`);
@@ -45,16 +46,39 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const price = material.price || 0;
   const isPremium = material.is_premium || price > 0;
 
+  // Check if material is PDF
+  const isPDF = material.file_type?.toLowerCase() === 'pdf' || 
+               material.file_url?.toLowerCase().includes('.pdf') ||
+               material.content_type?.toLowerCase().includes('pdf');
+
   return (
     <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800">
       <div 
-        className="h-48 bg-cover bg-center relative"
+        className="h-48 bg-cover bg-center relative group cursor-pointer"
         style={{ 
           backgroundImage: `url(${material.thumbnail_url})`,
           backgroundColor: '#f3f4f6'
         }}
+        onMouseEnter={() => isPDF && setShowPreview(true)}
+        onMouseLeave={() => isPDF && setShowPreview(false)}
+        onClick={isPDF ? () => setShowPreview(!showPreview) : undefined}
       >
-        {material.youtube_url && (
+        {/* PDF Preview Overlay */}
+        {isPDF && showPreview && material.file_url && (
+          <div className="absolute inset-0 bg-white z-10 overflow-hidden">
+            <iframe
+              src={`${material.file_url}#toolbar=0&navpanes=0&scrollbar=0`}
+              className="w-full h-full border-0"
+              title="PDF Preview"
+            />
+            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+              PDF Preview
+            </div>
+          </div>
+        )}
+
+        {/* YouTube Preview */}
+        {material.youtube_url && !isPDF && (
           <div 
             className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer hover:bg-black/30 transition-colors"
             onClick={handlePreview}
@@ -62,6 +86,17 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             <Play className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
           </div>
         )}
+
+        {/* PDF Icon for PDF files */}
+        {isPDF && !showPreview && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors">
+            <FileText className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
+            <span className="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+              Click to Preview
+            </span>
+          </div>
+        )}
+
         <div className="absolute top-4 right-4">
           {isPremium ? (
             <Badge className="bg-yellow-500 text-white border-0">

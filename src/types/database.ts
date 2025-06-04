@@ -1,3 +1,4 @@
+
 export interface Material {
   id: string;
   title: string;
@@ -18,6 +19,8 @@ export interface Material {
   price?: number;
   is_premium?: boolean;
   status?: string;
+  file_type?: string;
+  file_size?: number;
 }
 
 export interface Category {

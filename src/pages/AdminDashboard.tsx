@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "@/components/FileUpload";
 import MediaFireUpload from "@/components/MediaFireUpload";
+import CodePreview from "@/components/CodePreview";
 
 type SoftwareType = "premiere_pro" | "after_effects" | "davinci_resolve" | "final_cut_pro" | "photoshop" | "other";
 
