@@ -39,15 +39,18 @@ export type Database = {
           category: string | null
           content_type: string
           created_at: string
+          css_code: string | null
           description: string | null
           downloads_count: number | null
           file_name: string | null
           file_size: number | null
           file_type: string | null
           file_url: string | null
+          html_code: string | null
           id: string
           is_featured: boolean | null
           is_premium: boolean | null
+          js_code: string | null
           price: number | null
           rating: number | null
           software_compatibility:
@@ -65,15 +68,18 @@ export type Database = {
           category?: string | null
           content_type: string
           created_at?: string
+          css_code?: string | null
           description?: string | null
           downloads_count?: number | null
           file_name?: string | null
           file_size?: number | null
           file_type?: string | null
           file_url?: string | null
+          html_code?: string | null
           id?: string
           is_featured?: boolean | null
           is_premium?: boolean | null
+          js_code?: string | null
           price?: number | null
           rating?: number | null
           software_compatibility?:
@@ -91,15 +97,18 @@ export type Database = {
           category?: string | null
           content_type?: string
           created_at?: string
+          css_code?: string | null
           description?: string | null
           downloads_count?: number | null
           file_name?: string | null
           file_size?: number | null
           file_type?: string | null
           file_url?: string | null
+          html_code?: string | null
           id?: string
           is_featured?: boolean | null
           is_premium?: boolean | null
+          js_code?: string | null
           price?: number | null
           rating?: number | null
           software_compatibility?:
@@ -227,6 +236,24 @@ export type Database = {
           message?: string
           name?: string
           subject?: string
+        }
+        Relationships: []
+      }
+      "html java css": {
+        Row: {
+          "-- Add code columns to content table for HTML": string
+          "and JavaScript code storage": string
+          CSS: string
+        }
+        Insert: {
+          "-- Add code columns to content table for HTML": string
+          "and JavaScript code storage": string
+          CSS: string
+        }
+        Update: {
+          "-- Add code columns to content table for HTML"?: string
+          "and JavaScript code storage"?: string
+          CSS?: string
         }
         Relationships: []
       }

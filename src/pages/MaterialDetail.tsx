@@ -1,14 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowLeft, Play, CreditCard, Code, FileText, Palette } from "lucide-react";
+import { Download, ArrowLeft, Play, CreditCard, Code, FileText, Palette, Eye, EyeOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MaterialInteractions from "@/components/MaterialInteractions";
 import PaymentModal from "@/components/PaymentModal";
+import CodePreview from "@/components/CodePreview";
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
 import { handleMaterialDownload } from '@/utils/download';
@@ -20,6 +20,7 @@ const MaterialDetail = () => {
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showCodePreview, setShowCodePreview] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -93,6 +94,27 @@ const MaterialDetail = () => {
         return <FileText className="w-4 h-4" />;
     }
   };
+
+  const getContentTypeDescription = (contentType: string, fileType?: string) => {
+    const descriptions: { [key: string]: string } = {
+      'luts': 'Color grading lookup tables for cinematic color correction and enhancement',
+      'overlays': 'Visual overlay elements to enhance your video compositions',
+      'presets': 'Pre-configured settings for quick and professional video editing',
+      'templates': 'Ready-to-use project templates for faster workflow',
+      'transitions': 'Smooth transition effects between video clips',
+      'code': 'Complete code snippets and templates for web development',
+      'html': 'HTML markup code for web page structure and content',
+      'css': 'CSS styling code for beautiful web page design and layout',
+      'js': 'JavaScript code for interactive web functionality and features',
+      'javascript': 'JavaScript code for interactive web functionality and features'
+    };
+    
+    return descriptions[contentType.toLowerCase()] || 
+           descriptions[fileType?.toLowerCase() || ''] || 
+           'Professional editing material for your creative projects';
+  };
+
+  const hasCodeContent = material?.html_code || material?.css_code || material?.js_code;
 
   if (loading) {
     return (
@@ -183,10 +205,47 @@ const MaterialDetail = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl">{material.title}</CardTitle>
                   <CardDescription className="text-base">
-                    {material.description}
+                    {material.description || getContentTypeDescription(material.content_type, material.file_type)}
                   </CardDescription>
                 </CardHeader>
               </Card>
+
+              {/* Code Preview Section */}
+              {hasCodeContent && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Code className="w-5 h-5 text-blue-600" />
+                        <CardTitle className="text-lg">Code Preview</CardTitle>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowCodePreview(!showCodePreview)}
+                      >
+                        {showCodePreview ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                        {showCodePreview ? 'Hide Preview' : 'Show Preview'}
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {showCodePreview ? (
+                      <CodePreview
+                        htmlCode={material.html_code || ''}
+                        cssCode={material.css_code || ''}
+                        jsCode={material.js_code || ''}
+                        readonly={true}
+                      />
+                    ) : (
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <Code className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Click "Show Preview" to view the code and live preview</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Technical Details */}
               <Card>
@@ -200,10 +259,11 @@ const MaterialDetail = () => {
                       <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center space-x-2">
                           {getFileTypeIcon(material.file_type || '')}
-                          <span>Type: {material.file_type || 'Unknown'}</span>
+                          <span>Type: {material.file_type || material.content_type || 'Unknown'}</span>
                         </div>
                         <div>Size: {material.file_size ? `${(material.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'}</div>
                         <div>Author: {material.author || 'Anonymous'}</div>
+                        <div>Category: {material.category || 'General'}</div>
                       </div>
                     </div>
                     
@@ -214,7 +274,9 @@ const MaterialDetail = () => {
                           <Badge key={idx} variant="secondary" className="text-xs">
                             {getSoftwareDisplayName(software)}
                           </Badge>
-                        ))}
+                        )) || (
+                          <Badge variant="secondary" className="text-xs">Universal</Badge>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -226,74 +288,21 @@ const MaterialDetail = () => {
                         <Badge key={idx} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
-                      ))}
+                      )) || (
+                        <span className="text-sm text-gray-500">No tags available</span>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Content Description */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">About This Material</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {getContentTypeDescription(material.content_type, material.file_type)}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Code Examples (if applicable) */}
-              {(material.file_type === 'html' || material.file_type === 'css' || material.file_type === 'js') && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Code Example</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                      <code className="text-green-400 text-sm">
-                        {material.file_type === 'html' && (
-                          <pre>{`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${material.title}</title>
-</head>
-<body>
-    <!-- ${material.title} content -->
-    <div class="container">
-        <h1>Welcome to ${material.title}</h1>
-    </div>
-</body>
-</html>`}</pre>
-                        )}
-                        {material.file_type === 'css' && (
-                          <pre>{`.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.${material.title.toLowerCase().replace(/\s+/g, '-')} {
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-    border-radius: 10px;
-    padding: 2rem;
-}`}</pre>
-                        )}
-                        {material.file_type === 'js' && (
-                          <pre>{`// ${material.title} JavaScript
-class ${material.title.replace(/\s+/g, '')} {
-    constructor() {
-        this.init();
-    }
-    
-    init() {
-        console.log('${material.title} initialized');
-        this.setupEventListeners();
-    }
-    
-    setupEventListeners() {
-        // Add your event listeners here
-    }
-}
-
-new ${material.title.replace(/\s+/g, '')}();`}</pre>
-                        )}
-                      </code>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* Sidebar */}
@@ -332,6 +341,17 @@ new ${material.title.replace(/\s+/g, '')}();`}</pre>
                       Watch Preview
                     </Button>
                   )}
+
+                  {hasCodeContent && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => setShowCodePreview(!showCodePreview)}
+                    >
+                      <Code className="w-4 h-4 mr-2" />
+                      {showCodePreview ? 'Hide' : 'View'} Code
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
 
@@ -343,16 +363,24 @@ new ${material.title.replace(/\s+/g, '')}();`}</pre>
                 <CardContent className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Downloads:</span>
-                    <span className="font-medium">{material.downloads_count.toLocaleString()}</span>
+                    <span className="font-medium">{material.downloads_count?.toLocaleString() || 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Rating:</span>
-                    <span className="font-medium">{material.rating}/5</span>
+                    <span className="font-medium">{material.rating || 0}/5</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Category:</span>
-                    <span className="font-medium">{material.category}</span>
+                    <span>Type:</span>
+                    <span className="font-medium capitalize">{material.content_type}</span>
                   </div>
+                  {material.created_at && (
+                    <div className="flex justify-between text-sm">
+                      <span>Added:</span>
+                      <span className="font-medium">
+                        {new Date(material.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
