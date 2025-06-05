@@ -247,6 +247,52 @@ const MaterialDetail = () => {
                 </Card>
               )}
 
+              {/* Code Introductions */}
+              {hasCodeContent && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Code Documentation</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {material.html_code && material.html_introduction && (
+                      <div>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Code className="w-4 h-4 text-orange-500" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">HTML Structure</h4>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                          {material.html_introduction}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {material.css_code && material.css_introduction && (
+                      <div>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Palette className="w-4 h-4 text-blue-500" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">CSS Styling</h4>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                          {material.css_introduction}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {material.js_code && material.js_introduction && (
+                      <div>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Code className="w-4 h-4 text-yellow-500" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">JavaScript Functionality</h4>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                          {material.js_introduction}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Technical Details */}
               <Card>
                 <CardHeader>
@@ -400,6 +446,7 @@ const MaterialDetail = () => {
         <Footer />
       </div>
 
+      {/* Payment Modal */}
       {isPremium && (
         <PaymentModal 
           isOpen={showPaymentModal}

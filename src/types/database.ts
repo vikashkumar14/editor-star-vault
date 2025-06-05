@@ -1,4 +1,3 @@
-
 export interface Material {
   id: string;
   title: string;
@@ -24,6 +23,9 @@ export interface Material {
   html_code?: string;
   css_code?: string;
   js_code?: string;
+  html_introduction?: string;
+  css_introduction?: string;
+  js_introduction?: string;
 }
 
 export interface Category {
