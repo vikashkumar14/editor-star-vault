@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Grid, List, X } from "lucide-react";
+import { Search, Filter, Grid, List, X, Menu } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MaterialCard from "@/components/MaterialCard";
@@ -18,6 +18,7 @@ const Materials = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isMobile = useIsMobile();
   
   const { materials, loading: materialsLoading } = useMaterials();
@@ -49,7 +50,7 @@ const Materials = () => {
 
   if (materialsLoading || categoriesLoading) {
     return (
-      <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+      <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -65,63 +66,119 @@ const Materials = () => {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-          {/* Header */}
-          <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 md:py-8">
+          {/* Mobile-optimized Header */}
+          <div className="text-center mb-6 md:mb-12">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
               Professional Editing Materials
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-300">
               Download high-quality editing resources for your projects
             </p>
           </div>
 
-          {/* Mobile Search Bar */}
-          {isMobile && (
-            <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          {/* Mobile-first Search and Filter Bar */}
+          <div className="mb-4 md:mb-6">
+            <div className="flex gap-2">
+              {/* Mobile Search */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search materials..."
-                  className="pl-10 pr-12"
+                  placeholder={isMobile ? "Search materials..." : "Search by title, category, tags, software, author..."}
+                  className="pl-10 pr-4"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+              </div>
+              
+              {/* Mobile Filter Toggle */}
+              {isMobile && (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute right-1 top-1 h-8"
+                  className="px-3"
                   onClick={() => setShowFilters(!showFilters)}
                 >
                   <Filter className="h-4 w-4" />
                 </Button>
-              </div>
+              )}
+
+              {/* Mobile Menu Toggle */}
+              {isMobile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="px-3"
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              )}
             </div>
+          </div>
+
+          {/* Desktop Controls */}
+          {!isMobile && (
+            <Card className="mb-6 md:mb-8">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex gap-2">
+                  <select
+                    className="px-4 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Enhanced Search and Filters */}
-          <Card className={`mb-6 md:mb-8 ${isMobile && !showFilters ? 'hidden' : ''}`}>
-            <CardContent className="p-4 md:p-6">
-              {/* Desktop Search and Filters */}
-              {!isMobile && (
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search by title, category, tags, software, author..."
-                      className="pl-10"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2">
+          {/* Mobile Filters Dropdown */}
+          {isMobile && showFilters && (
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-medium">Filters</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFilters(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Category</label>
                     <select
-                      className="px-4 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600"
+                      className="w-full px-3 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600"
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >
@@ -132,106 +189,55 @@ const Materials = () => {
                         </option>
                       ))}
                     </select>
-                    
-                    <Button
-                      variant={viewMode === 'grid' ? 'default' : 'outline'}
-                      size="icon"
-                      onClick={() => setViewMode('grid')}
-                    >
-                      <Grid className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button
-                      variant={viewMode === 'list' ? 'default' : 'outline'}
-                      size="icon"
-                      onClick={() => setViewMode('list')}
-                    >
-                      <List className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
-              )}
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Mobile Filters */}
-              {isMobile && showFilters && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium">Filters</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowFilters(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+          {/* Mobile Menu Dropdown */}
+          {isMobile && showMobileMenu && (
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-medium">View Options</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="flex-1"
+                  >
+                    <Grid className="h-4 w-4 mr-2" />
+                    Grid
+                  </Button>
                   
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Category</label>
-                      <select
-                        className="w-full px-3 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                      >
-                        <option value="">All Categories</option>
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.name}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">View Mode</label>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={viewMode === 'grid' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setViewMode('grid')}
-                          className="flex-1"
-                        >
-                          <Grid className="h-4 w-4 mr-2" />
-                          Grid
-                        </Button>
-                        
-                        <Button
-                          variant={viewMode === 'list' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setViewMode('list')}
-                          className="flex-1"
-                        >
-                          <List className="h-4 w-4 mr-2" />
-                          List
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="flex-1"
+                  >
+                    <List className="h-4 w-4 mr-2" />
+                    List
+                  </Button>
                 </div>
-              )}
-              
-              {/* Search suggestions */}
-              {searchTerm && !isMobile && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="text-sm text-gray-500">Quick filters:</span>
-                  {['LUT', 'Template', 'Effect', 'Code', 'Sound'].map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => setSearchTerm(tag)}
-                      className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-xs rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Results Count */}
           <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
               Showing {filteredMaterials.length} of {materials.length} materials
               {searchTerm && ` for "${searchTerm}"`}
             </p>
@@ -245,6 +251,7 @@ const Materials = () => {
                   setSearchTerm('');
                   setSelectedCategory('');
                   setShowFilters(false);
+                  setShowMobileMenu(false);
                 }}
               >
                 Clear Filters
@@ -253,7 +260,7 @@ const Materials = () => {
           </div>
 
           {/* Materials Grid */}
-          <div className={`grid gap-4 md:gap-8 ${
+          <div className={`grid gap-3 sm:gap-4 md:gap-8 ${
             viewMode === 'grid' 
               ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
               : 'grid-cols-1'
@@ -268,10 +275,10 @@ const Materials = () => {
             <div className="text-center py-12">
               <div className="mb-4">
                 <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg mb-2">
+                <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2">
                   No materials found matching your search criteria.
                 </p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">
                   Try adjusting your search terms or browse all categories.
                 </p>
               </div>
@@ -280,6 +287,7 @@ const Materials = () => {
                   setSearchTerm('');
                   setSelectedCategory('');
                   setShowFilters(false);
+                  setShowMobileMenu(false);
                 }}
               >
                 Browse All Materials

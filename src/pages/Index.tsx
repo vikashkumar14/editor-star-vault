@@ -19,17 +19,19 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <Hero />
-        <StatsSection />
-        <TrustedCreators />
-        <TrendingSection />
-        <FeaturedMaterials />
-        <CreatorsShowcase />
-        <Newsletter />
-        <Footer />
+        <div className="w-full">
+          <Hero />
+          <StatsSection />
+          <TrustedCreators />
+          <TrendingSection />
+          <FeaturedMaterials />
+          <CreatorsShowcase />
+          <Newsletter />
+          <Footer />
+        </div>
       </div>
     </div>
   );
