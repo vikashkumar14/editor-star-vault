@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,9 +59,9 @@ const AdminDashboard = () => {
       title: material.title,
       description: material.description || '',
       content_type: material.content_type,
-      category: material.category,
-      file_url: material.file_url,
-      thumbnail_url: material.thumbnail_url,
+      category: material.category || '',
+      file_url: material.file_url || '',
+      thumbnail_url: material.thumbnail_url || '',
       youtube_url: material.youtube_url || '',
       tags: material.tags ? material.tags.join(', ') : '',
       software_compatibility: material.software_compatibility ? material.software_compatibility.join(', ') : '',
@@ -150,12 +151,11 @@ const AdminDashboard = () => {
   };
 
   const fetchCategories = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('name', { ascending: true });
 
       if (error) {
         console.error('Error fetching categories:', error);
@@ -175,13 +175,22 @@ const AdminDashboard = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.title || !formData.content_type) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (Title and Content Type)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -201,7 +210,7 @@ const AdminDashboard = () => {
         file_url: formData.file_url,
         thumbnail_url: formData.thumbnail_url,
         youtube_url: formData.youtube_url,
-        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [],
         software_compatibility: softwareCompatibilityArray,
         author: formData.author,
         price: formData.is_premium ? formData.price : 0,
@@ -212,19 +221,24 @@ const AdminDashboard = () => {
         js_code: formData.js_code,
         html_introduction: formData.html_introduction,
         css_introduction: formData.css_introduction,
-        js_introduction: formData.js_introduction
+        js_introduction: formData.js_introduction,
+        status: 'published'
       };
+
+      console.log('Submitting material data:', materialData);
 
       let result;
       if (editingMaterial) {
         result = await supabase
           .from('content')
           .update(materialData)
-          .eq('id', editingMaterial.id);
+          .eq('id', editingMaterial.id)
+          .select();
       } else {
         result = await supabase
           .from('content')
-          .insert([materialData]);
+          .insert([materialData])
+          .select();
       }
 
       if (result.error) {
@@ -322,7 +336,7 @@ const AdminDashboard = () => {
                   <TabsContent value="basic" className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="title">Title</Label>
+                        <Label htmlFor="title">Title *</Label>
                         <Input
                           id="title"
                           value={formData.title}
@@ -332,10 +346,11 @@ const AdminDashboard = () => {
                       </div>
                       
                       <div>
-                        <Label htmlFor="content_type">Content Type</Label>
+                        <Label htmlFor="content_type">Content Type *</Label>
                         <Select 
                           value={formData.content_type} 
                           onValueChange={(value) => setFormData({...formData, content_type: value})}
+                          required
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select content type" />
@@ -595,13 +610,29 @@ const AdminDashboard = () => {
             <Card key={material.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="flex items-center space-x-2">
-                      <span>{material.title}</span>
-                      {material.is_featured && <Badge className="bg-yellow-500">Featured</Badge>}
-                      {material.is_premium && <Badge className="bg-purple-500">Premium</Badge>}
-                    </CardTitle>
-                    <CardDescription>{material.description}</CardDescription>
+                  <div className="flex space-x-4">
+                    {/* Thumbnail Display */}
+                    {material.thumbnail_url && (
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img
+                          src={material.thumbnail_url}
+                          alt={material.title}
+                          className="w-full h-full object-cover rounded-lg border"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <CardTitle className="flex items-center space-x-2">
+                        <span>{material.title}</span>
+                        {material.is_featured && <Badge className="bg-yellow-500">Featured</Badge>}
+                        {material.is_premium && <Badge className="bg-purple-500">Premium</Badge>}
+                      </CardTitle>
+                      <CardDescription>{material.description}</CardDescription>
+                    </div>
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -624,19 +655,19 @@ const AdminDashboard = () => {
               <CardContent>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <strong>Category:</strong> {material.category}
+                    <strong>Category:</strong> {material.category || 'N/A'}
                   </div>
                   <div>
                     <strong>Type:</strong> {material.content_type}
                   </div>
                   <div>
-                    <strong>Downloads:</strong> {material.downloads_count?.toLocaleString()}
+                    <strong>Downloads:</strong> {material.downloads_count?.toLocaleString() || 0}
                   </div>
                   <div>
-                    <strong>Rating:</strong> {material.rating}/5
+                    <strong>Rating:</strong> {material.rating || 0}/5
                   </div>
                 </div>
-                {material.tags && (
+                {material.tags && material.tags.length > 0 && (
                   <div className="mt-4">
                     <div className="flex flex-wrap gap-2">
                       {material.tags.map((tag, idx) => (

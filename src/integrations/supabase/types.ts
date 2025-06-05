@@ -40,6 +40,7 @@ export type Database = {
           content_type: string
           created_at: string
           css_code: string | null
+          css_introduction: string | null
           description: string | null
           downloads_count: number | null
           file_name: string | null
@@ -47,10 +48,12 @@ export type Database = {
           file_type: string | null
           file_url: string | null
           html_code: string | null
+          html_introduction: string | null
           id: string
           is_featured: boolean | null
           is_premium: boolean | null
           js_code: string | null
+          js_introduction: string | null
           price: number | null
           rating: number | null
           software_compatibility:
@@ -69,6 +72,7 @@ export type Database = {
           content_type: string
           created_at?: string
           css_code?: string | null
+          css_introduction?: string | null
           description?: string | null
           downloads_count?: number | null
           file_name?: string | null
@@ -76,10 +80,12 @@ export type Database = {
           file_type?: string | null
           file_url?: string | null
           html_code?: string | null
+          html_introduction?: string | null
           id?: string
           is_featured?: boolean | null
           is_premium?: boolean | null
           js_code?: string | null
+          js_introduction?: string | null
           price?: number | null
           rating?: number | null
           software_compatibility?:
@@ -98,6 +104,7 @@ export type Database = {
           content_type?: string
           created_at?: string
           css_code?: string | null
+          css_introduction?: string | null
           description?: string | null
           downloads_count?: number | null
           file_name?: string | null
@@ -105,10 +112,12 @@ export type Database = {
           file_type?: string | null
           file_url?: string | null
           html_code?: string | null
+          html_introduction?: string | null
           id?: string
           is_featured?: boolean | null
           is_premium?: boolean | null
           js_code?: string | null
+          js_introduction?: string | null
           price?: number | null
           rating?: number | null
           software_compatibility?:
