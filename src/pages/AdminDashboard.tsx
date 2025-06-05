@@ -14,6 +14,8 @@ import { Material, Category } from '@/types/database';
 import CodePreview from '@/components/CodePreview';
 import { useToast } from "@/hooks/use-toast";
 
+type SoftwareType = "premiere_pro" | "after_effects" | "davinci_resolve" | "final_cut_pro" | "photoshop" | "other";
+
 const AdminDashboard = () => {
   const { toast } = useToast();
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -183,12 +185,34 @@ const AdminDashboard = () => {
     setLoading(true);
 
     try {
+      // Parse and validate software compatibility
+      const softwareCompatibilityArray = formData.software_compatibility 
+        ? formData.software_compatibility.split(',').map(s => s.trim()).filter(s => {
+            const validSoftware: SoftwareType[] = ["premiere_pro", "after_effects", "davinci_resolve", "final_cut_pro", "photoshop", "other"];
+            return validSoftware.includes(s as SoftwareType);
+          }) as SoftwareType[]
+        : [];
+
       const materialData = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
+        content_type: formData.content_type,
+        category: formData.category,
+        file_url: formData.file_url,
+        thumbnail_url: formData.thumbnail_url,
+        youtube_url: formData.youtube_url,
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
-        software_compatibility: formData.software_compatibility ? 
-          formData.software_compatibility.split(',').map(s => s.trim()) : [],
+        software_compatibility: softwareCompatibilityArray,
+        author: formData.author,
         price: formData.is_premium ? formData.price : 0,
+        is_premium: formData.is_premium,
+        is_featured: formData.is_featured,
+        html_code: formData.html_code,
+        css_code: formData.css_code,
+        js_code: formData.js_code,
+        html_introduction: formData.html_introduction,
+        css_introduction: formData.css_introduction,
+        js_introduction: formData.js_introduction
       };
 
       let result;
@@ -419,6 +443,9 @@ const AdminDashboard = () => {
                           onChange={(e) => setFormData({...formData, software_compatibility: e.target.value})}
                           placeholder="e.g., premiere_pro, after_effects"
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Valid options: premiere_pro, after_effects, davinci_resolve, final_cut_pro, photoshop, other
+                        </p>
                       </div>
                     </div>
 
