@@ -95,10 +95,11 @@ const AdminDashboard = () => {
 
   const handleEdit = (material: Material) => {
     setEditingMaterial(material);
+    // Properly populate the form with existing material data
     setFormData({
-      title: material.title,
+      title: material.title || '',
       description: material.description || '',
-      content_type: material.content_type,
+      content_type: material.content_type || '',
       category: material.category || '',
       file_url: material.file_url || '',
       thumbnail_url: material.thumbnail_url || '',
@@ -350,7 +351,10 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <Button 
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
             className="bg-red-500 hover:bg-red-600 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -390,7 +394,6 @@ const AdminDashboard = () => {
                         <Select 
                           value={formData.content_type} 
                           onValueChange={(value) => setFormData({...formData, content_type: value})}
-                          required
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select content type" />

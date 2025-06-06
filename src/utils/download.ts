@@ -110,15 +110,41 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
             </div>
             <script>
               let autoProgress = true;
+              let isProgressing = false;
+              
               function nextPage() {
+                if (isProgressing) return;
+                isProgressing = true;
                 autoProgress = false;
-                window.opener.postMessage({action: 'openPage2', downloadUrl: '${finalDownloadUrl}'}, '*');
-                window.close();
+                
+                if (window.opener && !window.opener.closed) {
+                  window.opener.postMessage({
+                    action: 'openPage2', 
+                    downloadUrl: '${finalDownloadUrl}',
+                    materialTitle: '${materialTitle}',
+                    fileName: '${fileName}'
+                  }, '*');
+                }
+                
+                setTimeout(() => {
+                  window.close();
+                }, 1000);
               }
-              // Auto advance after 4 seconds
+              
+              // Auto advance after 5 seconds
               setTimeout(() => {
-                if (autoProgress) nextPage();
-              }, 4000);
+                if (autoProgress && !isProgressing) {
+                  nextPage();
+                }
+              }, 5000);
+              
+              // Prevent back navigation
+              window.addEventListener('beforeunload', function(e) {
+                if (!isProgressing) {
+                  e.preventDefault();
+                  e.returnValue = '';
+                }
+              });
             </script>
           </body>
         </html>
@@ -127,7 +153,7 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
   };
 
   // Page 2 - Terms & Conditions
-  const openPage2 = (downloadUrl: string) => {
+  const openPage2 = (downloadUrl, materialTitle, fileName) => {
     currentPageCount++;
     const page2 = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
     if (page2) {
@@ -236,15 +262,41 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
             </div>
             <script>
               let autoProgress = true;
+              let isProgressing = false;
+              
               function nextPage() {
+                if (isProgressing) return;
+                isProgressing = true;
                 autoProgress = false;
-                window.opener.postMessage({action: 'openPage3', downloadUrl: '${downloadUrl}'}, '*');
-                window.close();
+                
+                if (window.opener && !window.opener.closed) {
+                  window.opener.postMessage({
+                    action: 'openPage3', 
+                    downloadUrl: '${downloadUrl}',
+                    materialTitle: '${materialTitle}',
+                    fileName: '${fileName}'
+                  }, '*');
+                }
+                
+                setTimeout(() => {
+                  window.close();
+                }, 1000);
               }
-              // Auto advance after 5 seconds
+              
+              // Auto advance after 6 seconds
               setTimeout(() => {
-                if (autoProgress) nextPage();
-              }, 5000);
+                if (autoProgress && !isProgressing) {
+                  nextPage();
+                }
+              }, 6000);
+              
+              // Prevent back navigation
+              window.addEventListener('beforeunload', function(e) {
+                if (!isProgressing) {
+                  e.preventDefault();
+                  e.returnValue = '';
+                }
+              });
             </script>
           </body>
         </html>
@@ -253,7 +305,7 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
   };
 
   // Page 3 - Final Download Page
-  const openPage3 = (downloadUrl: string) => {
+  const openPage3 = (downloadUrl, materialTitle, fileName) => {
     currentPageCount++;
     const page3 = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
     if (page3) {
@@ -364,14 +416,15 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
               </div>
               <p>Step 3 of ${totalPages} - Ready for Download!</p>
               
-              <div class="countdown" id="countdown">Auto-download in 5 seconds...</div>
+              <div class="countdown" id="countdown">Auto-download in 7 seconds...</div>
               
               <button class="btn" onclick="startDownload()">📥 Download Now!</button>
               
               <p style="margin-top: 20px; opacity: 0.8;">Thank you for choosing EditorStar! 🌟</p>
             </div>
             <script>
-              let countdown = 5;
+              let countdown = 7;
+              let downloadStarted = false;
               const countdownEl = document.getElementById('countdown');
               
               const timer = setInterval(() => {
@@ -381,18 +434,32 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
                 } else {
                   countdownEl.textContent = 'Opening download page...';
                   clearInterval(timer);
-                  startDownload();
+                  if (!downloadStarted) {
+                    startDownload();
+                  }
                 }
               }, 1000);
               
               function startDownload() {
+                if (downloadStarted) return;
+                downloadStarted = true;
+                
                 // Open the actual download URL (MediaFire, etc.)
                 window.open('${downloadUrl}', '_blank');
                 countdownEl.textContent = 'Download page opened! 🚀';
+                
                 setTimeout(() => {
                   window.close();
                 }, 3000);
               }
+              
+              // Prevent back navigation until download starts
+              window.addEventListener('beforeunload', function(e) {
+                if (!downloadStarted) {
+                  e.preventDefault();
+                  e.returnValue = '';
+                }
+              });
             </script>
           </body>
         </html>
@@ -401,14 +468,14 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
   };
 
   // Message handler for page progression
-  const messageHandler = (event: MessageEvent) => {
+  const messageHandler = (event) => {
     console.log('Received message:', event.data);
     
     if (event.data && typeof event.data === 'object') {
       if (event.data.action === 'openPage2') {
-        openPage2(event.data.downloadUrl);
+        openPage2(event.data.downloadUrl, event.data.materialTitle, event.data.fileName);
       } else if (event.data.action === 'openPage3') {
-        openPage3(event.data.downloadUrl);
+        openPage3(event.data.downloadUrl, event.data.materialTitle, event.data.fileName);
       }
     }
   };
@@ -418,13 +485,13 @@ const openMultiplePages = (materialTitle: string, fileName: string, finalDownloa
   // Start the flow
   openPage1();
   
-  // Clean up listener after 2 minutes
+  // Clean up listener after 3 minutes
   setTimeout(() => {
     window.removeEventListener('message', messageHandler);
-  }, 120000);
+  }, 180000);
 };
 
-export const handleMaterialDownload = async (materialId: string, fileUrl: string, fileName: string, materialTitle: string = 'Premium Material') => {
+export const handleMaterialDownload = async (materialId, fileUrl, fileName, materialTitle = 'Premium Material') => {
   try {
     console.log('Starting download process for:', fileName);
     console.log('File URL:', fileUrl);
@@ -439,39 +506,9 @@ export const handleMaterialDownload = async (materialId: string, fileUrl: string
     // Increment download count
     await supabase.rpc('increment_download_count', { content_uuid: materialId });
 
-    // Check if it's a MediaFire link or direct download
-    const isMediaFireLink = fileUrl.includes('mediafire.com') || fileUrl.includes('drive.google.com') || fileUrl.includes('dropbox.com');
-    
-    if (isMediaFireLink) {
-      // For external links like MediaFire, open the 3-page sequence first
-      console.log('Opening 3-page sequence for external link:', fileUrl);
-      openMultiplePages(materialTitle, fileName, fileUrl);
-    } else {
-      // For direct downloads, try direct download first, fallback to 3-page sequence
-      try {
-        const response = await fetch(fileUrl, { method: 'HEAD' });
-        
-        if (response.ok) {
-          // Direct download
-          const link = document.createElement('a');
-          link.href = fileUrl;
-          link.download = fileName;
-          link.style.display = 'none';
-          
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          console.log('Direct download completed for:', fileName);
-        } else {
-          throw new Error('Direct download not available');
-        }
-      } catch (error) {
-        console.log('Direct download failed, using 3-page sequence:', error);
-        // Fallback to 3-page sequence
-        openMultiplePages(materialTitle, fileName, fileUrl);
-      }
-    }
+    // Always use the 3-page sequence for all downloads
+    console.log('Opening 3-page sequence for:', fileUrl);
+    openMultiplePages(materialTitle, fileName, fileUrl);
 
   } catch (error) {
     console.error('Error handling download:', error);
