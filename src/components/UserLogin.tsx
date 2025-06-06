@@ -1,31 +1,110 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Mail, Phone, Github } from "lucide-react";
+import { Mail, Phone, Github, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const UserLogin = () => {
-  const [emailForm, setEmailForm] = useState({ email: '', password: '' });
+  const [emailForm, setEmailForm] = useState({ email: '', password: '', name: '' });
   const [phoneForm, setPhoneForm] = useState({ phone: '', otp: '' });
   const [otpSent, setOtpSent] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleEmailLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Email login successful!');
-    // Add your email login logic here
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: emailForm.email,
+          password: emailForm.password,
+        });
+
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Login successful!');
+          navigate('/');
+        }
+      } else {
+        // Signup
+        const { data, error } = await supabase.auth.signUp({
+          email: emailForm.email,
+          password: emailForm.password,
+          options: {
+            data: {
+              name: emailForm.name,
+            },
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
+
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Signup successful! Please check your email for confirmation.');
+          setEmailForm({ email: '', password: '', name: '' });
+        }
+      }
+    } catch (error: any) {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    toast.success('Google login initiated!');
-    // Add your Google login logic here
+  const handleGoogleLogin = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        toast.error('Google login failed');
+      }
+    } catch (error) {
+      toast.error('Google login failed');
+    }
   };
 
-  const handleGithubLogin = () => {
-    toast.success('GitHub login initiated!');
-    // Add your GitHub login logic here
+  const handleGithubLogin = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        toast.error('GitHub login failed');
+      }
+    } catch (error) {
+      toast.error('GitHub login failed');
+    }
   };
 
   const handleSendOTP = (e: React.FormEvent) => {
@@ -45,9 +124,11 @@ const UserLogin = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">User Login</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {isLogin ? 'User Login' : 'Create Account'}
+          </CardTitle>
           <CardDescription>
-            Choose your preferred login method
+            {isLogin ? 'Sign in to your account' : 'Create a new account to get started'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,7 +139,20 @@ const UserLogin = () => {
             </TabsList>
             
             <TabsContent value="email" className="space-y-4">
-              <form onSubmit={handleEmailLogin} className="space-y-4">
+              <form onSubmit={handleEmailAuth} className="space-y-4">
+                {!isLogin && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Full Name</label>
+                    <Input
+                      type="text"
+                      value={emailForm.name}
+                      onChange={(e) => setEmailForm({ ...emailForm, name: e.target.value })}
+                      placeholder="Enter your full name"
+                      required={!isLogin}
+                    />
+                  </div>
+                )}
+                
                 <div>
                   <label className="block text-sm font-medium mb-2">Email</label>
                   <Input
@@ -81,11 +175,24 @@ const UserLogin = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled={loading}>
                   <Mail className="w-4 h-4 mr-2" />
-                  Login with Email
+                  {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
                 </Button>
               </form>
+
+              <div className="text-center">
+                <Button
+                  variant="link"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-sm"
+                >
+                  {isLogin 
+                    ? "Don't have an account? Sign up" 
+                    : "Already have an account? Sign in"
+                  }
+                </Button>
+              </div>
             </TabsContent>
 
             <TabsContent value="phone" className="space-y-4">
@@ -162,15 +269,6 @@ const UserLogin = () => {
                 GitHub
               </Button>
             </div>
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <button className="text-red-500 hover:underline">
-                Sign up here
-              </button>
-            </p>
           </div>
         </CardContent>
       </Card>
