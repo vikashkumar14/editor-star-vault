@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 // Enhanced function to open multiple intermediate pages before download
-const openMultiplePages = (materialTitle: string, fileName: string) => {
+const openMultiplePages = (materialTitle: string, fileName: string, finalDownloadUrl: string) => {
   let currentPageCount = 0;
   const totalPages = 3;
 
@@ -112,7 +112,7 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
               let autoProgress = true;
               function nextPage() {
                 autoProgress = false;
-                window.opener.postMessage('openPage2', '*');
+                window.opener.postMessage({action: 'openPage2', downloadUrl: '${finalDownloadUrl}'}, '*');
                 window.close();
               }
               // Auto advance after 4 seconds
@@ -127,7 +127,7 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
   };
 
   // Page 2 - Terms & Conditions
-  const openPage2 = () => {
+  const openPage2 = (downloadUrl: string) => {
     currentPageCount++;
     const page2 = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
     if (page2) {
@@ -238,7 +238,7 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
               let autoProgress = true;
               function nextPage() {
                 autoProgress = false;
-                window.opener.postMessage('openPage3', '*');
+                window.opener.postMessage({action: 'openPage3', downloadUrl: '${downloadUrl}'}, '*');
                 window.close();
               }
               // Auto advance after 5 seconds
@@ -253,7 +253,7 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
   };
 
   // Page 3 - Final Download Page
-  const openPage3 = () => {
+  const openPage3 = (downloadUrl: string) => {
     currentPageCount++;
     const page3 = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
     if (page3) {
@@ -379,18 +379,19 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
                 if (countdown > 0) {
                   countdownEl.textContent = \`Auto-download in \${countdown} seconds...\`;
                 } else {
-                  countdownEl.textContent = 'Starting download...';
+                  countdownEl.textContent = 'Opening download page...';
                   clearInterval(timer);
                   startDownload();
                 }
               }, 1000);
               
               function startDownload() {
-                window.opener.postMessage('startDownload', '*');
-                countdownEl.textContent = 'Download started! 🚀';
+                // Open the actual download URL (MediaFire, etc.)
+                window.open('${downloadUrl}', '_blank');
+                countdownEl.textContent = 'Download page opened! 🚀';
                 setTimeout(() => {
                   window.close();
-                }, 2000);
+                }, 3000);
               }
             </script>
           </body>
@@ -400,13 +401,15 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
   };
 
   // Message handler for page progression
-  const messageHandler = (event) => {
-    if (event.data === 'openPage2') {
-      openPage2();
-    } else if (event.data === 'openPage3') {
-      openPage3();
-    } else if (event.data === 'startDownload') {
-      window.removeEventListener('message', messageHandler);
+  const messageHandler = (event: MessageEvent) => {
+    console.log('Received message:', event.data);
+    
+    if (event.data && typeof event.data === 'object') {
+      if (event.data.action === 'openPage2') {
+        openPage2(event.data.downloadUrl);
+      } else if (event.data.action === 'openPage3') {
+        openPage3(event.data.downloadUrl);
+      }
     }
   };
 
@@ -414,11 +417,17 @@ const openMultiplePages = (materialTitle: string, fileName: string) => {
   
   // Start the flow
   openPage1();
+  
+  // Clean up listener after 2 minutes
+  setTimeout(() => {
+    window.removeEventListener('message', messageHandler);
+  }, 120000);
 };
 
 export const handleMaterialDownload = async (materialId: string, fileUrl: string, fileName: string, materialTitle: string = 'Premium Material') => {
   try {
     console.log('Starting download process for:', fileName);
+    console.log('File URL:', fileUrl);
     
     // Track the download
     await supabase.from('downloads').insert({
@@ -430,23 +439,22 @@ export const handleMaterialDownload = async (materialId: string, fileUrl: string
     // Increment download count
     await supabase.rpc('increment_download_count', { content_uuid: materialId });
 
-    // Open the 3-page sequence
-    openMultiplePages(materialTitle, fileName);
-
-    // Listen for final download message
-    const downloadHandler = async (event) => {
-      if (event.data === 'startDownload') {
-        console.log('Executing final download for:', fileName);
+    // Check if it's a MediaFire link or direct download
+    const isMediaFireLink = fileUrl.includes('mediafire.com') || fileUrl.includes('drive.google.com') || fileUrl.includes('dropbox.com');
+    
+    if (isMediaFireLink) {
+      // For external links like MediaFire, open the 3-page sequence first
+      console.log('Opening 3-page sequence for external link:', fileUrl);
+      openMultiplePages(materialTitle, fileName, fileUrl);
+    } else {
+      // For direct downloads, try direct download first, fallback to 3-page sequence
+      try {
+        const response = await fetch(fileUrl, { method: 'HEAD' });
         
-        // Perform the actual download
-        try {
-          const response = await fetch(fileUrl);
-          const blob = await response.blob();
-          
-          // Create download link
-          const downloadUrl = window.URL.createObjectURL(blob);
+        if (response.ok) {
+          // Direct download
           const link = document.createElement('a');
-          link.href = downloadUrl;
+          link.href = fileUrl;
           link.download = fileName;
           link.style.display = 'none';
           
@@ -454,31 +462,20 @@ export const handleMaterialDownload = async (materialId: string, fileUrl: string
           link.click();
           document.body.removeChild(link);
           
-          // Clean up the blob URL
-          window.URL.revokeObjectURL(downloadUrl);
-
-          console.log('Download completed successfully for:', fileName);
-        } catch (downloadError) {
-          console.error('Download error:', downloadError);
-          // Fallback to direct link
-          const link = document.createElement('a');
-          link.href = fileUrl;
-          link.download = fileName;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          console.log('Direct download completed for:', fileName);
+        } else {
+          throw new Error('Direct download not available');
         }
-        window.removeEventListener('message', downloadHandler);
+      } catch (error) {
+        console.log('Direct download failed, using 3-page sequence:', error);
+        // Fallback to 3-page sequence
+        openMultiplePages(materialTitle, fileName, fileUrl);
       }
-    };
-
-    window.addEventListener('message', downloadHandler);
+    }
 
   } catch (error) {
     console.error('Error handling download:', error);
-    // Fallback to direct download
+    // Ultimate fallback - direct link
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = fileName;

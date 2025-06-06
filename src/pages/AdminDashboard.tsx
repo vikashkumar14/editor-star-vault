@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Trash2, Edit, Plus, Eye, Code } from "lucide-react";
+import { Upload, Trash2, Edit, Plus, Eye, Code, Image } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { Material, Category } from '@/types/database';
 import CodePreview from '@/components/CodePreview';
@@ -24,6 +24,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -52,6 +53,45 @@ const AdminDashboard = () => {
     fetchMaterials();
     fetchCategories();
   }, []);
+
+  const handleThumbnailUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please select an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingThumbnail(true);
+    try {
+      // Convert image to base64 for temporary preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setFormData({...formData, thumbnail_url: result});
+      };
+      reader.readAsDataURL(file);
+      
+      toast({
+        title: "Success",
+        description: "Thumbnail uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload thumbnail",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingThumbnail(false);
+    }
+  };
 
   const handleEdit = (material: Material) => {
     setEditingMaterial(material);
@@ -410,7 +450,7 @@ const AdminDashboard = () => {
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-4">
+                    <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="file_url">File URL</Label>
                         <Input
@@ -421,21 +461,60 @@ const AdminDashboard = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
-                        <Input
-                          id="thumbnail_url"
-                          value={formData.thumbnail_url}
-                          onChange={(e) => setFormData({...formData, thumbnail_url: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
                         <Label htmlFor="youtube_url">YouTube URL</Label>
                         <Input
                           id="youtube_url"
                           value={formData.youtube_url}
                           onChange={(e) => setFormData({...formData, youtube_url: e.target.value})}
                         />
+                      </div>
+                    </div>
+
+                    {/* Thumbnail Upload Section */}
+                    <div>
+                      <Label htmlFor="thumbnail">Thumbnail Image</Label>
+                      <div className="mt-2 space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={uploadingThumbnail}
+                            onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                            className="flex items-center gap-2"
+                          >
+                            {uploadingThumbnail ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                            ) : (
+                              <Image className="w-4 h-4" />
+                            )}
+                            {uploadingThumbnail ? 'Uploading...' : 'Upload Thumbnail'}
+                          </Button>
+                          <input
+                            id="thumbnail-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleThumbnailUpload}
+                            className="hidden"
+                          />
+                        </div>
+                        
+                        {formData.thumbnail_url && (
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={formData.thumbnail_url}
+                              alt="Thumbnail preview"
+                              className="w-20 h-20 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setFormData({...formData, thumbnail_url: ''})}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
