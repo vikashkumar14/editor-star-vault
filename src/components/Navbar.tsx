@@ -41,38 +41,62 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Search - hidden on mobile */}
+            <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search materials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
+                className="pl-9 w-48 md:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
               />
             </div>
             
+            {/* Login button - simplified on mobile */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hidden sm:flex"
             >
               <User className="w-4 h-4 mr-2" />
               Login
             </Button>
 
+            {/* Mobile login icon only */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 sm:hidden"
+            >
+              <User className="w-5 h-5" />
+            </Button>
+
+            {/* Admin button - simplified on mobile */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/admin-login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hidden sm:flex"
             >
               <Shield className="w-4 h-4 mr-2" />
               Admin
             </Button>
+
+            {/* Mobile admin icon only */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/admin-login')}
+              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 sm:hidden"
+            >
+              <Shield className="w-5 h-5" />
+            </Button>
             
+            {/* Dark mode toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -82,14 +106,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
 
-            {/* Mobile menu button */}
+            {/* Mobile menu button - ALWAYS VISIBLE */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden text-gray-700 dark:text-gray-300"
+              className="md:hidden text-gray-700 dark:text-gray-300 p-2"
             >
-              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -99,6 +123,18 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700">
               
+              {/* Mobile search */}
+              <div className="relative mb-3 sm:hidden">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search materials..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
+                />
+              </div>
+
               <Link
                 to="/materials"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
@@ -126,6 +162,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 onClick={() => setIsOpen(false)}
               >
+                <User className="w-4 h-4 inline mr-2" />
                 Login
               </Link>
 
@@ -134,6 +171,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 onClick={() => setIsOpen(false)}
               >
+                <Shield className="w-4 h-4 inline mr-2" />
                 Admin Login
               </Link>
             </div>
@@ -144,7 +182,6 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
       {/* Search Results Dropdown */}
       {searchQuery && (
         <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
-          {/* Implement search results here */}
           <p className="px-4 py-2 text-gray-700 dark:text-gray-300">No results found for "{searchQuery}"</p>
         </div>
       )}
