@@ -1,3 +1,4 @@
+
 export interface Material {
   id: string;
   title: string;
@@ -20,6 +21,7 @@ export interface Material {
   status?: string;
   file_type?: string;
   file_size?: number;
+  file_name?: string;
   html_code?: string;
   css_code?: string;
   js_code?: string;
