@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Download, Eye, Star, Play, CreditCard, Info, FileText, Code } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
+import { handleMaterialDownload } from "@/utils/download";
+import { toast } from "sonner";
 
 interface MaterialCardProps {
   material: Material;
@@ -14,6 +15,7 @@ interface MaterialCardProps {
 const MaterialCard = ({ material }: MaterialCardProps) => {
   const navigate = useNavigate();
   const [showPreview, setShowPreview] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const handleViewDetails = () => {
     navigate(`/material/${material.id}`);
@@ -22,6 +24,29 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const handlePreview = () => {
     if (material.youtube_url) {
       window.open(material.youtube_url, '_blank');
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!material.file_url || !material.file_name) {
+      toast.error('Download link not available');
+      return;
+    }
+
+    setDownloading(true);
+    try {
+      await handleMaterialDownload(
+        material.id, 
+        material.file_url, 
+        material.file_name,
+        material.title
+      );
+      toast.success('Download started! Check the new windows.');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Download failed. Please try again.');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -222,6 +247,19 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             <Info className="w-4 h-4 mr-2" />
             View Details
           </Button>
+          
+          {material.file_url && (
+            <Button 
+              variant="outline" 
+              onClick={handleDownload}
+              disabled={downloading}
+              className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white border-0"
+            >
+              <Download className="w-4 h-4 mr-1" />
+              {downloading ? 'Preparing...' : 'Download'}
+            </Button>
+          )}
+          
           {material.youtube_url && (
             <Button variant="outline" size="icon" onClick={handlePreview}>
               <Eye className="w-4 h-4" />
