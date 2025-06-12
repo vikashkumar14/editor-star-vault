@@ -22,7 +22,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <span className="font-bold text-xl text-red-500 dark:text-orange-500">
-                EditorStar
+               Gyaan Repo
               </span>
             </Link>
           </div>
