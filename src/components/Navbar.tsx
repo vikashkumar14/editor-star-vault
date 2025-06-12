@@ -22,11 +22,17 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <span className="font-bold text-xl text-red-500 dark:text-orange-500">
-               Gyaan Repo
-               <!-- Favicons -->
-    <link rel="icon" href="https://i.ibb.co/XkjPcgsv/icon.jpg" type="image/jpeg" />
-    <link rel="apple-touch-icon" href="https://i.ibb.co/XkjPcgsv/icon.jpg" />
-    <link rel="shortcut icon" href="https://i.ibb.co/XkjPcgsv/icon.jpg" />
+              {/* Logo + Brand Name */}
+          <Link to="/" className="flex items-center space-x-2">
+            <img
+              src="https://i.ibb.co/XkjPcgsv/icon.jpg"
+              alt="Gyaan Repo Logo"
+              className="h-8 w-8 rounded-md"
+            />
+            <span className="font-bold text-xl text-red-500 dark:text-orange-500">
+              Gyaan Repo
+            </span>
+          </Link>
 
               </span>
             </Link>
