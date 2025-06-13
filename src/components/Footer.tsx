@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Youtube, Instagram, Twitter, Facebook, Mail, MapPin } from "lucide-react";
@@ -6,38 +9,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    Materials: [
-      "Video Overlays",
-      "Color LUTs",
-      "Sound Effects",
-      "Transitions",
-      "Presets",
-      "Templates"
-    ],
-    Resources: [
-      "Tutorials",
-      "Blog",
-      "FAQ",
-      "Support",
-      "Downloads",
-      "Updates"
-    ],
-    Community: [
-      "YouTube Channel",
-      "Discord",
-      "Newsletter",
-      "Feedback",
-      "Contributors",
-      "Showcase"
-    ],
-    Legal: [
-      "Privacy Policy",
-      "Terms of Service",
-      "License",
-      "Refund Policy",
-      "DMCA",
-      "Contact"
-    ]
+    Materials: ["Video Overlays", "Color LUTs", "Sound Effects", "Transitions", "Presets", "Templates"],
+    Resources: ["Tutorials", "Blog", "FAQ", "Support", "Downloads", "Updates"],
+    Community: ["YouTube Channel", "Discord", "Newsletter", "Feedback", "Contributors", "Showcase"],
+    Legal: ["Privacy Policy", "Terms of Service", "License", "Refund Policy", "DMCA", "Contact"]
   };
 
   const socialLinks = [
@@ -46,6 +21,14 @@ const Footer = () => {
     { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-blue-500" },
     { icon: Facebook, href: "https://www.facebook.com/share/1V897i7BiX/", label: "Facebook", color: "hover:text-blue-600" }
   ];
+
+  // Inject ad script after render
+  useEffect(() => {
+    const adScript = document.createElement("script");
+    adScript.type = "text/javascript";
+    adScript.src = "//www.highperformanceformat.com/a8709061226e0f722b3b9e857f597987/invoke.js";
+    document.getElementById("footer-ad-slot")?.appendChild(adScript);
+  }, []);
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -63,7 +46,9 @@ const Footer = () => {
                 />
                 <div>
                   <h3 className="text-xl font-bold">Gyaan Repo</h3>
-                  <p className="text-gray-400 text-sm">Free, Reliable & Developer-Ready Source Code</p>
+                  <p className="text-gray-400 text-sm">
+                    Free, Reliable & Developer-Ready Source Code
+                  </p>
                 </div>
               </div>
 
@@ -82,7 +67,6 @@ const Footer = () => {
                   <MapPin className="w-4 h-4" />
                   <span>Bihar, India</span>
                 </div>
-		      <script type='text/javascript' src='//pl26901727.profitableratecpm.com/29/c5/d3/29c5d3abc0ece377cd035264b85c7eac.js'></script>
               </div>
 
               {/* Social Links */}
@@ -127,6 +111,11 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* 📢 Ad Slot */}
+        <div className="py-4" id="footer-ad-slot">
+          {/* Ad iframe will be injected here */}
+        </div>
+
         <Separator className="bg-gray-800" />
 
         {/* Bottom Footer */}
@@ -142,16 +131,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <script type="text/javascript">
-	atOptions = {
-		'key' : 'a8709061226e0f722b3b9e857f597987',
-		'format' : 'iframe',
-		'height' : 50,
-		'width' : 320,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/a8709061226e0f722b3b9e857f597987/invoke.js"></script>
       </div>
     </footer>
   );
