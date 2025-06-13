@@ -189,6 +189,8 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           </div>
         )}
       </div>
+      <script async="async" data-cfasync="false" src="//pl26901674.profitableratecpm.com/a854473247e60c5665d2d4ea033b8634/invoke.js"></script>
+<div id="container-a854473247e60c5665d2d4ea033b8634"></div>
 
       {/* Search Results Dropdown */}
       {searchQuery && (
