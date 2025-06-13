@@ -82,6 +82,7 @@ const Footer = () => {
                   <MapPin className="w-4 h-4" />
                   <span>Bihar, India</span>
                 </div>
+		      <script type='text/javascript' src='//pl26901727.profitableratecpm.com/29/c5/d3/29c5d3abc0ece377cd035264b85c7eac.js'></script>
               </div>
 
               {/* Social Links */}
