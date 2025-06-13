@@ -126,6 +126,16 @@ const MaterialDetail = () => {
           </div>
           <Footer />
         </div>
+        <script type="text/javascript">
+	atOptions = {
+		'key' : '9cc9681c32fb41b714d5654e1e97c8e0',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/9cc9681c32fb41b714d5654e1e97c8e0/invoke.js"></script>
       </div>
     );
   }
@@ -338,6 +348,16 @@ const MaterialDetail = () => {
                         <span className="text-sm text-gray-500">No tags available</span>
                       )}
                     </div>
+                    <script type="text/javascript">
+	atOptions = {
+		'key' : '9cc9681c32fb41b714d5654e1e97c8e0',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/9cc9681c32fb41b714d5654e1e97c8e0/invoke.js"></script>
                   </div>
 
                   {/* Content Description */}
@@ -440,6 +460,7 @@ const MaterialDetail = () => {
                 </CardContent>
               </Card>
             </div>
+            
           </div>
         </div>
 
