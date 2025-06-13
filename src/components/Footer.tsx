@@ -141,6 +141,16 @@ const Footer = () => {
             </div>
           </div>
         </div>
+        <script type="text/javascript">
+	atOptions = {
+		'key' : 'a8709061226e0f722b3b9e857f597987',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/a8709061226e0f722b3b9e857f597987/invoke.js"></script>
       </div>
     </footer>
   );
