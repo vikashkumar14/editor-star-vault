@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Youtube, Instagram, Twitter, Facebook, Mail, MapPin, Phone } from "lucide-react";
+import { Youtube, Instagram, Twitter, Facebook, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -57,13 +56,6 @@ const Footer = () => {
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">E</span>
-                </div>
-                <div>
-                  {/* Brand Section with Logo */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
                 <img
                   src="https://i.ibb.co/XkjPcgsv/icon.jpg"
                   alt="Gyaan Repo Logo"
@@ -74,11 +66,12 @@ const Footer = () => {
                   <p className="text-gray-400 text-sm">Free, Reliable & Developer-Ready Source Code</p>
                 </div>
               </div>
+
               <p className="text-gray-400 mb-6 leading-relaxed">
                 Gyaan Repo - Unlock Free, Reliable & Developer-Ready Source Code to help Gyaan Repo
                 make stunning content. Join our community of 50K+ Gyaan Repo worldwide.
               </p>
-              
+
               {/* Contact Info */}
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3 text-gray-400">
@@ -119,8 +112,8 @@ const Footer = () => {
                 <ul className="space-y-3">
                   {links.map((link, index) => (
                     <li key={index}>
-                      <a 
-                        href="#" 
+                      <a
+                        href="#"
                         className="text-gray-400 hover:text-white transition-colors"
                       >
                         {link}
