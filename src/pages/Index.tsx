@@ -42,6 +42,16 @@ const Index = () => {
 		'params' : {}
 	};
 </script>
+	    <script type="text/javascript">
+	atOptions = {
+		'key' : '9cc9681c32fb41b714d5654e1e97c8e0',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/9cc9681c32fb41b714d5654e1e97c8e0/invoke.js"></script>
 <script type="text/javascript" src="//www.highperformanceformat.com/a8709061226e0f722b3b9e857f597987/invoke.js"></script>
     </div>
   );
