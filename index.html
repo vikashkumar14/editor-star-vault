@@ -128,23 +128,98 @@
         box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
         color: #fff;
       }
+
+      /* Common styles that won't interfere with React */
+      .carousel-wrapper {
+        position: fixed;
+        top: 60px; /* Adjust this value based on your header height */
+        left: 0;
+        right: 0;
+        z-index: 1;
+      }
+
+      #custom-carousel {
+        width: 100%;
+        background-color: #000;
+      }
+
+      @media (max-width: 768px) {
+        #custom-carousel {
+          width: 90%;
+          margin: 0 auto;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .carousel-item {
+          height: 300px !important;
+        }
+        
+        .carousel-caption h5 {
+          font-size: 1.5rem !important;
+        }
+        
+        .carousel-caption p {
+          font-size: 1rem !important;
+        }
+      }
+
+      .carousel-item {
+        height: 500px;
+        max-height: 60vh;
+      }
+
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        filter: brightness(0.8);
+      }
+
+      .carousel-caption {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent);
+        padding: 50px 20px 30px;
+      }
+
+      .carousel-caption h5 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .carousel-caption p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Add spacing for content below carousel */
+      #root {
+        padding-top: calc(60vh + 60px); /* Adjust based on carousel height + header height */
+      }
+
+      @media (max-width: 768px) {
+        #root {
+          padding-top: calc(300px + 60px); /* Adjust for mobile */
+        }
+      }
     </style>
-  </head>  <body>
-    <!-- Site Header -->
-    <header class="site-header">
-      <div class="container">
-        <h1>Gyaan Repo</h1>
-      </div>
-    </header>
+  </head>
+
+  <body>
+   
 
     <!-- Carousel Section -->
-    <section class="custom-carousel-section">
-        <div id="techCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" data-bs-wrap="true">
+    <div class="carousel-wrapper">
+      <div id="custom-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" data-bs-wrap="true">
         <div class="carousel-indicators">
-          <button type="button" data-bs-target="#techCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#techCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#techCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          <button type="button" data-bs-target="#techCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+          <button type="button" data-bs-target="#custom-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#custom-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#custom-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          <button type="button" data-bs-target="#custom-carousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
         </div>
         
         <div class="carousel-inner">
@@ -185,20 +260,34 @@
           </div>
         </div>
 
-        <button class="carousel-control-prev" type="button" data-bs-target="#techCarousel" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#custom-carousel" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#techCarousel" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#custom-carousel" data-bs-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>        </button>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
-    </section>
+    </div>
 
     <!-- React root div -->
     <div id="root"></div>
 
-   
+    <!-- Scripts -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+    <script async="async" data-cfasync="false" src="//pl26901674.profitableratecpm.com/a854473247e60c5665d2d4ea033b8634/invoke.js"></script>
+    <div id="container-a854473247e60c5665d2d4ea033b8634"></div>
+    <script type='text/javascript' src='//pl26901727.profitableratecpm.com/29/c5/d3/29c5d3abc0ece377cd035264b85c7eac.js'></script>
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '9cc9681c32fb41b714d5654e1e97c8e0',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
     </script>
     <script type='text/javascript' src='//pl26901805.profitableratecpm.com/44/39/47/443947e5b4cac05c32021e932fccd26f.js'></script>
     <script type="text/javascript" src="//www.highperformanceformat.com/9cc9681c32fb41b714d5654e1e97c8e0/invoke.js"></script>
