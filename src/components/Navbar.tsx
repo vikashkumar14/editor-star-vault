@@ -20,20 +20,15 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            {/* Logo + Brand Name */}
+            <Link to="/" className="flex items-center space-x-2">
+              <img
+                src="https://i.ibb.co/XkjPcgsv/icon.jpg"
+                alt="Gyaan Repo Logo"
+                className="h-8 w-8 rounded-md"
+              />
               <span className="font-bold text-xl text-red-500 dark:text-orange-500">
-              {/* Logo + Brand Name */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img
-              src="https://i.ibb.co/XkjPcgsv/icon.jpg"
-              alt="Gyaan Repo Logo"
-              className="h-8 w-8 rounded-md"
-            />
-            <span className="font-bold text-xl text-red-500 dark:text-orange-500">
-              Gyaan Repo
-            </span>
-          </Link>
-
+                Gyaan Repo
               </span>
             </Link>
           </div>
@@ -189,8 +184,6 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           </div>
         )}
       </div>
-      <script async="async" data-cfasync="false" src="//pl26901674.profitableratecpm.com/a854473247e60c5665d2d4ea033b8634/invoke.js"></script>
-<div id="container-a854473247e60c5665d2d4ea033b8634"></div>
 
       {/* Search Results Dropdown */}
       {searchQuery && (
