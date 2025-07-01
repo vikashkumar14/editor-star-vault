@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import ImageSlider from "@/components/ImageSlider";
+import DeveloperFeatures from "@/components/DeveloperFeatures";
 import FeaturedMaterials from "@/components/FeaturedMaterials";
 import StatsSection from "@/components/StatsSection";
 import TrendingSection from "@/components/TrendingSection";
@@ -24,6 +26,8 @@ const Index = () => {
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <div className="w-full">
           <Hero />
+          <ImageSlider />
+          <DeveloperFeatures />
           <StatsSection />
           <TrustedCreators />
           <TrendingSection />
@@ -33,7 +37,6 @@ const Index = () => {
           <Footer />
         </div>
       </div>
-     
     </div>
   );
 };

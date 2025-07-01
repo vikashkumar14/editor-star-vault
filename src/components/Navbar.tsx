@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Menu, X, User, Shield } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, User, Shield, Code } from "lucide-react";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -31,6 +31,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 Gyaan Repo
               </span>
             </Link>
+            
+            {/* Developer Name - Hidden on mobile */}
+            <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-300 dark:border-gray-600">
+              <Code className="w-4 h-4 text-purple-600 dark:text-purple-400 mr-2" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                Developed by <span className="font-semibold text-purple-600 dark:text-purple-400">Vikash Kumar Kushwaha</span>
+              </span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -139,6 +147,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
                 />
+              </div>
+
+              {/* Developer info on mobile */}
+              <div className="lg:hidden px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-3">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                  <Code className="w-4 h-4 text-purple-600 dark:text-purple-400 mr-2" />
+                  <span>Developed by <span className="font-semibold text-purple-600 dark:text-purple-400">Vikash Kumar Kushwaha</span></span>
+                </div>
               </div>
 
               <Link
