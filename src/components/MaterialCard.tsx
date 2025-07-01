@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Star, Play, CreditCard, Info, FileText, Code } from "lucide-react";
+import { Download, Eye, Star, Play, Info, FileText, Code } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
 import { handleMaterialDownload } from "@/utils/download";
@@ -41,12 +42,34 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
         material.file_name,
         material.title
       );
-      toast.success('Download started! Check the new windows.');
+      toast.success('Download started! Check your downloads.');
     } catch (error) {
       console.error('Download failed:', error);
       toast.error('Download failed. Please try again.');
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleLivePreview = () => {
+    // For code materials, show live preview
+    if (hasCodeContent) {
+      const previewWindow = window.open('', '_blank', 'width=800,height=600');
+      if (previewWindow) {
+        previewWindow.document.write(generateCodePreview());
+      }
+    } 
+    // For PDF materials, open PDF in new tab
+    else if (isPDF && material.file_url) {
+      window.open(material.file_url, '_blank');
+    }
+    // For video materials, show YouTube preview
+    else if (material.youtube_url) {
+      window.open(material.youtube_url, '_blank');
+    }
+    // Default fallback
+    else {
+      toast.info('Live preview not available for this material type');
     }
   };
 
@@ -88,7 +111,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Preview</title>
+        <title>Live Preview</title>
         <style>
           body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
           ${material.css_code || ''}
@@ -104,6 +127,9 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
     `;
     return combinedCode;
   };
+
+  // Check if live preview is available
+  const hasLivePreview = hasCodeContent || isPDF || material.youtube_url;
 
   return (
     <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800">
@@ -131,7 +157,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         )}
 
-        {/* Code Preview Overlay */}
         {hasCodeContent && showPreview && (
           <div className="absolute inset-0 bg-white z-10 overflow-hidden">
             <iframe
@@ -146,7 +171,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         )}
 
-        {/* YouTube Preview */}
         {material.youtube_url && !isPDF && !hasCodeContent && (
           <div 
             className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer hover:bg-black/30 transition-colors"
@@ -156,7 +180,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         )}
 
-        {/* PDF Icon for PDF files */}
         {isPDF && !showPreview && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors">
             <FileText className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
@@ -166,7 +189,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         )}
 
-        {/* Code Icon for code materials */}
         {hasCodeContent && !showPreview && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors">
             <Code className="w-12 h-12 text-white/80 hover:text-white transition-colors" />
@@ -248,6 +270,17 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             View Details
           </Button>
           
+          {hasLivePreview && (
+            <Button 
+              variant="outline" 
+              onClick={handleLivePreview}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0"
+            >
+              <Eye className="w-4 h-4 mr-1" />
+              Live Preview
+            </Button>
+          )}
+          
           {material.file_url && (
             <Button 
               variant="outline" 
@@ -257,12 +290,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             >
               <Download className="w-4 h-4 mr-1" />
               {downloading ? 'Preparing...' : 'Download'}
-            </Button>
-          )}
-          
-          {material.youtube_url && (
-            <Button variant="outline" size="icon" onClick={handlePreview}>
-              <Eye className="w-4 h-4" />
             </Button>
           )}
         </div>

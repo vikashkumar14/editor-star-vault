@@ -4,7 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Users, Download, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, Users, Download, Award, Code, Palette, Zap, Globe } from "lucide-react";
 
 const About = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -19,41 +20,83 @@ const About = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Hero Section */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          {/* Hero Section with Developer Image */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              About The Editor Star
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              We're passionate about empowering creators with high-quality editing resources
-              that bring their vision to life.
-            </p>
+            <div className="mb-8">
+              <img
+                src="/public/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png"
+                alt="Vikash Kumar Kushwaha"
+                className="w-32 h-32 rounded-full mx-auto mb-6 shadow-2xl border-4 border-white dark:border-slate-700 object-cover"
+              />
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                About <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Vikash Kumar Kushwaha</span>
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Passionate full-stack developer and content creator empowering the next generation
+                of developers with high-quality resources and innovative solutions.
+              </p>
+            </div>
+          </div>
+
+          {/* Developer Skills Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <CardContent className="p-6">
+                <Code className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Full Stack Development</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">React, Node.js, TypeScript</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <CardContent className="p-6">
+                <Palette className="w-12 h-12 text-purple-500 mx-auto mb-4" />
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">UI/UX Design</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Modern, Responsive Design</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <CardContent className="p-6">
+                <Globe className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Web3 & Blockchain</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">DeFi, Smart Contracts</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <CardContent className="p-6">
+                <Zap className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Performance Optimization</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Fast, Scalable Apps</p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Mission Section */}
-          <Card className="mb-12">
+          <Card className="mb-12 border-0 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-2xl">Our Mission</CardTitle>
+              <CardTitle className="text-2xl text-center">Our Mission</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                At The Editor Star, we believe that great content creation shouldn't be limited by
-                access to professional resources. Our mission is to democratize video editing by
-                providing free, high-quality assets that help creators of all levels produce
-                stunning content.
+              <p className="text-gray-600 dark:text-gray-300 mb-4 text-center text-lg">
+                At EditorStar, we believe that great content creation shouldn't be limited by
+                access to professional resources. Our mission is to democratize video editing and
+                web development by providing free, high-quality assets that help creators of all 
+                levels produce stunning content.
               </p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600 dark:text-gray-300 text-center">
                 Whether you're a beginner learning the ropes or a professional working on your
                 next masterpiece, we're here to support your creative journey with carefully
-                curated editing materials.
+                curated editing materials and development resources.
               </p>
             </CardContent>
           </Card>
 
           {/* Stats Section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-            <Card className="text-center">
+            <Card className="text-center transform hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
                 <Users className="w-8 h-8 text-red-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">50K+</div>
@@ -61,7 +104,7 @@ const About = () => {
               </CardContent>
             </Card>
             
-            <Card className="text-center">
+            <Card className="text-center transform hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
                 <Download className="w-8 h-8 text-red-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">1M+</div>
@@ -69,7 +112,7 @@ const About = () => {
               </CardContent>
             </Card>
             
-            <Card className="text-center">
+            <Card className="text-center transform hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
                 <Star className="w-8 h-8 text-red-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">4.9</div>
@@ -77,7 +120,7 @@ const About = () => {
               </CardContent>
             </Card>
             
-            <Card className="text-center">
+            <Card className="text-center transform hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
                 <Award className="w-8 h-8 text-red-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">500+</div>
@@ -87,27 +130,27 @@ const About = () => {
           </div>
 
           {/* Values Section */}
-          <Card>
+          <Card className="border-0 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-2xl">Our Values</CardTitle>
+              <CardTitle className="text-2xl text-center">Our Values</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <Badge className="mb-3">Quality First</Badge>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm px-4 py-2">Quality First</Badge>
+                  <p className="text-gray-600 dark:text-gray-300">
                     Every asset is carefully reviewed and tested to ensure professional standards.
                   </p>
                 </div>
-                <div>
-                  <Badge className="mb-3">Community Driven</Badge>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                <div className="text-center">
+                  <Badge className="mb-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm px-4 py-2">Community Driven</Badge>
+                  <p className="text-gray-600 dark:text-gray-300">
                     We listen to our community and create resources based on real needs.
                   </p>
                 </div>
-                <div>
-                  <Badge className="mb-3">Always Free</Badge>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                <div className="text-center">
+                  <Badge className="mb-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm px-4 py-2">Always Free</Badge>
+                  <p className="text-gray-600 dark:text-gray-300">
                     Our core mission is to provide free access to professional editing resources.
                   </p>
                 </div>
