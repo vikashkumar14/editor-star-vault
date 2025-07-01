@@ -3,10 +3,9 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Star, Play, Info, FileText, Code } from "lucide-react";
+import { Eye, Star, Play, Info, FileText, Code, Heart } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
-import { handleMaterialDownload } from "@/utils/download";
 import { toast } from "sonner";
 
 interface MaterialCardProps {
@@ -16,7 +15,10 @@ interface MaterialCardProps {
 const MaterialCard = ({ material }: MaterialCardProps) => {
   const navigate = useNavigate();
   const [showPreview, setShowPreview] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(() => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    return favorites.includes(material.id);
+  });
 
   const handleViewDetails = () => {
     navigate(`/material/${material.id}`);
@@ -25,29 +27,6 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const handlePreview = () => {
     if (material.youtube_url) {
       window.open(material.youtube_url, '_blank');
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!material.file_url || !material.file_name) {
-      toast.error('Download link not available');
-      return;
-    }
-
-    setDownloading(true);
-    try {
-      await handleMaterialDownload(
-        material.id, 
-        material.file_url, 
-        material.file_name,
-        material.title
-      );
-      toast.success('Download started! Check your downloads.');
-    } catch (error) {
-      console.error('Download failed:', error);
-      toast.error('Download failed. Please try again.');
-    } finally {
-      setDownloading(false);
     }
   };
 
@@ -71,6 +50,22 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
     else {
       toast.info('Live preview not available for this material type');
     }
+  };
+
+  const handleFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    let updatedFavorites;
+    
+    if (isFavorited) {
+      updatedFavorites = favorites.filter((id: string) => id !== material.id);
+      toast.success('Removed from favorites');
+    } else {
+      updatedFavorites = [...favorites, material.id];
+      toast.success('Added to favorites');
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    setIsFavorited(!isFavorited);
   };
 
   const getSoftwareDisplayName = (software: string) => {
@@ -132,7 +127,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const hasLivePreview = hasCodeContent || isPDF || material.youtube_url;
 
   return (
-    <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800">
+    <Card className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800 group transform hover:-translate-y-1">
       <div 
         className="h-48 bg-cover bg-center relative group cursor-pointer"
         style={{ 
@@ -143,6 +138,23 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
         onMouseLeave={() => (isPDF || hasCodeContent) && setShowPreview(false)}
         onClick={(isPDF || hasCodeContent) ? () => setShowPreview(!showPreview) : undefined}
       >
+        {/* Favorite Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`absolute top-2 left-2 z-10 p-2 rounded-full ${
+            isFavorited 
+              ? 'bg-red-500 hover:bg-red-600 text-white' 
+              : 'bg-white/80 hover:bg-white text-gray-600'
+          } transition-all duration-200`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFavorite();
+          }}
+        >
+          <Heart className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
+        </Button>
+
         {/* PDF Preview Overlay */}
         {isPDF && showPreview && material.file_url && (
           <div className="absolute inset-0 bg-white z-10 overflow-hidden">
@@ -200,11 +212,11 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
 
         <div className="absolute top-4 right-4">
           {isPremium ? (
-            <Badge className="bg-yellow-500 text-white border-0">
+            <Badge className="bg-yellow-500 text-white border-0 shadow-lg">
               Premium ₹{price}
             </Badge>
           ) : (
-            <Badge className="bg-green-500 text-white border-0">
+            <Badge className="bg-green-500 text-white border-0 shadow-lg">
               Free
             </Badge>
           )}
@@ -213,26 +225,31 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
       
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg">{material.title}</CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-300">
+          <div className="flex-1">
+            <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-200">
+              {material.title}
+            </CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
               {truncateDescription(material.description || '', 50)}
             </CardDescription>
           </div>
         </div>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-3">
           <div className="flex items-center space-x-1">
-            <Download className="w-4 h-4" />
-            <span>{material.downloads_count.toLocaleString()}</span>
+            <Eye className="w-4 h-4" />
+            <span>{material.downloads_count?.toLocaleString() || 0}</span>
           </div>
           <div className="flex items-center space-x-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span>{material.rating}</span>
+            <span>{material.rating || 0}</span>
+          </div>
+          <div className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
+            {material.content_type}
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mt-3">
           {material.software_compatibility?.slice(0, 2).map((software, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs">
               {getSoftwareDisplayName(software)}
@@ -245,7 +262,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           )}
         </div>
         
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 mt-2">
           {material.tags?.slice(0, 2).map((tag, idx) => (
             <Badge key={idx} variant="outline" className="text-xs">
               {tag}
@@ -260,10 +277,10 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Action Buttons */}
+        {/* Action Buttons - Only View Details and Live Preview */}
         <div className="flex space-x-2">
           <Button 
-            className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white"
+            className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={handleViewDetails}
           >
             <Info className="w-4 h-4 mr-2" />
@@ -274,22 +291,10 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             <Button 
               variant="outline" 
               onClick={handleLivePreview}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <Eye className="w-4 h-4 mr-1" />
               Live Preview
-            </Button>
-          )}
-          
-          {material.file_url && (
-            <Button 
-              variant="outline" 
-              onClick={handleDownload}
-              disabled={downloading}
-              className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white border-0"
-            >
-              <Download className="w-4 h-4 mr-1" />
-              {downloading ? 'Preparing...' : 'Download'}
             </Button>
           )}
         </div>

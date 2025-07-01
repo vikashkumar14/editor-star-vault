@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowLeft, Play, CreditCard, Code, FileText, Palette, Eye, EyeOff } from "lucide-react";
+import { Download, ArrowLeft, Play, CreditCard, Code, FileText, Palette, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MaterialInteractions from "@/components/MaterialInteractions";
@@ -13,6 +12,7 @@ import CodePreview from "@/components/CodePreview";
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
 import { handleMaterialDownload } from '@/utils/download';
+import { toast } from "sonner";
 
 const MaterialDetail = () => {
   const { id } = useParams();
@@ -22,6 +22,7 @@ const MaterialDetail = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCodePreview, setShowCodePreview] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -55,10 +56,29 @@ const MaterialDetail = () => {
     fetchMaterial();
   }, [id]);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!material) return;
-    const fileName = `${material.title.replace(/\s+/g, '-').toLowerCase()}.zip`;
-    handleMaterialDownload(material.id, material.file_url, fileName);
+    
+    if (!material.file_url || !material.file_name) {
+      toast.error('Download link not available');
+      return;
+    }
+
+    setDownloading(true);
+    try {
+      await handleMaterialDownload(
+        material.id, 
+        material.file_url, 
+        material.file_name,
+        material.title
+      );
+      toast.success('Download started successfully! Check your downloads folder.');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Download failed. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handlePremiumDownload = () => {
@@ -174,7 +194,7 @@ const MaterialDetail = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Hero Section */}
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden shadow-xl">
                 <div 
                   className="h-64 bg-cover bg-center relative"
                   style={{ 
@@ -192,102 +212,106 @@ const MaterialDetail = () => {
                   )}
                   <div className="absolute top-4 right-4">
                     {isPremium ? (
-                      <Badge className="bg-yellow-500 text-white border-0">
+                      <Badge className="bg-yellow-500 text-white border-0 shadow-lg">
                         Premium ₹{price}
                       </Badge>
                     ) : (
-                      <Badge className="bg-green-500 text-white border-0">
+                      <Badge className="bg-green-500 text-white border-0 shadow-lg">
                         Free
                       </Badge>
                     )}
                   </div>
                 </div>
                 
-                <CardHeader>
-                  <CardTitle className="text-2xl">{material.title}</CardTitle>
-                  <CardDescription className="text-base">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700">
+                  <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {material.title}
+                  </CardTitle>
+                  <CardDescription className="text-lg text-gray-700 dark:text-gray-300">
                     {material.description || getContentTypeDescription(material.content_type, material.file_type)}
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              {/* Code Preview Section */}
+              {/* Enhanced Code Documentation */}
               {hasCodeContent && (
-                <Card>
+                <Card className="shadow-xl">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <Code className="w-5 h-5 text-blue-600" />
-                        <CardTitle className="text-lg">Code Preview</CardTitle>
+                        <Code className="w-6 h-6 text-blue-600" />
+                        <CardTitle className="text-2xl font-bold">Code Documentation</CardTitle>
                       </div>
                       <Button
                         variant="outline"
-                        size="sm"
                         onClick={() => setShowCodePreview(!showCodePreview)}
+                        className="shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         {showCodePreview ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                         {showCodePreview ? 'Hide Preview' : 'Show Preview'}
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    {showCodePreview ? (
-                      <CodePreview
-                        htmlCode={material.html_code || ''}
-                        cssCode={material.css_code || ''}
-                        jsCode={material.js_code || ''}
-                        readonly={true}
-                      />
-                    ) : (
-                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                        <Code className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Click "Show Preview" to view the code and live preview</p>
+                  <CardContent className="space-y-8">
+                    {showCodePreview && (
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                        <CodePreview
+                          htmlCode={material.html_code || ''}
+                          cssCode={material.css_code || ''}
+                          jsCode={material.js_code || ''}
+                          readonly={true}
+                        />
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              )}
 
-              {/* Code Introductions */}
-              {hasCodeContent && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Code Documentation</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                    {/* Enhanced HTML Section */}
                     {material.html_code && material.html_introduction && (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Code className="w-4 h-4 text-orange-500" />
-                          <h4 className="font-semibold text-gray-900 dark:text-white">HTML Structure</h4>
+                      <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-6 rounded-lg border-l-4 border-orange-500">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <Code className="w-6 h-6 text-orange-600" />
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">HTML Structure</h3>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                          {material.html_introduction}
-                        </p>
+                        <div className="prose prose-gray dark:prose-invert max-w-none">
+                          {material.html_introduction.split('\n').map((line, idx) => (
+                            <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     )}
                     
+                    {/* Enhanced CSS Section */}
                     {material.css_code && material.css_introduction && (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Palette className="w-4 h-4 text-blue-500" />
-                          <h4 className="font-semibold text-gray-900 dark:text-white">CSS Styling</h4>
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-lg border-l-4 border-blue-500">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <Palette className="w-6 h-6 text-blue-600" />
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">CSS Styling</h3>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                          {material.css_introduction}
-                        </p>
+                        <div className="prose prose-gray dark:prose-invert max-w-none">
+                          {material.css_introduction.split('\n').map((line, idx) => (
+                            <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     )}
                     
+                    {/* Enhanced JavaScript Section */}
                     {material.js_code && material.js_introduction && (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Code className="w-4 h-4 text-yellow-500" />
-                          <h4 className="font-semibold text-gray-900 dark:text-white">JavaScript Functionality</h4>
+                      <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-6 rounded-lg border-l-4 border-yellow-500">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <Code className="w-6 h-6 text-yellow-600" />
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">JavaScript Functionality</h3>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                          {material.js_introduction}
-                        </p>
+                        <div className="prose prose-gray dark:prose-invert max-w-none">
+                          {material.js_introduction.split('\n').map((line, idx) => (
+                            <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -295,27 +319,27 @@ const MaterialDetail = () => {
               )}
 
               {/* Technical Details */}
-              <Card>
+              <Card className="shadow-xl">
                 <CardHeader>
-                  <CardTitle className="text-lg">Technical Details</CardTitle>
+                  <CardTitle className="text-2xl font-bold">Technical Details</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">File Information</h4>
-                      <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                <CardContent className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                      <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-3">File Information</h4>
+                      <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center space-x-2">
                           {getFileTypeIcon(material.file_type || '')}
-                          <span>Type: {material.file_type || material.content_type || 'Unknown'}</span>
+                          <span><strong>Type:</strong> {material.file_type || material.content_type || 'Unknown'}</span>
                         </div>
-                        <div>Size: {material.file_size ? `${(material.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'}</div>
-                        <div>Author: {material.author || 'Anonymous'}</div>
-                        <div>Category: {material.category || 'General'}</div>
+                        <div><strong>Size:</strong> {material.file_size ? `${(material.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'}</div>
+                        <div><strong>Author:</strong> {material.author || 'Anonymous'}</div>
+                        <div><strong>Category:</strong> {material.category || 'General'}</div>
                       </div>
                     </div>
                     
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Compatibility</h4>
+                    <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                      <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-3">Compatibility</h4>
                       <div className="flex flex-wrap gap-2">
                         {material.software_compatibility?.map((software, idx) => (
                           <Badge key={idx} variant="secondary" className="text-xs">
@@ -328,11 +352,11 @@ const MaterialDetail = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Tags</h4>
+                  <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                    <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-3">Tags</h4>
                     <div className="flex flex-wrap gap-2">
                       {material.tags?.map((tag, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
+                        <Badge key={idx} variant="outline" className="text-sm">
                           {tag}
                         </Badge>
                       )) || (
@@ -340,90 +364,117 @@ const MaterialDetail = () => {
                       )}
                     </div>
                   </div>
-
-                  {/* Content Description */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">About This Material</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {getContentTypeDescription(material.content_type, material.file_type)}
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Sidebar */}
+            {/* Enhanced Sidebar */}
             <div className="space-y-6">
-              {/* Download Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Download</CardTitle>
+              {/* Enhanced Download Section */}
+              <Card className="shadow-xl border-2 border-blue-200 dark:border-blue-800">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+                  <CardTitle className="text-xl font-bold">Download Material</CardTitle>
+                  {material.file_size && (
+                    <CardDescription className="text-sm">
+                      File size: {(material.file_size / 1024 / 1024).toFixed(2)} MB
+                    </CardDescription>
+                  )}
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
+                  {/* File Preview Info */}
+                  <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                    <div className="flex items-center space-x-3 mb-2">
+                      {getFileTypeIcon(material.file_type || '')}
+                      <span className="font-medium">{material.file_type?.toUpperCase() || 'FILE'}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {getContentTypeDescription(material.content_type, material.file_type)}
+                    </p>
+                  </div>
+
+                  {/* Enhanced Download Button */}
                   {isPremium ? (
                     <Button 
-                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                      className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
                       onClick={handlePremiumDownload}
                     >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Buy for ₹{price}
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Purchase & Download ₹{price}
                     </Button>
                   ) : (
                     <Button 
-                      className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white"
+                      className="w-full h-12 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
                       onClick={handleDownload}
+                      disabled={downloading}
                     >
-                      <Download className="w-4 h-4 mr-2" />
-                      Free Download
+                      <Download className="w-5 h-5 mr-2" />
+                      {downloading ? (
+                        <span className="flex items-center">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Preparing Download...
+                        </span>
+                      ) : (
+                        'Free Download'
+                      )}
                     </Button>
                   )}
+                  
+                  {/* Success/Info Messages */}
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-start space-x-2">
+                      <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        Download will start automatically. Check your downloads folder after clicking.
+                      </p>
+                    </div>
+                  </div>
                   
                   {material.youtube_url && (
                     <Button 
                       variant="outline" 
-                      className="w-full" 
+                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200" 
                       onClick={handlePreview}
                     >
                       <Play className="w-4 h-4 mr-2" />
-                      Watch Preview
+                      Watch Tutorial
                     </Button>
                   )}
 
                   {hasCodeContent && (
                     <Button 
                       variant="outline" 
-                      className="w-full" 
+                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200" 
                       onClick={() => setShowCodePreview(!showCodePreview)}
                     >
                       <Code className="w-4 h-4 mr-2" />
-                      {showCodePreview ? 'Hide' : 'View'} Code
+                      {showCodePreview ? 'Hide' : 'View'} Code Preview
                     </Button>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Stats Card */}
-              <Card>
+              {/* Enhanced Stats Card */}
+              <Card className="shadow-xl">
                 <CardHeader>
-                  <CardTitle>Statistics</CardTitle>
+                  <CardTitle className="text-xl font-bold">Statistics</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Downloads:</span>
-                    <span className="font-medium">{material.downloads_count?.toLocaleString() || 0}</span>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between items-center text-sm bg-gray-50 dark:bg-slate-800 p-3 rounded">
+                    <span className="font-medium">Downloads:</span>
+                    <span className="font-bold text-green-600">{material.downloads_count?.toLocaleString() || 0}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Rating:</span>
-                    <span className="font-medium">{material.rating || 0}/5</span>
+                  <div className="flex justify-between items-center text-sm bg-gray-50 dark:bg-slate-800 p-3 rounded">
+                    <span className="font-medium">Rating:</span>
+                    <span className="font-bold text-yellow-600">{material.rating || 0}/5 ⭐</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Type:</span>
-                    <span className="font-medium capitalize">{material.content_type}</span>
+                  <div className="flex justify-between items-center text-sm bg-gray-50 dark:bg-slate-800 p-3 rounded">
+                    <span className="font-medium">Type:</span>
+                    <span className="font-bold capitalize">{material.content_type}</span>
                   </div>
                   {material.created_at && (
-                    <div className="flex justify-between text-sm">
-                      <span>Added:</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between items-center text-sm bg-gray-50 dark:bg-slate-800 p-3 rounded">
+                      <span className="font-medium">Added:</span>
+                      <span className="font-bold">
                         {new Date(material.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -432,9 +483,9 @@ const MaterialDetail = () => {
               </Card>
 
               {/* Interactions */}
-              <Card>
+              <Card className="shadow-xl">
                 <CardHeader>
-                  <CardTitle>Community</CardTitle>
+                  <CardTitle className="text-xl font-bold">Community Feedback</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <MaterialInteractions materialId={material.id} />
