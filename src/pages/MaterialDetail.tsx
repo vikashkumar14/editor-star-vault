@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -126,7 +127,6 @@ const MaterialDetail = () => {
           </div>
           <Footer />
         </div>
-       
       </div>
     );
   }
@@ -339,7 +339,6 @@ const MaterialDetail = () => {
                         <span className="text-sm text-gray-500">No tags available</span>
                       )}
                     </div>
-                   
                   </div>
 
                   {/* Content Description */}
@@ -442,7 +441,6 @@ const MaterialDetail = () => {
                 </CardContent>
               </Card>
             </div>
-            
           </div>
         </div>
 
