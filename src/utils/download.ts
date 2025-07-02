@@ -12,11 +12,11 @@ export const handleMaterialDownload = async (materialId: string, fileUrl: string
     }
 
     // Track the download in background (don't let this block the download)
-    supabase.from('downloads').insert({
+    Promise.resolve(supabase.from('downloads').insert({
       content_id: materialId,
       user_ip: 'unknown',
       user_agent: navigator.userAgent
-    }).then(() => {
+    })).then(() => {
       // Increment download count in background
       return supabase.rpc('increment_download_count', { content_uuid: materialId });
     }).catch(error => {
