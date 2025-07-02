@@ -23,27 +23,10 @@ export const handleMaterialDownload = async (materialId: string, fileUrl: string
       console.warn('Failed to track download:', error);
     });
 
-    // For direct file downloads - use the admin provided link directly
-    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
-      // Open the admin provided URL directly
-      window.open(fileUrl, '_blank', 'noopener,noreferrer');
-      console.log('Download initiated successfully via direct link');
-      return;
-    }
-
-    // If it's a relative path, try to download normally
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName || 'download';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    
-    // Trigger download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    console.log('Download initiated successfully');
+    // Always open the admin provided URL directly - this is the most reliable approach
+    console.log('Opening admin provided URL:', fileUrl);
+    window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    console.log('Download initiated successfully via direct link');
 
   } catch (error) {
     console.error('Error handling download:', error);

@@ -29,18 +29,30 @@ const Materials = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  // Enhanced search functionality
+  // Enhanced search functionality with better matching
   const filteredMaterials = useMemo(() => {
+    if (!materials || materials.length === 0) return [];
+    
     return materials.filter(material => {
-      const searchLower = searchTerm.toLowerCase();
+      const searchLower = searchTerm.toLowerCase().trim();
       
-      const matchesSearch = !searchTerm || 
-        material.title.toLowerCase().includes(searchLower) ||
+      // If no search term, just filter by category
+      if (!searchTerm) {
+        return !selectedCategory || material.category === selectedCategory;
+      }
+      
+      // Enhanced search matching
+      const matchesSearch = 
+        material.title?.toLowerCase().includes(searchLower) ||
         material.description?.toLowerCase().includes(searchLower) ||
         material.category?.toLowerCase().includes(searchLower) ||
         material.author?.toLowerCase().includes(searchLower) ||
-        material.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
-        material.software_compatibility?.some(software => software.toLowerCase().includes(searchLower));
+        material.content_type?.toLowerCase().includes(searchLower) ||
+        material.file_type?.toLowerCase().includes(searchLower) ||
+        material.tags?.some(tag => tag?.toLowerCase().includes(searchLower)) ||
+        material.software_compatibility?.some(software => 
+          software?.toLowerCase().replace('_', ' ').includes(searchLower)
+        );
       
       const matchesCategory = !selectedCategory || material.category === selectedCategory;
       

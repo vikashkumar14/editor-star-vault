@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Code, Palette, Zap, Star } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 
 const ImageSlider = () => {
   const [api, setApi] = useState<any>();
@@ -25,7 +26,9 @@ const ImageSlider = () => {
       subtitle: "Full Stack Developer & Creative Designer",
       description: "Passionate developer creating amazing web experiences with modern technologies",
       features: ["React & TypeScript", "UI/UX Design", "Full Stack Development", "Creative Solutions"],
-      gradient: "from-purple-600 via-blue-600 to-indigo-600"
+      gradient: "from-purple-600 via-blue-600 to-indigo-600",
+      profileUrl: "https://github.com/vikashkushwaha",
+      projectsUrl: "https://vikashkushwaha.dev/projects"
     },
     {
       id: 2,
@@ -34,7 +37,9 @@ const ImageSlider = () => {
       subtitle: "Professional Code Templates & Components",
       description: "Access thousands of high-quality code snippets, templates, and development resources",
       features: ["HTML/CSS Templates", "JavaScript Libraries", "React Components", "API Integrations"],
-      gradient: "from-green-600 via-teal-600 to-blue-600"
+      gradient: "from-green-600 via-teal-600 to-blue-600",
+      profileUrl: "/materials",
+      projectsUrl: "/materials"
     },
     {
       id: 3,
@@ -43,7 +48,9 @@ const ImageSlider = () => {
       subtitle: "Design Assets & Visual Elements",
       description: "Discover premium design resources, UI kits, and creative assets for your projects",
       features: ["UI Design Kits", "Icon Collections", "Color Palettes", "Typography Sets"],
-      gradient: "from-orange-600 via-red-600 to-pink-600"
+      gradient: "from-orange-600 via-red-600 to-pink-600",
+      profileUrl: "/materials",
+      projectsUrl: "/materials"
     }
   ];
 
@@ -57,6 +64,22 @@ const ImageSlider = () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
+  const handleProfileClick = (profileUrl: string) => {
+    if (profileUrl.startsWith('http')) {
+      window.open(profileUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      window.location.href = profileUrl;
+    }
+  };
+
+  const handleProjectsClick = (projectsUrl: string) => {
+    if (projectsUrl.startsWith('http')) {
+      window.open(projectsUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      window.location.href = projectsUrl;
+    }
+  };
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -73,7 +96,16 @@ const ImageSlider = () => {
         </p>
       </div>
 
-      <Carousel setApi={setApi} className="w-full">
+      <Carousel 
+        setApi={setApi} 
+        className="w-full"
+        plugins={[
+          Autoplay({
+            delay: 5000,
+            stopOnInteraction: true,
+          }),
+        ]}
+      >
         <CarouselContent>
           {slides.map((slide) => (
             <CarouselItem key={slide.id}>
@@ -124,6 +156,7 @@ const ImageSlider = () => {
                       <div className="flex flex-col sm:flex-row gap-4">
                         <Button
                           className={`bg-gradient-to-r ${slide.gradient} hover:opacity-90 text-white border-0 shadow-lg transform hover:-translate-y-1 transition-all duration-300`}
+                          onClick={() => handleProfileClick(slide.profileUrl)}
                         >
                           <User className="w-4 h-4 mr-2" />
                           View Profile
@@ -131,6 +164,7 @@ const ImageSlider = () => {
                         <Button
                           variant="outline"
                           className="border-2 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-950/30 dark:hover:to-blue-950/30 transform hover:-translate-y-1 transition-all duration-300"
+                          onClick={() => handleProjectsClick(slide.projectsUrl)}
                         >
                           <Code className="w-4 h-4 mr-2" />
                           View Projects
