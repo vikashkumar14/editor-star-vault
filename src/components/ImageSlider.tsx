@@ -28,7 +28,7 @@ const ImageSlider = () => {
       features: ["React & TypeScript", "UI/UX Design", "Full Stack Development", "Creative Solutions"],
       gradient: "from-purple-600 via-blue-600 to-indigo-600",
       profileUrl: "https://github.com/vikashkumar14",
-      projectsUrl: "https://vikashkushwaha.dev/projects"
+      projectsUrl: "https://github.com/vikashkumar14?tab=repositories"
     },
     {
       id: 2,

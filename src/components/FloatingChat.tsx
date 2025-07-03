@@ -49,7 +49,12 @@ const FloatingChat = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Chat response:', data, error);
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
