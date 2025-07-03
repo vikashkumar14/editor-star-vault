@@ -19,7 +19,7 @@ serve(async (req) => {
     console.log('Received message:', message);
     console.log('Using API key:', geminiApiKey ? 'API key present' : 'No API key');
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,18 +29,19 @@ serve(async (req) => {
           {
             parts: [
               {
-                text: `You are a helpful AI assistant for a material sharing and editing platform. You help users with questions about video editing, graphic design, downloading materials, and general support. Be friendly, helpful, and respond in the same language as the user. 
+                text: `You are a helpful AI assistant that can answer questions on any topic including technology, science, education, programming, general knowledge, and more. You should provide accurate, detailed, and helpful responses in the same language as the user's question. Be conversational and friendly.
 
-User message: ${message}`
+User question: ${message}`
               }
             ]
           }
         ],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.8,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
+          candidateCount: 1
         },
         safetySettings: [
           {
