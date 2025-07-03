@@ -27,7 +27,7 @@ const ImageSlider = () => {
       description: "Passionate developer creating amazing web experiences with modern technologies",
       features: ["React & TypeScript", "UI/UX Design", "Full Stack Development", "Creative Solutions"],
       gradient: "from-purple-600 via-blue-600 to-indigo-600",
-      profileUrl: "https://github.com/vikashkushwaha",
+      profileUrl: "https://github.com/vikashkumar14",
       projectsUrl: "https://vikashkushwaha.dev/projects"
     },
     {

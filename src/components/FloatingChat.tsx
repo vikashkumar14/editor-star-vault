@@ -1,24 +1,76 @@
 
 import { useState } from 'react';
-import { MessageCircle, X, Send, User } from 'lucide-react';
+import { MessageCircle, X, Send, User, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Message {
+  id: string;
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+}
 
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      text: 'Hello! How can I help you today?',
+      isUser: false,
+      timestamp: new Date()
+    }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Message sent:', { name, email, message });
-    setMessage('');
-    setName('');
-    setEmail('');
-    setIsOpen(false);
+    if (!currentMessage.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: currentMessage,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setCurrentMessage('');
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-gemini', {
+        body: { 
+          message: currentMessage,
+          history: messages.slice(-5) // Send last 5 messages for context
+        }
+      });
+
+      if (error) throw error;
+
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: data.reply || "Sorry, I couldn't process your message.",
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, I'm having trouble responding right now. Please try again later.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,16 +91,17 @@ const FloatingChat = () => {
 
       {/* Chat Modal */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 md:w-96">
-          <div className="glass-effect rounded-3xl p-6 border border-white/20 dark:border-slate-700/50 shadow-2xl animate-scale-in">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed bottom-24 right-6 z-50 w-80 md:w-96 h-96">
+          <div className="glass-effect rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-2xl animate-scale-in h-full flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10 dark:border-slate-700/50">
               <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">Chat with us</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">We're here to help!</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">AI Assistant</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Online • Always ready to help</p>
                 </div>
               </div>
               <Button
@@ -61,40 +114,64 @@ const FloatingChat = () => {
               </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50"
-                required
-              />
-              
-              <Input
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50"
-                required
-              />
-              
-              <Textarea
-                placeholder="How can we help you?"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 min-h-[100px]"
-                required
-              />
-              
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Send Message
-              </Button>
-            </form>
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-3">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                        msg.isUser
+                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                          : 'bg-white/60 dark:bg-slate-700/60 text-gray-900 dark:text-white backdrop-blur-sm'
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                      <p className={`text-xs mt-1 opacity-70 ${
+                        msg.isUser ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm p-3 rounded-2xl">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            {/* Input */}
+            <div className="p-4 border-t border-white/10 dark:border-slate-700/50">
+              <form onSubmit={handleSendMessage} className="flex gap-2">
+                <Input
+                  placeholder="Type your message..."
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  className="flex-1 bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-sm"
+                  disabled={isLoading}
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isLoading || !currentMessage.trim()}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       )}
