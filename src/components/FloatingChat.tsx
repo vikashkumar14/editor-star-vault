@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface Message {
   id: string;
@@ -134,7 +137,71 @@ const FloatingChat = () => {
                           : 'bg-white/60 dark:bg-slate-700/60 text-gray-900 dark:text-white backdrop-blur-sm'
                       }`}
                     >
-                      <p>{msg.text}</p>
+                      {msg.isUser ? (
+                        <p>{msg.text}</p>
+                      ) : (
+                        <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-gray-800 prose-pre:text-gray-100">
+                          <ReactMarkdown
+                            components={{
+                              code({ className, children, ...props }: any) {
+                                const match = /language-(\w+)/.exec(className || '');
+                                const inline = !match;
+                                return !inline && match ? (
+                                  <SyntaxHighlighter
+                                    customStyle={{
+                                      background: '#1e293b',
+                                      padding: '1rem',
+                                      borderRadius: '0.375rem',
+                                      fontSize: '0.75rem'
+                                    }}
+                                    language={match[1]}
+                                    PreTag="div"
+                                    {...props}
+                                  >
+                                    {String(children).replace(/\n$/, '')}
+                                  </SyntaxHighlighter>
+                                ) : (
+                                  <code 
+                                    className="bg-gray-200 dark:bg-gray-700 text-red-600 dark:text-red-400 px-1 py-0.5 rounded text-xs font-mono" 
+                                    {...props}
+                                  >
+                                    {children}
+                                  </code>
+                                );
+                              },
+                              h1: ({ children }: any) => (
+                                <h1 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">{children}</h1>
+                              ),
+                              h2: ({ children }: any) => (
+                                <h2 className="text-base font-bold text-red-600 dark:text-red-400 mb-2">{children}</h2>
+                              ),
+                              h3: ({ children }: any) => (
+                                <h3 className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">{children}</h3>
+                              ),
+                              p: ({ children }: any) => (
+                                <p className="mb-2 leading-relaxed">{children}</p>
+                              ),
+                              ul: ({ children }: any) => (
+                                <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+                              ),
+                              ol: ({ children }: any) => (
+                                <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+                              ),
+                              li: ({ children }: any) => (
+                                <li className="text-sm">{children}</li>
+                              ),
+                              strong: ({ children }: any) => (
+                                <strong className="font-bold text-blue-600 dark:text-blue-400">{children}</strong>
+                              ),
+                              em: ({ children }: any) => (
+                                <em className="italic text-purple-600 dark:text-purple-400">{children}</em>
+                              )
+                            }}
+                          >
+                            {msg.text}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                       <p className={`text-xs mt-1 opacity-70 ${
                         msg.isUser ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
                       }`}>
