@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { MessageCircle, X, Send, User, Bot } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { MessageCircle, X, Send, User, Bot, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import VoiceChat, { useVoiceResponse } from './VoiceChat';
 
 interface Message {
   id: string;
@@ -19,23 +20,77 @@ interface Message {
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMessage, setCurrentMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    {
+  const [messages, setMessages] = useState<Message[]>(() => {
+    // Load messages from localStorage
+    const savedMessages = localStorage.getItem('chatMessages');
+    if (savedMessages) {
+      try {
+        const parsed = JSON.parse(savedMessages);
+        return parsed.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+      } catch (error) {
+        console.error('Error loading saved messages:', error);
+      }
+    }
+    return [
+      {
+        id: '1',
+        text: 'Hello! How can I help you today? मैं आपकी किसी भी चीज़ में मदद कर सकता हूँ!',
+        isUser: false,
+        timestamp: new Date()
+      }
+    ];
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { speak } = useVoiceResponse();
+
+  // Save messages to localStorage whenever messages change
+  useEffect(() => {
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Clear chat history
+  const clearChat = () => {
+    const initialMessage = {
       id: '1',
-      text: 'Hello! How can I help you today?',
+      text: 'Hello! How can I help you today? मैं आपकी किसी भी चीज़ में मदद कर सकता हूँ!',
       isUser: false,
       timestamp: new Date()
-    }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+    };
+    setMessages([initialMessage]);
+    localStorage.removeItem('chatMessages');
+  };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentMessage.trim() || isLoading) return;
+  // Handle voice transcript
+  const handleVoiceTranscript = (transcript: string) => {
+    setCurrentMessage(transcript);
+    // Auto-send the message
+    setTimeout(() => {
+      handleSendMessage(null, transcript);
+    }, 100);
+  };
+
+  // Handle voice response
+  const handleVoiceResponse = (text: string) => {
+    speak(text);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent | null, voiceText?: string) => {
+    if (e) e.preventDefault();
+    const messageText = voiceText || currentMessage;
+    if (!messageText.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: currentMessage,
+      text: messageText,
       isUser: true,
       timestamp: new Date()
     };
@@ -47,8 +102,8 @@ const FloatingChat = () => {
     try {
       const { data, error } = await supabase.functions.invoke('chat-with-gemini', {
         body: { 
-          message: currentMessage,
-          history: messages.slice(-5) // Send last 5 messages for context
+          message: messageText,
+          history: messages.slice(-10) // Send last 10 messages for better context
         }
       });
 
@@ -67,6 +122,12 @@ const FloatingChat = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+      
+      // Auto-speak the response (first 100 characters for brevity)
+      const responseText = data.reply || "Sorry, I couldn't process your message.";
+      const shortResponse = responseText.length > 100 ? 
+        responseText.substring(0, 100) + "..." : responseText;
+      speak(shortResponse.replace(/[*#`]/g, '')); // Remove markdown formatting
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage: Message = {
@@ -99,7 +160,7 @@ const FloatingChat = () => {
 
       {/* Chat Modal */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 md:w-96 h-96">
+        <div className="fixed bottom-24 right-6 z-50 w-96 md:w-[480px] h-[600px]">
           <div className="glass-effect rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-2xl animate-scale-in h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10 dark:border-slate-700/50">
@@ -109,17 +170,28 @@ const FloatingChat = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 dark:text-white text-sm">AI Assistant</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Online • Always ready to help</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Online • Voice & Text • Memory Enabled</p>
                 </div>
               </div>
-              <Button
-                onClick={() => setIsOpen(false)}
-                variant="ghost"
-                size="sm"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={clearChat}
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                  title="Clear Chat"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Messages */}
@@ -221,28 +293,43 @@ const FloatingChat = () => {
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
 
             {/* Input */}
             <div className="p-4 border-t border-white/10 dark:border-slate-700/50">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
-                <Input
-                  placeholder="Type your message..."
-                  value={currentMessage}
-                  onChange={(e) => setCurrentMessage(e.target.value)}
-                  className="flex-1 bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-sm"
-                  disabled={isLoading}
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={isLoading || !currentMessage.trim()}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </form>
+              <div className="flex flex-col gap-3">
+                {/* Voice Controls */}
+                <div className="flex items-center justify-between">
+                  <VoiceChat 
+                    onTranscript={handleVoiceTranscript}
+                    onResponse={handleVoiceResponse}
+                  />
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Voice & Memory Enabled
+                  </span>
+                </div>
+                
+                {/* Text Input */}
+                <form onSubmit={handleSendMessage} className="flex gap-2">
+                  <Input
+                    placeholder="Type your message... या अपनी आवाज़ का उपयोग करें"
+                    value={currentMessage}
+                    onChange={(e) => setCurrentMessage(e.target.value)}
+                    className="flex-1 bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-sm"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isLoading || !currentMessage.trim()}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
