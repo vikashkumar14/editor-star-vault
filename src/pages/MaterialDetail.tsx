@@ -189,21 +189,21 @@ const MaterialDetail = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
           <Button 
             variant="outline" 
             onClick={() => navigate('/materials')}
-            className="mb-6"
+            className="mb-4 sm:mb-6 w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Materials
           </Button>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card className="overflow-hidden shadow-xl">
                 <div 
-                  className="h-64 bg-cover bg-center relative"
+                  className="h-48 sm:h-64 bg-cover bg-center relative"
                   style={{ 
                     backgroundImage: `url(${material.thumbnail_url})`,
                     backgroundColor: '#f3f4f6'
@@ -230,12 +230,41 @@ const MaterialDetail = () => {
                   </div>
                 </div>
                 
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700">
-                  <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 p-4 sm:p-6">
+                  <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
                     {material.title}
                   </CardTitle>
                   <CardDescription className="text-lg text-gray-700 dark:text-gray-300">
-                    {material.description || getContentTypeDescription(material.content_type, material.file_type)}
+                    <div className="space-y-4">
+                      {/* Step-by-step description */}
+                      {material.description ? (
+                        <div className="space-y-3">
+                          {material.description.split('\n').filter(line => line.trim()).map((step, index) => (
+                            <div key={index} className="flex items-start gap-3 bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg">
+                              <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="text-white text-sm font-bold">✓</span>
+                              </div>
+                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                                {step.trim()}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {getContentTypeDescription(material.content_type, material.file_type).split('.').filter(part => part.trim()).map((feature, index) => (
+                            <div key={index} className="flex items-start gap-3 bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg">
+                              <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="text-white text-sm font-bold">✓</span>
+                              </div>
+                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                                {feature.trim()}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -258,7 +287,7 @@ const MaterialDetail = () => {
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-8">
+                  <CardContent className="space-y-6 sm:space-y-8 p-4 sm:p-6">
                     {showCodePreview && (
                       <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
                         <CodePreview
@@ -370,17 +399,17 @@ const MaterialDetail = () => {
               </Card>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <Card className="shadow-xl border-2 border-blue-200 dark:border-blue-800">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-                  <CardTitle className="text-xl font-bold">Download Material</CardTitle>
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl font-bold">Download Material</CardTitle>
                   {material.file_size && (
                     <CardDescription className="text-sm">
                       File size: {(material.file_size / 1024 / 1024).toFixed(2)} MB
                     </CardDescription>
                   )}
                 </CardHeader>
-                <CardContent className="space-y-4 pt-6">
+                <CardContent className="space-y-4 pt-4 sm:pt-6 p-4 sm:p-6">
                   <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
                     <div className="flex items-center space-x-3 mb-2">
                       {getFileTypeIcon(material.file_type || '')}

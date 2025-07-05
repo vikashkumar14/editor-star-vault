@@ -45,6 +45,7 @@ const FloatingChat = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const voiceChatRef = useRef<{ handleTextToSpeech: (text: string) => void } | null>(null);
   const { speak } = useVoiceResponse();
 
   // Save messages to localStorage whenever messages change
@@ -158,9 +159,9 @@ const FloatingChat = () => {
         </Button>
       </div>
 
-      {/* Chat Modal */}
-      {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 md:w-[480px] h-[600px]">
+        {/* Chat Modal */}
+        {isOpen && (
+          <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 md:w-[480px] h-[500px] sm:h-[600px] max-w-[calc(100vw-3rem)]">
           <div className="glass-effect rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-2xl animate-scale-in h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10 dark:border-slate-700/50">
