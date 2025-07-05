@@ -229,8 +229,12 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-200">
               {material.title}
             </CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line leading-relaxed">
-              {material.description?.split('\n').slice(0, 3).join('\n') || 'No description available'}
+            <CardDescription className="text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+              {material.description ? 
+                (material.description.length > 100 ? 
+                  material.description.substring(0, 100) + '...' : 
+                  material.description) : 
+                'No description available'}
             </CardDescription>
           </div>
         </div>

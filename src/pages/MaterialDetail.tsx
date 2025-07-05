@@ -272,10 +272,10 @@ const MaterialDetail = () => {
 
                     {material.html_code && material.html_introduction && (
                       <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-6 rounded-lg border-l-4 border-orange-500">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <Code className="w-6 h-6 text-orange-600" />
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">HTML Structure</h3>
-                        </div>
+                         <div className="flex items-center space-x-3 mb-4">
+                           <Code className="w-6 h-6 text-red-600" />
+                           <h3 className="text-xl font-bold text-red-600 dark:text-red-400">HTML Structure</h3>
+                         </div>
                         <div className="prose prose-gray dark:prose-invert max-w-none">
                           {material.html_introduction.split('\n').map((line, idx) => (
                             <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
@@ -288,10 +288,10 @@ const MaterialDetail = () => {
                     
                     {material.css_code && material.css_introduction && (
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <Palette className="w-6 h-6 text-blue-600" />
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">CSS Styling</h3>
-                        </div>
+                         <div className="flex items-center space-x-3 mb-4">
+                           <Palette className="w-6 h-6 text-red-600" />
+                           <h3 className="text-xl font-bold text-red-600 dark:text-red-400">CSS Styling</h3>
+                         </div>
                         <div className="prose prose-gray dark:prose-invert max-w-none">
                           {material.css_introduction.split('\n').map((line, idx) => (
                             <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
@@ -304,10 +304,10 @@ const MaterialDetail = () => {
                     
                     {material.js_code && material.js_introduction && (
                       <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-6 rounded-lg border-l-4 border-yellow-500">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <Code className="w-6 h-6 text-yellow-600" />
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">JavaScript Functionality</h3>
-                        </div>
+                         <div className="flex items-center space-x-3 mb-4">
+                           <Code className="w-6 h-6 text-red-600" />
+                           <h3 className="text-xl font-bold text-red-600 dark:text-red-400">JavaScript Functionality</h3>
+                         </div>
                         <div className="prose prose-gray dark:prose-invert max-w-none">
                           {material.js_introduction.split('\n').map((line, idx) => (
                             <p key={idx} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">

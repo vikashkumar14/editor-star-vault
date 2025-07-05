@@ -21,7 +21,7 @@ const ImageSlider = () => {
   const slides = [
     {
       id: 1,
-      image: "/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png",
+      image: "/lovable-uploads/911a6ff2-7f67-4420-9f8f-0ecc1441ac65.png",
       title: "Meet Vikash Kumar Kushwaha",
       subtitle: "Full Stack Developer & Creative Designer",
       description: "Passionate developer creating amazing web experiences with modern technologies",

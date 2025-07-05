@@ -24,11 +24,11 @@ const About = () => {
           {/* Hero Section with Developer Image */}
           <div className="text-center mb-16">
             <div className="mb-8">
-              <img
-                src="/public/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png"
-                alt="Vikash Kumar Kushwaha"
-                className="w-32 h-32 rounded-full mx-auto mb-6 shadow-2xl border-4 border-white dark:border-slate-700 object-cover"
-              />
+               <img
+                 src="/lovable-uploads/911a6ff2-7f67-4420-9f8f-0ecc1441ac65.png"
+                 alt="Vikash Kumar Kushwaha"
+                 className="w-32 h-32 rounded-full mx-auto mb-6 shadow-2xl border-4 border-white dark:border-slate-700 object-cover"
+               />
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 About <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Vikash Kumar Kushwaha</span>
               </h1>
