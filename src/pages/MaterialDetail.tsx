@@ -239,7 +239,7 @@ const MaterialDetail = () => {
                       {/* Step-by-step description */}
                       {material.description ? (
                         <div className="space-y-3">
-                          {material.description.split('\n').filter(line => line.trim()).map((step, index) => (
+                          {material.description.split(/[.\n]/).filter(line => line.trim()).map((step, index) => (
                             <div key={index} className="flex items-start gap-3 bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg">
                               <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-white text-sm font-bold">✓</span>
@@ -252,7 +252,7 @@ const MaterialDetail = () => {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {getContentTypeDescription(material.content_type, material.file_type).split('.').filter(part => part.trim()).map((feature, index) => (
+                          {getContentTypeDescription(material.content_type, material.file_type).split(/[.\n]/).filter(part => part.trim()).map((feature, index) => (
                             <div key={index} className="flex items-start gap-3 bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg">
                               <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-white text-sm font-bold">✓</span>
