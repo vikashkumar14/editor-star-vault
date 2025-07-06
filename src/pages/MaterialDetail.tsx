@@ -9,8 +9,10 @@ import Footer from "@/components/Footer";
 import MaterialInteractions from "@/components/MaterialInteractions";
 import PaymentModal from "@/components/PaymentModal";
 import CodePreview from "@/components/CodePreview";
+import RelatedMaterials from "@/components/RelatedMaterials";
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
+import { useMaterials } from '@/hooks/useMaterials';
 import { handleMaterialDownload } from '@/utils/download';
 import { toast } from "sonner";
 
@@ -23,6 +25,9 @@ const MaterialDetail = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCodePreview, setShowCodePreview] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  
+  // Fetch all materials for suggestions
+  const { materials } = useMaterials();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -199,11 +204,11 @@ const MaterialDetail = () => {
             Back to Materials
           </Button>
 
-          <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
               <Card className="overflow-hidden shadow-xl">
                 <div 
-                  className="h-48 sm:h-64 bg-cover bg-center relative"
+                  className="h-40 sm:h-48 lg:h-64 bg-cover bg-center relative"
                   style={{ 
                     backgroundImage: `url(${material.thumbnail_url})`,
                     backgroundColor: '#f3f4f6'
@@ -399,38 +404,38 @@ const MaterialDetail = () => {
               </Card>
             </div>
 
-            <div className="space-y-4 sm:space-y-6">
-              <Card className="shadow-xl border-2 border-blue-200 dark:border-blue-800">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl font-bold">Download Material</CardTitle>
+            <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
+              <Card className="shadow-xl border-2 border-blue-200 dark:border-blue-800 sticky top-4">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3 sm:p-4 lg:p-6">
+                  <CardTitle className="text-base sm:text-lg lg:text-xl font-bold">Download Material</CardTitle>
                   {material.file_size && (
-                    <CardDescription className="text-sm">
+                    <CardDescription className="text-xs sm:text-sm">
                       File size: {(material.file_size / 1024 / 1024).toFixed(2)} MB
                     </CardDescription>
                   )}
                 </CardHeader>
-                <CardContent className="space-y-4 pt-4 sm:pt-6 p-4 sm:p-6">
-                  <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-3 sm:p-4 rounded-lg">
                     <div className="flex items-center space-x-3 mb-2">
                       {getFileTypeIcon(material.file_type || '')}
-                      <span className="font-medium">{material.file_type?.toUpperCase() || 'FILE'}</span>
+                      <span className="font-medium text-sm sm:text-base">{material.file_type?.toUpperCase() || 'FILE'}</span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                       {getContentTypeDescription(material.content_type, material.file_type)}
                     </p>
                   </div>
 
                   {isPremium ? (
                     <Button 
-                      className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
+                      className="w-full h-10 sm:h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-sm sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
                       onClick={handlePremiumDownload}
                     >
-                      <CreditCard className="w-5 h-5 mr-2" />
+                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Purchase & Download ₹{price}
                     </Button>
                   ) : (
                     <Button 
-                      className="w-full h-12 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
+                      className="w-full h-10 sm:h-12 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white text-sm sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
                       onClick={handleDownload}
                       disabled={downloading}
                     >
@@ -441,16 +446,16 @@ const MaterialDetail = () => {
                         </span>
                       ) : (
                         <>
-                          <Download className="w-5 h-5 mr-2" />
+                          <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                           Free Download
                         </>
                       )}
                     </Button>
                   )}
                   
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-2 sm:p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-blue-700 dark:text-blue-300">
                         Download will start automatically. Check your downloads folder.
                       </p>
@@ -460,7 +465,7 @@ const MaterialDetail = () => {
                   {material.youtube_url && (
                     <Button 
                       variant="outline" 
-                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200" 
+                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200 h-9 sm:h-10" 
                       onClick={handlePreview}
                     >
                       <Play className="w-4 h-4 mr-2" />
@@ -471,7 +476,7 @@ const MaterialDetail = () => {
                   {hasCodeContent && (
                     <Button 
                       variant="outline" 
-                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200" 
+                      className="w-full shadow-lg hover:shadow-xl transition-all duration-200 h-9 sm:h-10" 
                       onClick={() => setShowCodePreview(!showCodePreview)}
                     >
                       <Code className="w-4 h-4 mr-2" />
@@ -518,6 +523,11 @@ const MaterialDetail = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+          
+          {/* Related Materials Suggestions - Only show coding materials */}
+          <div className="max-w-6xl mx-auto px-4">
+            <RelatedMaterials materials={materials} currentMaterialId={material.id} />
           </div>
         </div>
 
