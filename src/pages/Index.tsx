@@ -50,7 +50,7 @@ const Index = () => {
     <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="w-full">
+        <div className="w-full pt-16"> {/* Added padding-top for fixed navbar */}
           <EnhancedHero />
           <div id="projects">
             <ImageSlider />

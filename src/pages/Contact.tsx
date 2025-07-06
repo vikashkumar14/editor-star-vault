@@ -69,7 +69,7 @@ const Contact = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 py-16"> {/* Added pt-16 for fixed navbar */}
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-4">

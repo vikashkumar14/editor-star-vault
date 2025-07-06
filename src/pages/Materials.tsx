@@ -61,7 +61,7 @@ const Materials = () => {
       <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex items-center justify-center min-h-[60vh] pt-16"> {/* Added pt-16 for fixed navbar */}
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-gray-300">Loading materials...</p>
@@ -78,7 +78,7 @@ const Materials = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 md:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-16 py-4 md:py-8"> {/* Added pt-16 for fixed navbar */}
           <div className="text-center mb-6 md:mb-12">
             <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
               Professional Editing Materials

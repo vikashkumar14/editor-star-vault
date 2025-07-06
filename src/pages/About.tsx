@@ -20,7 +20,7 @@ const About = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 py-8 sm:py-16"> {/* Added pt-16 for fixed navbar */}
           {/* Hero Section with Developer Image */}
           <div className="text-center mb-8 sm:mb-16">
             <div className="mb-6 sm:mb-8">

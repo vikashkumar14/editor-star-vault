@@ -157,7 +157,7 @@ const MaterialDetail = () => {
       <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex items-center justify-center min-h-[60vh] pt-16"> {/* Added pt-16 for fixed navbar */}
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
           </div>
           <Footer />
@@ -171,7 +171,7 @@ const MaterialDetail = () => {
       <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto px-4 pt-16 py-8"> {/* Added pt-16 for fixed navbar */}
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Material Not Found</h1>
               <Button onClick={() => navigate('/materials')}>
@@ -194,7 +194,7 @@ const MaterialDetail = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
-        <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
+        <div className="max-w-6xl mx-auto px-4 pt-16 py-4 sm:py-8"> {/* Added pt-16 for fixed navbar */}
           <Button 
             variant="outline" 
             onClick={() => navigate('/materials')}
