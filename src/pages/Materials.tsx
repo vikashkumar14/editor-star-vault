@@ -21,7 +21,7 @@ const Materials = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useIsMobile();
   
-  const { materials, loading: materialsLoading, totalPages, totalCount } = useMaterials({ 
+  const { materials, loading: materialsLoading, totalPages, totalCount, error: materialsError, retry } = useMaterials({ 
     page: currentPage, 
     limit: 6, 
     category: selectedCategory 
@@ -72,10 +72,41 @@ const Materials = () => {
       <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh] pt-16"> {/* Added pt-16 for fixed navbar */}
+          <div className="flex items-center justify-center min-h-[60vh] pt-16">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-gray-300">Loading coding materials...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">This may take a moment...</p>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error state with retry option
+  if (materialsError && !materialsLoading) {
+    return (
+      <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          <div className="flex items-center justify-center min-h-[60vh] pt-16">
+            <div className="text-center max-w-md mx-auto px-4">
+              <div className="bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+                  Failed to Load Materials
+                </h3>
+                <p className="text-red-600 dark:text-red-300 mb-4">
+                  {materialsError}
+                </p>
+                <Button 
+                  onClick={retry}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Try Again
+                </Button>
+              </div>
             </div>
           </div>
           <Footer />
@@ -201,7 +232,7 @@ const Materials = () => {
 
           <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
-              Showing {materials.length} of {totalCount} coding materials (Page {currentPage} of {totalPages})
+              Showing {filteredMaterials.length} of {totalCount} coding materials (Page {currentPage} of {totalPages})
             </p>
             {(searchTerm || selectedCategory) && (
               <Button variant="outline" size="sm" onClick={() => { 
@@ -215,27 +246,35 @@ const Materials = () => {
           </div>
 
           <div className={`grid gap-4 md:gap-6 ${ viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1' }`}>
-            {materials.map((material) => (
+            {filteredMaterials.map((material) => (
               <MaterialCard key={material.id} material={material} />
             ))}
           </div>
 
-          {materials.length === 0 && !materialsLoading && (
+          {filteredMaterials.length === 0 && !materialsLoading && !materialsError && (
             <div className="text-center py-12 col-span-full">
               <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2">
-                No coding materials found matching your criteria.
+                {searchTerm || selectedCategory 
+                  ? "No coding materials found matching your criteria."
+                  : "No coding materials available yet."
+                }
               </p>
-              <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">
-                Try adjusting your search terms or clearing the filters.
+              <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mb-4">
+                {searchTerm || selectedCategory 
+                  ? "Try adjusting your search terms or clearing the filters."
+                  : "We're working on adding coding materials to the platform."
+                }
               </p>
-              <Button className="mt-4" onClick={() => { 
-                setSearchTerm(''); 
-                setSelectedCategory(''); 
-                setCurrentPage(1);
-              }}>
-                Browse All Coding Materials
-              </Button>
+              {(searchTerm || selectedCategory) && (
+                <Button onClick={() => { 
+                  setSearchTerm(''); 
+                  setSelectedCategory(''); 
+                  setCurrentPage(1);
+                }}>
+                  Clear Filters
+                </Button>
+              )}
             </div>
           )}
 

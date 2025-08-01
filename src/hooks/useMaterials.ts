@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
 
@@ -17,20 +17,48 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
 
-  useEffect(() => {
-    const fetchMaterials = async () => {
-      try {
-        setLoading(true);
+  const fetchMaterials = useCallback(async (retryAttempt = 0) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Build base query - start with all published content, then apply coding filters
+      let query = supabase
+        .from('content')
+        .select('*', { count: 'exact' })
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+
+      // Apply coding-related filters (more flexible approach)
+      if (!featured && !category) {
+        // Try to get coding materials first, fallback to all materials if none found
+        const codingCategories = ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'];
         
-        // Build base query for coding materials only
-        let query = supabase
+        // First try with coding categories
+        const codingQuery = supabase
           .from('content')
           .select('*', { count: 'exact' })
           .eq('status', 'published')
-          .in('category', ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'])
-          .order('created_at', { ascending: false });
+          .in('category', codingCategories)
+          .order('created_at', { ascending: false })
+          .range((page - 1) * limit, (page - 1) * limit + limit - 1);
 
+        const { data: codingData, count: codingCount } = await codingQuery;
+        
+        // If we have coding materials, use them. Otherwise, fallback to all materials.
+        if (codingData && codingData.length > 0) {
+          setMaterials(codingData);
+          setTotalCount(codingCount || 0);
+          setTotalPages(Math.ceil((codingCount || 0) / limit));
+          setLoading(false);
+          return;
+        }
+        
+        // Fallback: get all materials if no coding materials found
+        query = query.range((page - 1) * limit, (page - 1) * limit + limit - 1);
+      } else {
         if (featured) {
           query = query.eq('is_featured', true);
         }
@@ -42,27 +70,51 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         // Add pagination
         const offset = (page - 1) * limit;
         query = query.range(offset, offset + limit - 1);
-
-        const { data, error, count } = await query;
-
-        if (error) {
-          console.error('Error fetching materials:', error);
-          setError('Failed to load coding materials');
-        } else {
-          setMaterials(data || []);
-          setTotalCount(count || 0);
-          setTotalPages(Math.ceil((count || 0) / limit));
-        }
-      } catch (err) {
-        console.error('Error:', err);
-        setError('Failed to load coding materials');
-      } finally {
-        setLoading(false);
       }
-    };
 
+      const { data, error, count } = await query;
+
+      if (error) {
+        throw error;
+      }
+      
+      setMaterials(data || []);
+      setTotalCount(count || 0);
+      setTotalPages(Math.ceil((count || 0) / limit));
+      setRetryCount(0); // Reset retry count on success
+      
+    } catch (err: any) {
+      console.error('Error fetching materials:', err);
+      
+      // Implement retry logic for network failures
+      if (retryAttempt < 3 && (err.message?.includes('timeout') || err.message?.includes('network') || err.code === '57014')) {
+        console.log(`Retrying fetch materials (attempt ${retryAttempt + 1})`);
+        setTimeout(() => {
+          fetchMaterials(retryAttempt + 1);
+        }, 1000 * (retryAttempt + 1)); // Exponential backoff
+        return;
+      }
+      
+      setError(err.message || 'Failed to load materials');
+      setMaterials([]);
+      setTotalCount(0);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [featured, page, limit, category]);
+
+  useEffect(() => {
     fetchMaterials();
+  }, [fetchMaterials]);
 
+  // Retry function for manual retry
+  const retry = useCallback(() => {
+    setRetryCount(prev => prev + 1);
+    fetchMaterials();
+  }, [fetchMaterials]);
+
+  useEffect(() => {
     // Set up real-time subscription for content changes
     const channel = supabase
       .channel('schema-db-changes')
@@ -105,6 +157,7 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
     error, 
     totalCount, 
     totalPages, 
-    currentPage: page 
+    currentPage: page,
+    retry
   };
 };
