@@ -9,7 +9,7 @@ import { useCategories } from "@/hooks/useCategories";
 import MaterialCard from "./MaterialCard";
 
 const FeaturedMaterials = () => {
-  const { materials: featuredMaterials, loading: materialsLoading } = useMaterials(true);
+  const { materials: featuredMaterials, loading: materialsLoading } = useMaterials({ featured: true });
   const { categories, loading: categoriesLoading } = useCategories();
 
   const iconMap: { [key: string]: any } = {
@@ -51,10 +51,10 @@ const FeaturedMaterials = () => {
             Featured Collections
           </Badge>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Premium Editing Materials
+            Premium Coding Materials
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Discover our handpicked collection of professional-grade editing materials used in The Editor Star tutorials
+            Discover our handpicked collection of professional-grade coding resources, templates, and projects
           </p>
         </div>
 

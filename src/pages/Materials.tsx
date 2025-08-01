@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Search, Filter, Grid, List, X, Menu } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -17,10 +18,20 @@ const Materials = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useIsMobile();
   
-  const { materials, loading: materialsLoading } = useMaterials();
+  const { materials, loading: materialsLoading, totalPages, totalCount } = useMaterials({ 
+    page: currentPage, 
+    limit: 6, 
+    category: selectedCategory 
+  });
   const { categories, loading: categoriesLoading } = useCategories();
+
+  // Filter categories to show only coding-related ones
+  const codingCategories = categories.filter(cat => 
+    ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'].includes(cat.name)
+  );
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -63,8 +74,8 @@ const Materials = () => {
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex items-center justify-center min-h-[60vh] pt-16"> {/* Added pt-16 for fixed navbar */}
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">Loading materials...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-300">Loading coding materials...</p>
             </div>
           </div>
           <Footer />
@@ -81,10 +92,10 @@ const Materials = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-16 py-4 md:py-8"> {/* Added pt-16 for fixed navbar */}
           <div className="text-center mb-6 md:mb-12">
             <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
-              Professional Editing Materials
+              Professional Coding Materials
             </h1>
             <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-300">
-              Download high-quality editing resources for your projects
+              Download high-quality coding resources, templates, and projects for your development journey
             </p>
           </div>
 
@@ -126,7 +137,7 @@ const Materials = () => {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                         <option value="">All Categories</option>
-                        {categories.map((category) => (
+                        {codingCategories.map((category) => (
                         <option key={category.id} value={category.name}>
                             {category.name}
                         </option>
@@ -161,7 +172,7 @@ const Materials = () => {
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowFilters(false); }}
                 >
                   <option value="">All Categories</option>
-                  {categories.map((category) => ( <option key={category.id} value={category.name}> {category.name} </option> ))}
+                  {codingCategories.map((category) => ( <option key={category.id} value={category.name}> {category.name} </option> ))}
                 </select>
               </CardContent>
             </Card>
@@ -190,33 +201,94 @@ const Materials = () => {
 
           <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
-              Showing {filteredMaterials.length} of {materials.length} materials
+              Showing {materials.length} of {totalCount} coding materials (Page {currentPage} of {totalPages})
             </p>
             {(searchTerm || selectedCategory) && (
-              <Button variant="outline" size="sm" onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}>
+              <Button variant="outline" size="sm" onClick={() => { 
+                setSearchTerm(''); 
+                setSelectedCategory(''); 
+                setCurrentPage(1);
+              }}>
                 Clear Filters
               </Button>
             )}
           </div>
 
-          <div className={`grid gap-3 sm:gap-4 md:gap-8 ${ viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1' }`}>
-            {filteredMaterials.map((material) => (
+          <div className={`grid gap-4 md:gap-6 ${ viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1' }`}>
+            {materials.map((material) => (
               <MaterialCard key={material.id} material={material} />
             ))}
           </div>
 
-          {filteredMaterials.length === 0 && (
+          {materials.length === 0 && !materialsLoading && (
             <div className="text-center py-12 col-span-full">
               <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2">
-                No materials found matching your criteria.
+                No coding materials found matching your criteria.
               </p>
               <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">
                 Try adjusting your search terms or clearing the filters.
               </p>
-              <Button className="mt-4" onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}>
-                Browse All Materials
+              <Button className="mt-4" onClick={() => { 
+                setSearchTerm(''); 
+                setSelectedCategory(''); 
+                setCurrentPage(1);
+              }}>
+                Browse All Coding Materials
               </Button>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  {currentPage > 1 && (
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        className="cursor-pointer"
+                      />
+                    </PaginationItem>
+                  )}
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNum)}
+                          isActive={currentPage === pageNum}
+                          className="cursor-pointer"
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  {currentPage < totalPages && (
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        className="cursor-pointer"
+                      />
+                    </PaginationItem>
+                  )}
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>

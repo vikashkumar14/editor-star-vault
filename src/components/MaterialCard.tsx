@@ -127,7 +127,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const hasLivePreview = hasCodeContent || isPDF || material.youtube_url;
 
   return (
-    <Card className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 card-hover overflow-hidden bg-white dark:bg-slate-800 group transform hover:-translate-y-1">
+    <Card className="border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden bg-gray-50 dark:bg-slate-800 group hover:-translate-y-1 rounded-lg">
       <div 
         className="h-48 bg-cover bg-center relative group cursor-pointer"
         style={{ 
@@ -239,66 +239,81 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
           </div>
         </div>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-3">
-          <div className="flex items-center space-x-1">
-            <Eye className="w-4 h-4" />
-            <span>{material.downloads_count?.toLocaleString() || 0}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span>{material.rating || 0}</span>
-          </div>
-          <div className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
-            {material.content_type}
-          </div>
-        </div>
-        
-        <div className="flex flex-wrap gap-2 mt-3">
-          {material.software_compatibility?.slice(0, 2).map((software, idx) => (
-            <Badge key={idx} variant="secondary" className="text-xs">
-              {getSoftwareDisplayName(software)}
+        {/* Meta Information */}
+        <div className="space-y-3 mt-3">
+          {/* Language/Category */}
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Language:</span>
+            <Badge variant="secondary" className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+              {material.category || material.content_type}
             </Badge>
-          ))}
-          {material.software_compatibility && material.software_compatibility.length > 2 && (
-            <Badge variant="secondary" className="text-xs">
-              +{material.software_compatibility.length - 2} more
-            </Badge>
-          )}
-        </div>
-        
-        <div className="flex flex-wrap gap-1 mt-2">
-          {material.tags?.slice(0, 2).map((tag, idx) => (
-            <Badge key={idx} variant="outline" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-          {material.tags && material.tags.length > 2 && (
+          </div>
+          
+          {/* Level */}
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Level:</span>
             <Badge variant="outline" className="text-xs">
-              +{material.tags.length - 2}
+              {material.tags?.find(tag => ['beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase())) || 'Intermediate'}
             </Badge>
+          </div>
+          
+          {/* Format */}
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Format:</span>
+            <Badge variant="outline" className="text-xs">
+              {material.file_type?.toUpperCase() || 'Code'}
+            </Badge>
+          </div>
+          
+          {/* Stats */}
+          <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center space-x-1">
+              <Eye className="w-4 h-4" />
+              <span>{material.downloads_count?.toLocaleString() || 0}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <span>{material.rating || 0}</span>
+            </div>
+          </div>
+          
+          {/* Tags */}
+          {material.tags && material.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {material.tags.slice(0, 3).map((tag, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {material.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{material.tags.length - 3}
+                </Badge>
+              )}
+            </div>
           )}
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        {/* Action Buttons - Only View Details and Live Preview */}
+      <CardContent className="pt-0">
+        {/* Download Button */}
         <div className="flex space-x-2">
           <Button 
-            className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={handleViewDetails}
           >
             <Info className="w-4 h-4 mr-2" />
-            View Details
+            Download Material
           </Button>
           
           {hasLivePreview && (
             <Button 
               variant="outline" 
               onClick={handleLivePreview}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
             >
               <Eye className="w-4 h-4 mr-1" />
-              Live Preview
+              Preview
             </Button>
           )}
         </div>
