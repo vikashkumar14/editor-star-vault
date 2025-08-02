@@ -16,7 +16,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-[100] glass-effect border-b border-white/20 shadow-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -27,7 +27,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 alt="Gyaan Repo Logo"
                 className="h-8 w-8 rounded-md"
               />
-              <span className="font-bold text-xl text-red-500 dark:text-orange-500">
+              <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Gyaan Repo
               </span>
             </Link>
@@ -43,13 +43,13 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/materials" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+            <Link to="/materials" className="text-white/90 hover:text-primary transition-colors duration-200 font-medium">
               Materials
             </Link>
-            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+            <Link to="/about" className="text-white/90 hover:text-primary transition-colors duration-200 font-medium">
               About
             </Link>
-            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400">
+            <Link to="/contact" className="text-white/90 hover:text-primary transition-colors duration-200 font-medium">
               Contact
             </Link>
           </div>
@@ -64,7 +64,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 placeholder="Search materials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-48 md:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-red-500 focus:border-red-500"
+                className="pl-9 w-48 md:w-64 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/70 focus:ring-primary focus:border-primary"
               />
             </div>
             
@@ -73,7 +73,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hidden sm:flex"
+              className="text-white/90 hover:text-primary transition-colors duration-200 hidden sm:flex"
             >
               <User className="w-4 h-4 mr-2" />
               Login
@@ -84,7 +84,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 sm:hidden"
+              className="text-white/90 hover:text-primary transition-colors duration-200 sm:hidden"
             >
               <User className="w-5 h-5" />
             </Button>
@@ -94,7 +94,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/admin-login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hidden sm:flex"
+              className="text-white/90 hover:text-primary transition-colors duration-200 hidden sm:flex"
             >
               <Shield className="w-4 h-4 mr-2" />
               Admin
@@ -105,7 +105,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/admin-login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 sm:hidden"
+              className="text-white/90 hover:text-primary transition-colors duration-200 sm:hidden"
             >
               <Shield className="w-5 h-5" />
             </Button>
@@ -115,7 +115,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={toggleDarkMode}
-              className="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+              className="text-white/90 hover:text-primary transition-colors duration-200"
             >
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
@@ -125,7 +125,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden text-gray-700 dark:text-gray-300 p-2"
+              className="md:hidden text-white/90 hover:text-primary transition-colors duration-200 p-2"
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -135,7 +135,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 glass-effect border-t border-white/20">
               
               {/* Mobile search */}
               <div className="relative mb-3 sm:hidden">

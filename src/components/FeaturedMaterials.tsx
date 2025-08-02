@@ -46,14 +46,14 @@ const FeaturedMaterials = () => {
     <section className="py-20 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 mb-4">
+        <div className="text-center mb-16 animate-fade-in">
+          <Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground border-0 mb-4">
             Featured Collections
           </Badge>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
             Premium Coding Materials
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover our handpicked collection of professional-grade coding resources, templates, and projects
           </p>
         </div>
@@ -66,13 +66,13 @@ const FeaturedMaterials = () => {
             const materialCount = featuredMaterials.filter(m => m.category === category.name).length;
             
             return (
-              <Card key={category.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-hover bg-white dark:bg-slate-800">
+              <Card key={category.id} className="material-card bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
                 <CardHeader className="text-center">
                   <div className={`w-16 h-16 bg-gradient-to-r ${colorClass} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{category.name}</CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-300">
+                  <CardTitle className="text-xl text-foreground">{category.name}</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     {category.description}
                   </CardDescription>
                   <Badge variant="secondary" className="w-fit mx-auto">
@@ -81,7 +81,7 @@ const FeaturedMaterials = () => {
                 </CardHeader>
                 <CardContent>
                   <Link to="/materials">
-                    <Button variant="outline" className="w-full hover:bg-gray-50 dark:hover:bg-slate-700">
+                    <Button variant="outline" className="w-full bg-primary/5 hover:bg-primary hover:text-primary-foreground border-primary/30 hover:border-primary transition-all duration-300">
                       Browse Category
                     </Button>
                   </Link>
@@ -93,29 +93,30 @@ const FeaturedMaterials = () => {
 
         {/* Featured Items */}
         <div className="space-y-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <div className="text-center animate-slide-up">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
               Most Downloaded This Week
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted-foreground">
               Popular materials from our community
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredMaterials.slice(0, 3).map((material) => (
-              <MaterialCard key={material.id} material={material} />
+            {featuredMaterials.slice(0, 3).map((material, index) => (
+              <div key={material.id} className="animate-scale-in" style={{ animationDelay: `${index * 0.15}s` }}>
+                <MaterialCard material={material} />
+              </div>
             ))}
           </div>
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 animate-bounce-in">
           <Link to="/materials">
             <Button 
               size="lg" 
-              variant="outline" 
-              className="px-8 py-4 text-lg border-2 hover:bg-gray-50 dark:hover:bg-slate-800"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-8 py-4 text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border-0"
             >
               View All Materials
               <span className="ml-2">→</span>
