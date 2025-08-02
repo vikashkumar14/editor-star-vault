@@ -24,7 +24,8 @@ const Materials = () => {
   const { materials, loading: materialsLoading, totalPages, totalCount, error: materialsError, retry } = useMaterials({ 
     page: currentPage, 
     limit: 6, 
-    category: selectedCategory 
+    category: selectedCategory,
+    search: searchTerm
   });
   const { categories, loading: categoriesLoading } = useCategories();
 
@@ -38,34 +39,9 @@ const Materials = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  // --- 💡 FINAL FIX YAHAN HAI: Code ko data errors se bachane ke liye Optional Chaining (?. ) ka istemaal ---
-  const filteredMaterials = useMemo(() => {
-    if (!materials) return [];
-
-    return materials.filter(material => {
-      // Agar material object hi null hai to use filter se bahar kar do
-      if (!material) return false;
-
-      const searchLower = searchTerm.toLowerCase().trim();
-      
-      // Har property ko access karne se pehle ?. se check kiya ja raha hai
-      const matchesSearch = !searchLower || 
-        material.title?.toLowerCase().includes(searchLower) ||
-        material.description?.toLowerCase().includes(searchLower) ||
-        material.category?.toLowerCase().includes(searchLower) ||
-        material.author?.toLowerCase().includes(searchLower) ||
-        material.content_type?.toLowerCase().includes(searchLower) ||
-        material.file_type?.toLowerCase().includes(searchLower) ||
-        material.tags?.some(tag => tag?.toLowerCase().includes(searchLower)) ||
-        material.software_compatibility?.some(software => 
-          software?.toLowerCase().replace('_', ' ').includes(searchLower)
-        );
-      
-      const matchesCategory = !selectedCategory || material.category === selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    });
-  }, [materials, searchTerm, selectedCategory]);
+  // Search is now handled server-side in the useMaterials hook
+  // No need for client-side filtering anymore since we're doing global search
+  const displayMaterials = materials || [];
 
   if (materialsLoading || categoriesLoading) {
     return (
@@ -163,7 +139,7 @@ const Materials = () => {
                     <label htmlFor="category-select-desktop" className="text-sm font-medium text-gray-700 dark:text-gray-300">Category:</label>
                     <select
                         id="category-select-desktop"
-                        className="px-4 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                        className="px-4 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
@@ -232,7 +208,8 @@ const Materials = () => {
 
           <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
-              Showing {filteredMaterials.length} of {totalCount} coding materials (Page {currentPage} of {totalPages})
+              {searchTerm ? `Showing results for "${searchTerm}"` : `Showing ${totalCount} coding materials`} 
+              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
             </p>
             {(searchTerm || selectedCategory) && (
               <Button variant="outline" size="sm" onClick={() => { 
@@ -246,12 +223,12 @@ const Materials = () => {
           </div>
 
           <div className={`grid gap-4 md:gap-6 ${ viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1' }`}>
-            {filteredMaterials.map((material) => (
+            {displayMaterials.map((material) => (
               <MaterialCard key={material.id} material={material} />
             ))}
           </div>
 
-          {filteredMaterials.length === 0 && !materialsLoading && !materialsError && (
+          {displayMaterials.length === 0 && !materialsLoading && !materialsError && (
             <div className="text-center py-12 col-span-full">
               <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2">

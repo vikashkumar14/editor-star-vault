@@ -35,43 +35,43 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
-        <div className="py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 sm:gap-12">
+        <div className="py-8 sm:py-12 lg:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
             {/* Brand Section */}
-            <div className="sm:col-span-2 lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
+            <div className="sm:col-span-2 lg:col-span-2 mb-6 sm:mb-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 mb-4 sm:mb-6">
                 <img
                   src="https://i.ibb.co/XkjPcgsv/icon.jpg"
                   alt="Gyaan Repo Logo"
-                  className="w-12 h-12 rounded-xl object-cover"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover"
                 />
                 <div>
-                  <h3 className="text-xl font-bold">Gyaan Repo</h3>
-                  <p className="text-gray-400 text-sm">
+                  <h3 className="text-lg sm:text-xl font-bold">Gyaan Repo</h3>
+                  <p className="text-gray-400 text-xs sm:text-sm">
                     Free, Reliable & Developer-Ready Source Code
                   </p>
                 </div>
               </div>
 
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Gyaan Repo - Unlock Free, Reliable & Developer-Ready Source Code to help Gyaan Repo
-                make stunning content. Join our community of 50K+ Gyaan Repo worldwide.
+              <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
+                Gyaan Repo - Unlock Free, Reliable & Developer-Ready Source Code to help developers
+                create amazing projects. Join our community of 50K+ developers worldwide.
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center space-x-3 text-gray-400">
-                  <Mail className="w-4 h-4" />
-                  <span>contact@GyaanRepo.com</span>
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                <div className="flex items-center space-x-3 text-gray-400 text-sm sm:text-base">
+                  <Mail className="w-4 h-4 flex-shrink-0" />
+                  <span className="break-all">contact@GyaanRepo.com</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-400">
-                  <MapPin className="w-4 h-4" />
+                <div className="flex items-center space-x-3 text-gray-400 text-sm sm:text-base">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span>Bihar, India</span>
                 </div>
               </div>
 
               {/* Social Links */}
-              <div className="flex space-x-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4 justify-start sm:justify-start">
                 {socialLinks.map((social, index) => {
                   const IconComponent = social.icon;
                   return (
@@ -79,11 +79,11 @@ const Footer = () => {
                       key={index}
                       variant="ghost"
                       size="icon"
-                      className={`text-gray-400 ${social.color} transition-colors`}
+                      className={`text-gray-400 ${social.color} transition-colors h-9 w-9 sm:h-10 sm:w-10`}
                       asChild
                     >
                       <a href={social.href} aria-label={social.label}>
-                        <IconComponent className="w-5 h-5" />
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                       </a>
                     </Button>
                   );
@@ -93,14 +93,14 @@ const Footer = () => {
 
             {/* Footer Links */}
             {Object.entries(footerLinks).map(([category, links]) => (
-              <div key={category}>
-                <h4 className="text-lg font-semibold mb-6">{category}</h4>
-                <ul className="space-y-3">
+              <div key={category} className="mb-6 sm:mb-0">
+                <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-6">{category}</h4>
+                <ul className="space-y-2 sm:space-y-3">
                   {links.map((link, index) => (
                     <li key={index}>
                       <a
                         href="#"
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base block py-1"
                       >
                         {link}
                       </a>
@@ -120,15 +120,15 @@ const Footer = () => {
         <Separator className="bg-gray-800" />
 
         {/* Bottom Footer */}
-        <div className="py-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-center sm:text-left">
-            <div className="text-gray-400 text-sm">
+        <div className="py-4 sm:py-6 lg:py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 text-center sm:text-left">
+            <div className="text-gray-400 text-xs sm:text-sm">
               © {currentYear} Gyaan Repo. All rights reserved.
             </div>
-            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4 sm:gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
+              <a href="#" className="hover:text-white transition-colors py-1">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors py-1">Terms</a>
+              <a href="#" className="hover:text-white transition-colors py-1">Cookies</a>
             </div>
           </div>
         </div>

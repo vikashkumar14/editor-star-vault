@@ -8,10 +8,11 @@ interface UseMaterialsOptions {
   page?: number;
   limit?: number;
   category?: string;
+  search?: string;
 }
 
 export const useMaterials = (options: UseMaterialsOptions = {}) => {
-  const { featured = false, page = 1, limit = 6, category } = options;
+  const { featured = false, page = 1, limit = 6, category, search } = options;
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,39 +25,48 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
       setLoading(true);
       setError(null);
       
-      // Build base query - start with all published content, then apply coding filters
+      // Build base query - start with all published content, then apply filters
       let query = supabase
         .from('content')
         .select('*', { count: 'exact' })
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
+        .eq('status', 'published');
+
+      // Apply search filter first (global search across all materials)
+      if (search && search.trim()) {
+        const searchTerm = search.trim();
+        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,content_type.ilike.%${searchTerm}%,file_type.ilike.%${searchTerm}%`);
+      }
 
       // Apply coding-related filters (more flexible approach)
       if (!featured && !category) {
         // Try to get coding materials first, fallback to all materials if none found
         const codingCategories = ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'];
         
-        // First try with coding categories
-        const codingQuery = supabase
-          .from('content')
-          .select('*', { count: 'exact' })
-          .eq('status', 'published')
-          .in('category', codingCategories)
-          .order('created_at', { ascending: false })
-          .range((page - 1) * limit, (page - 1) * limit + limit - 1);
+        // If we have a search term, search all materials. Otherwise, try coding categories first.
+        if (!search || !search.trim()) {
+          // First try with coding categories (only when no search is active)
+          const codingQuery = supabase
+            .from('content')
+            .select('*', { count: 'exact' })
+            .eq('status', 'published')
+            .in('category', codingCategories)
+            .order('created_at', { ascending: false })
+            .range((page - 1) * limit, (page - 1) * limit + limit - 1);
 
-        const { data: codingData, count: codingCount } = await codingQuery;
-        
-        // If we have coding materials, use them. Otherwise, fallback to all materials.
-        if (codingData && codingData.length > 0) {
-          setMaterials(codingData);
-          setTotalCount(codingCount || 0);
-          setTotalPages(Math.ceil((codingCount || 0) / limit));
-          setLoading(false);
-          return;
+          const { data: codingData, count: codingCount } = await codingQuery;
+          
+          // If we have coding materials, use them. Otherwise, fallback to all materials.
+          if (codingData && codingData.length > 0) {
+            setMaterials(codingData);
+            setTotalCount(codingCount || 0);
+            setTotalPages(Math.ceil((codingCount || 0) / limit));
+            setLoading(false);
+            return;
+          }
         }
         
-        // Fallback: get all materials if no coding materials found
+        // Apply order and pagination to the main query
+        query = query.order('created_at', { ascending: false });
         query = query.range((page - 1) * limit, (page - 1) * limit + limit - 1);
       } else {
         if (featured) {
@@ -67,7 +77,8 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
           query = query.eq('category', category);
         }
 
-        // Add pagination
+        // Apply order and pagination
+        query = query.order('created_at', { ascending: false });
         const offset = (page - 1) * limit;
         query = query.range(offset, offset + limit - 1);
       }
@@ -102,7 +113,7 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [featured, page, limit, category]);
+  }, [featured, page, limit, category, search]);
 
   useEffect(() => {
     fetchMaterials();
@@ -149,7 +160,7 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [featured, page, limit, category]);
+  }, [featured, page, limit, category, search]);
 
   return { 
     materials, 
