@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,22 +10,27 @@ import MaterialCard from "@/components/MaterialCard";
 import { useMaterials } from "@/hooks/useMaterials";
 import { useCategories } from "@/hooks/useCategories";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useSearchParams } from 'react-router-dom';
 
 const Materials = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useIsMobile();
   
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  
   const { materials, loading: materialsLoading, totalPages, totalCount, error: materialsError, retry } = useMaterials({ 
     page: currentPage, 
     limit: 6, 
     category: selectedCategory,
-    search: searchTerm
+    search: debouncedSearchTerm
   });
   const { categories, loading: categoriesLoading } = useCategories();
 
@@ -33,6 +38,20 @@ const Materials = () => {
   const codingCategories = categories.filter(cat => 
     ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'].includes(cat.name)
   );
+
+  // Update URL when filters change
+  useEffect(() => {
+    const newParams = new URLSearchParams();
+    if (debouncedSearchTerm) newParams.set('search', debouncedSearchTerm);
+    if (selectedCategory) newParams.set('category', selectedCategory);
+    if (currentPage > 1) newParams.set('page', currentPage.toString());
+    setSearchParams(newParams);
+  }, [debouncedSearchTerm, selectedCategory, currentPage, setSearchParams]);
+
+  // Reset page when search or category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, selectedCategory]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -69,19 +88,24 @@ const Materials = () => {
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex items-center justify-center min-h-[60vh] pt-16">
             <div className="text-center max-w-md mx-auto px-4">
-              <div className="bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
-                  Failed to Load Materials
+              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-destructive mb-2">
+                  Connection Error
                 </h3>
-                <p className="text-red-600 dark:text-red-300 mb-4">
-                  {materialsError}
+                <p className="text-destructive/80 mb-4">
+                  {materialsError.includes('timeout') ? 'Request timed out. Server may be overloaded.' : materialsError}
                 </p>
-                <Button 
-                  onClick={retry}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Try Again
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    onClick={retry}
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground w-full"
+                  >
+                    Retry Loading
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    If the problem persists, try refreshing the page
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -208,10 +232,10 @@ const Materials = () => {
 
           <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
-              {searchTerm ? `Showing results for "${searchTerm}"` : `Showing ${totalCount} coding materials`} 
+              {debouncedSearchTerm ? `Showing ${materials.length} results for "${debouncedSearchTerm}"` : `Showing ${totalCount} coding materials`} 
               {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
             </p>
-            {(searchTerm || selectedCategory) && (
+            {(debouncedSearchTerm || selectedCategory) && (
               <Button variant="outline" size="sm" onClick={() => { 
                 setSearchTerm(''); 
                 setSelectedCategory(''); 
@@ -230,28 +254,33 @@ const Materials = () => {
 
           {displayMaterials.length === 0 && !materialsLoading && !materialsError && (
             <div className="text-center py-12 col-span-full">
-              <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2">
-                {searchTerm || selectedCategory 
-                  ? "No coding materials found matching your criteria."
-                  : "No coding materials available yet."
-                }
-              </p>
-              <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mb-4">
-                {searchTerm || selectedCategory 
-                  ? "Try adjusting your search terms or clearing the filters."
-                  : "We're working on adding coding materials to the platform."
-                }
-              </p>
-              {(searchTerm || selectedCategory) && (
-                <Button onClick={() => { 
-                  setSearchTerm(''); 
-                  setSelectedCategory(''); 
-                  setCurrentPage(1);
-                }}>
-                  Clear Filters
-                </Button>
-              )}
+              <div className="bg-accent/5 rounded-lg p-8 border border-accent/20">
+                <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2 font-semibold">
+                  {debouncedSearchTerm || selectedCategory 
+                    ? `No results found for ${debouncedSearchTerm ? `"${debouncedSearchTerm}"` : selectedCategory}`
+                    : "No coding materials available yet."
+                  }
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mb-4">
+                  {debouncedSearchTerm || selectedCategory 
+                    ? "Try adjusting your search terms or clearing the filters."
+                    : "We're working on adding coding materials to the platform."
+                  }
+                </p>
+                {(debouncedSearchTerm || selectedCategory) && (
+                  <Button 
+                    onClick={() => { 
+                      setSearchTerm(''); 
+                      setSelectedCategory(''); 
+                      setCurrentPage(1);
+                    }}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Clear All Filters
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 

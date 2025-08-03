@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Moon, Sun, Menu, X, User, Shield, Code } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -14,6 +15,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (debouncedSearchQuery.trim()) {
+      navigate(`/materials?search=${encodeURIComponent(debouncedSearchQuery.trim())}`);
+      setSearchQuery('');
+      setIsOpen(false);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm transition-all duration-300">
@@ -57,7 +68,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           {/* Right side buttons */}
           <div className="flex items-center space-x-2 md:space-x-4">
             {/* Search - hidden on mobile */}
-            <div className="relative hidden sm:block">
+            <form onSubmit={handleSearch} className="relative hidden sm:block">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
@@ -66,7 +77,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 w-48 md:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary"
               />
-            </div>
+            </form>
             
             {/* Login button - simplified on mobile */}
             <Button
@@ -138,7 +149,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700 shadow-lg">
               
               {/* Mobile search */}
-              <div className="relative mb-3 sm:hidden">
+              <form onSubmit={handleSearch} className="relative mb-3 sm:hidden">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
                   type="text"
@@ -147,7 +158,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary"
                 />
-              </div>
+              </form>
 
               {/* Developer info on mobile */}
               <div className="lg:hidden px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-3">
@@ -201,10 +212,12 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
         )}
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Search hint */}
       {searchQuery && (
-        <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
-          <p className="px-4 py-2 text-gray-700 dark:text-gray-300">No results found for "{searchQuery}"</p>
+        <div className="absolute left-4 right-4 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+          <p className="px-4 py-2 text-gray-700 dark:text-gray-300">
+            Press Enter to search for "{searchQuery}"
+          </p>
         </div>
       )}
     </nav>

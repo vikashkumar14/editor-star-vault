@@ -163,10 +163,12 @@ const AdminDashboard = () => {
   const fetchMaterials = async () => {
     setLoading(true);
     try {
+      // Fetch with pagination to avoid timeout
       const { data, error } = await supabase
         .from('content')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50); // Limit to prevent timeout
 
       if (error) {
         console.error('Error fetching materials:', error);
@@ -182,8 +184,8 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: "Error", 
+        description: "Connection timeout. Try refreshing the page.",
         variant: "destructive",
       });
     } finally {
