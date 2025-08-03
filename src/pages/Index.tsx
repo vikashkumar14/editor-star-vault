@@ -5,6 +5,7 @@ import EnhancedHero from "@/components/EnhancedHero";
 import ImageSlider from "@/components/ImageSlider";
 import DeveloperFeatures from "@/components/DeveloperFeatures";
 import FeaturedMaterials from "@/components/FeaturedMaterials";
+import MostDownloadedWeek from "@/components/MostDownloadedWeek";
 import AnimatedStats from "@/components/AnimatedStats";
 import TrendingSection from "@/components/TrendingSection";
 import CreatorsShowcase from "@/components/CreatorsShowcase";
@@ -55,6 +56,8 @@ const Index = () => {
           <div id="projects">
             <ImageSlider />
           </div>
+          {/* Most Downloaded Section - moved right after slider */}
+          <MostDownloadedWeek />
           <DeveloperFeatures />
           <AnimatedStats />
           <TrustedCreators />

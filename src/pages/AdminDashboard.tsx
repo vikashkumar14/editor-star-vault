@@ -26,6 +26,11 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   
+  // Pagination state for better performance
+  const [currentPage, setCurrentPage] = useState(1);
+  const [materialsPerPage] = useState(10);
+  const [totalMaterials, setTotalMaterials] = useState(0);
+  
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -50,9 +55,15 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    fetchMaterials();
+    // Load data with pagination
+    fetchMaterials(currentPage);
     fetchCategories();
-  }, []);
+  }, [currentPage]);
+
+  // Calculate pagination info
+  const totalPages = Math.ceil(totalMaterials / materialsPerPage);
+  const startIndex = (currentPage - 1) * materialsPerPage;
+  const endIndex = Math.min(startIndex + materialsPerPage, totalMaterials);
 
   const handleThumbnailUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,7 +158,7 @@ const AdminDashboard = () => {
         description: "Material deleted successfully",
       });
 
-      fetchMaterials();
+      fetchMaterials(currentPage);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -160,32 +171,32 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchMaterials = async () => {
-    setLoading(true);
+  const fetchMaterials = async (page = 1, limit = materialsPerPage) => {
     try {
-      // Fetch with pagination to avoid timeout
+      setLoading(true);
+      const offset = (page - 1) * limit;
+      
+      // Get total count first (lighter query)
+      const { count } = await supabase
+        .from('content')
+        .select('*', { count: 'exact', head: true });
+      
+      setTotalMaterials(count || 0);
+
+      // Then get paginated data with all necessary fields for Material type
       const { data, error } = await supabase
         .from('content')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(50); // Limit to prevent timeout
+        .range(offset, offset + limit - 1);
 
-      if (error) {
-        console.error('Error fetching materials:', error);
-        toast({
-          title: "Error",
-          description: `Failed to fetch materials: ${error.message}`,
-          variant: "destructive",
-        });
-        return;
-      }
-
+      if (error) throw error;
       setMaterials(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching materials:', error);
       toast({
-        title: "Error", 
-        description: "Connection timeout. Try refreshing the page.",
+        title: "Error",
+        description: "Failed to fetch materials. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -300,7 +311,7 @@ const AdminDashboard = () => {
       });
 
       resetForm();
-      fetchMaterials();
+      fetchMaterials(currentPage);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -766,6 +777,58 @@ const AdminDashboard = () => {
             </Card>
           ))}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Showing {startIndex + 1} to {endIndex} of {totalMaterials} materials
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
