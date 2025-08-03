@@ -31,57 +31,39 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         .select('*', { count: 'exact' })
         .eq('status', 'published');
 
-      // Apply search filter first (global search across all materials)
+      // Apply featured filter
+      if (featured) {
+        query = query.eq('is_featured', true);
+      }
+
+      // Apply category filter
+      if (category && category !== '') {
+        query = query.eq('category', category);
+      }
+
+      // Apply search filter (enhanced for better partial/full word matching)
       if (search && search.trim()) {
-        const searchTerm = search.trim();
-        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,content_type.ilike.%${searchTerm}%,file_type.ilike.%${searchTerm}%`);
-      }
-
-      // Apply coding-related filters (more flexible approach)
-      if (!featured && !category) {
-        // Try to get coding materials first, fallback to all materials if none found
+        const searchTerm = search.trim().toLowerCase();
+        // Use multiple search patterns for better matching
+        query = query.or(`
+          title.ilike.%${searchTerm}%,
+          description.ilike.%${searchTerm}%,
+          category.ilike.%${searchTerm}%,
+          content_type.ilike.%${searchTerm}%,
+          file_type.ilike.%${searchTerm}%,
+          author.ilike.%${searchTerm}%,
+          tags.cs.{${searchTerm}}
+        `.replace(/\s+/g, ''));
+      } else if (!featured && !category) {
+        // Apply coding-related filter only when no search/filters are active
         const codingCategories = ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'];
-        
-        // If we have a search term, search all materials. Otherwise, try coding categories first.
-        if (!search || !search.trim()) {
-          // First try with coding categories (only when no search is active)
-          const codingQuery = supabase
-            .from('content')
-            .select('*', { count: 'exact' })
-            .eq('status', 'published')
-            .in('category', codingCategories)
-            .order('created_at', { ascending: false })
-            .range((page - 1) * limit, (page - 1) * limit + limit - 1);
-
-          const { data: codingData, count: codingCount } = await codingQuery;
-          
-          // If we have coding materials, use them. Otherwise, fallback to all materials.
-          if (codingData && codingData.length > 0) {
-            setMaterials(codingData);
-            setTotalCount(codingCount || 0);
-            setTotalPages(Math.ceil((codingCount || 0) / limit));
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Apply order and pagination to the main query
-        query = query.order('created_at', { ascending: false });
-        query = query.range((page - 1) * limit, (page - 1) * limit + limit - 1);
-      } else {
-        if (featured) {
-          query = query.eq('is_featured', true);
-        }
-
-        if (category && category !== '') {
-          query = query.eq('category', category);
-        }
-
-        // Apply order and pagination
-        query = query.order('created_at', { ascending: false });
-        const offset = (page - 1) * limit;
-        query = query.range(offset, offset + limit - 1);
+        query = query.in('category', codingCategories);
       }
+
+      // Apply ordering and pagination
+      query = query.order('created_at', { ascending: false });
+      const offset = (page - 1) * limit;
+      query = query.range(offset, offset + limit - 1);
 
       const { data, error, count } = await query;
 

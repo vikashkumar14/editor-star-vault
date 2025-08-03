@@ -24,7 +24,7 @@ const Materials = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useIsMobile();
   
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 800);
   
   const { materials, loading: materialsLoading, totalPages, totalCount, error: materialsError, retry } = useMaterials({ 
     page: currentPage, 
