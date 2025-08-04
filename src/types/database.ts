@@ -28,6 +28,8 @@ export interface Material {
   html_introduction?: string;
   css_introduction?: string;
   js_introduction?: string;
+  generated_thumbnail_url?: string;
+  thumbnail_auto_generated?: boolean;
 }
 
 export interface Category {

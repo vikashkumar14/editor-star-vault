@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import AdminLogin from "./components/AdminLogin";
 import UserLogin from "./components/UserLogin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import MaterialPreview from "./pages/MaterialPreview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/materials" element={<Materials />} />
+          <Route path="/preview/:id" element={<MaterialPreview />} />
           <Route path="/material/:id" element={<MaterialDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

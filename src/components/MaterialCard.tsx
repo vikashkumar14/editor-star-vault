@@ -7,6 +7,7 @@ import { Eye, Star, Play, Info, FileText, Code, Heart } from "lucide-react";
 import { Material } from "@/types/database";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import SocialShare from "./SocialShare";
 
 interface MaterialCardProps {
   material: Material;
@@ -296,7 +297,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
       </CardHeader>
       
       <CardContent className="pt-0">
-        {/* Download Button */}
+        {/* Action Buttons */}
         <div className="flex space-x-2">
           <Button 
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
@@ -305,6 +306,14 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
             <Info className="w-4 h-4 mr-2" />
             Download Material
           </Button>
+          
+          <SocialShare 
+            materialId={material.id}
+            title={material.title}
+            fileUrl={material.file_url}
+            fileName={material.file_name}
+            fileType={material.file_type}
+          />
           
           {hasLivePreview && (
             <Button 

@@ -1,1 +1,4 @@
 project_id = "vueagetqayqfyakhmolh"
+
+[functions.generate-thumbnail]
+verify_jwt = false

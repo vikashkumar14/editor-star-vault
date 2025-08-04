@@ -10,6 +10,7 @@ import MaterialInteractions from "@/components/MaterialInteractions";
 import PaymentModal from "@/components/PaymentModal";
 import CodePreview from "@/components/CodePreview";
 import RelatedMaterials from "@/components/RelatedMaterials";
+import SocialShare from "@/components/SocialShare";
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
 import { useMaterials } from '@/hooks/useMaterials';
@@ -452,6 +453,17 @@ const MaterialDetail = () => {
                       )}
                     </Button>
                   )}
+                  
+                  {/* Social Share Button */}
+                  <div className="mt-4">
+                    <SocialShare 
+                      materialId={material.id}
+                      title={material.title}
+                      fileUrl={material.file_url}
+                      fileName={material.file_name}
+                      fileType={material.file_type}
+                    />
+                  </div>
                   
                   <div className="bg-blue-50 dark:bg-blue-900/20 p-2 sm:p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-start space-x-2">
