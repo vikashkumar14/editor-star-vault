@@ -54,10 +54,6 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
           author.ilike.%${searchTerm}%,
           tags.cs.{${searchTerm}}
         `.replace(/\s+/g, ''));
-      } else if (!featured && !category) {
-        // Apply coding-related filter only when no search/filters are active
-        const codingCategories = ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'];
-        query = query.in('category', codingCategories);
       }
 
       // Apply ordering and pagination
