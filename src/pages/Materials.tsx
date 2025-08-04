@@ -34,10 +34,8 @@ const Materials = () => {
   });
   const { categories, loading: categoriesLoading } = useCategories();
 
-  // Filter categories to show only coding-related ones
-  const codingCategories = categories.filter(cat => 
-    ['HTML', 'CSS', 'JavaScript', 'Python', 'React', 'Vue', 'Angular', 'Node.js', 'PHP', 'Java', 'C++', 'C#', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Web Development', 'Frontend', 'Backend', 'Full Stack', 'Mobile Development', 'Game Development'].includes(cat.name)
-  );
+  // Show all available categories
+  const availableCategories = categories;
 
   // Update URL when filters change
   useEffect(() => {
@@ -168,7 +166,7 @@ const Materials = () => {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                         <option value="">All Categories</option>
-                        {codingCategories.map((category) => (
+                        {availableCategories.map((category) => (
                         <option key={category.id} value={category.name}>
                             {category.name}
                         </option>
@@ -203,7 +201,7 @@ const Materials = () => {
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowFilters(false); }}
                 >
                   <option value="">All Categories</option>
-                  {codingCategories.map((category) => ( <option key={category.id} value={category.name}> {category.name} </option> ))}
+                  {availableCategories.map((category) => ( <option key={category.id} value={category.name}> {category.name} </option> ))}
                 </select>
               </CardContent>
             </Card>
