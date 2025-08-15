@@ -13,6 +13,15 @@ interface MaterialInteraction {
   created_at: string;
 }
 
+interface PublicInteraction {
+  id: string;
+  material_id: string;
+  interaction_type: string;
+  comment_text: string | null;
+  rating_value: number | null;
+  created_at: string;
+}
+
 interface InteractionStats {
   likes: number;
   comments: number;
@@ -29,7 +38,7 @@ export const useMaterialInteractions = (materialId: string) => {
     averageRating: 0,
     totalRatings: 0,
   });
-  const [comments, setComments] = useState<MaterialInteraction[]>([]);
+  const [comments, setComments] = useState<PublicInteraction[]>([]);
   const [userInteractions, setUserInteractions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -51,25 +60,24 @@ export const useMaterialInteractions = (materialId: string) => {
     const fetchInteractions = async () => {
       try {
         const { data: interactions, error } = await supabase
-          .from('material_interactions')
-          .select('*')
-          .eq('material_id', materialId);
+          .rpc('get_material_interactions_public', { material_id_input: materialId });
 
         if (error) {
           console.error('Error fetching interactions:', error);
           return;
         }
 
-        const userIP = await getUserIP();
-        const userInteractionTypes = new Set(
-          interactions
-            ?.filter(i => i.user_ip === userIP)
-            .map(i => i.interaction_type) || []
-        );
-        setUserInteractions(userInteractionTypes);
+        // Load user's prior interactions from localStorage (privacy-preserving)
+        try {
+          const stored = localStorage.getItem(`material_interactions:${materialId}`);
+          const userInteractionTypes = new Set<string>(stored ? JSON.parse(stored) : []);
+          setUserInteractions(userInteractionTypes);
+        } catch {
+          setUserInteractions(new Set());
+        }
 
         const likes = interactions?.filter(i => i.interaction_type === 'like').length || 0;
-        const comments = interactions?.filter(i => i.interaction_type === 'comment') || [];
+        const commentItems = interactions?.filter(i => i.interaction_type === 'comment') || [];
         const shares = interactions?.filter(i => i.interaction_type === 'share').length || 0;
         const ratings = interactions?.filter(i => i.interaction_type === 'rating') || [];
         
@@ -79,13 +87,13 @@ export const useMaterialInteractions = (materialId: string) => {
 
         setStats({
           likes,
-          comments: comments.length,
+          comments: commentItems.length,
           shares,
           averageRating,
           totalRatings: ratings.length,
         });
 
-        setComments(comments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+        setComments(commentItems.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -126,7 +134,17 @@ export const useMaterialInteractions = (materialId: string) => {
             });
 
             if (newInteraction.interaction_type === 'comment') {
-              setComments(prev => [newInteraction, ...prev]);
+              setComments(prev => [
+                {
+                  id: newInteraction.id,
+                  material_id: newInteraction.material_id,
+                  interaction_type: newInteraction.interaction_type,
+                  comment_text: newInteraction.comment_text,
+                  rating_value: newInteraction.rating_value,
+                  created_at: newInteraction.created_at,
+                },
+                ...prev,
+              ]);
             }
           }
         }
@@ -175,6 +193,14 @@ export const useMaterialInteractions = (materialId: string) => {
       }
 
       setUserInteractions(prev => new Set([...prev, type]));
+
+      // Persist locally to prevent duplicate actions for anonymous users
+      try {
+        const key = `material_interactions:${materialId}`;
+        const existing = new Set<string>(JSON.parse(localStorage.getItem(key) || '[]'));
+        existing.add(type);
+        localStorage.setItem(key, JSON.stringify(Array.from(existing)));
+      } catch {}
       
       toast({
         title: "Success",

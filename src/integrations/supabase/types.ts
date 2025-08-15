@@ -365,6 +365,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_material_interactions_public: {
+        Args: { material_id_input: string }
+        Returns: {
+          comment_text: string
+          created_at: string
+          id: string
+          interaction_type: string
+          material_id: string
+          rating_value: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
