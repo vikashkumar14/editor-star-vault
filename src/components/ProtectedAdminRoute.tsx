@@ -1,17 +1,40 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import AdminDashboard from '@/pages/AdminDashboard';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const ProtectedAdminRoute = () => {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { user, loading } = useAuth();
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const adminStatus = localStorage.getItem('isAdmin');
-    setIsAdmin(adminStatus === 'true');
-  }, []);
+    const checkAccess = async () => {
+      if (loading) return;
+      if (!user) {
+        setAuthorized(false);
+        return;
+      }
 
-  if (isAdmin === null) {
+      // Check if the user has admin or creator role
+      const [{ data: isAdmin, error: adminErr }, { data: isCreator, error: creatorErr }] = await Promise.all([
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' }),
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'creator' }),
+      ]);
+
+      if (adminErr || creatorErr) {
+        console.error('Role check failed', adminErr || creatorErr);
+        setAuthorized(false);
+        return;
+      }
+
+      setAuthorized(Boolean(isAdmin) || Boolean(isCreator));
+    };
+
+    checkAccess();
+  }, [user, loading]);
+
+  if (loading || authorized === null) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -22,7 +45,7 @@ const ProtectedAdminRoute = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!authorized) {
     return <Navigate to="/admin-login" replace />;
   }
 
