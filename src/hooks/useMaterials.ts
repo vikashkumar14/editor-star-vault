@@ -41,10 +41,10 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         query = query.eq('category', category);
       }
 
-      // Apply search filter (enhanced comprehensive search across all relevant fields)
+      // Apply search filter (enhanced comprehensive search with safer enum handling)
       if (search && search.trim()) {
         const searchTerm = search.trim().toLowerCase();
-        // Enhanced search across all searchable fields including software compatibility
+        // Enhanced search across text fields only - avoid enum issues
         query = query.or(`
           title.ilike.%${searchTerm}%,
           description.ilike.%${searchTerm}%,
@@ -52,12 +52,15 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
           content_type.ilike.%${searchTerm}%,
           file_type.ilike.%${searchTerm}%,
           author.ilike.%${searchTerm}%,
-          tags.cs.{${searchTerm}},
-          software_compatibility.cs.{${searchTerm}},
           html_introduction.ilike.%${searchTerm}%,
           css_introduction.ilike.%${searchTerm}%,
           js_introduction.ilike.%${searchTerm}%
         `.replace(/\s+/g, ''));
+        
+        // Separate search for array fields to avoid enum conflicts
+        if (searchTerm.length > 2) { // Only search arrays for longer terms
+          query = query.or(`tags.cs.{${searchTerm}}`);
+        }
       }
 
       // Apply ordering and pagination

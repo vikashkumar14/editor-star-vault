@@ -27,7 +27,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm transition-all duration-300">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-lg dark:shadow-2xl transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -38,16 +38,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 alt="Gyaan Repo Logo"
                 className="h-8 w-8 rounded-md"
               />
-              <span className="font-bold text-xl text-primary dark:text-primary">
+              <span className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 Gyaan Repo
               </span>
             </Link>
             
             {/* Developer Name - Hidden on mobile */}
-            <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-300 dark:border-gray-600">
-              <Code className="w-4 h-4 text-primary dark:text-primary mr-2" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Developed by <span className="font-semibold text-primary dark:text-primary">Vikash Kumar Kushwaha</span>
+            <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-300 dark:border-gray-700">
+              <Code className="w-4 h-4 text-primary dark:text-blue-400 mr-2" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Developed by <span className="font-semibold text-primary dark:text-blue-400">Vikash Kumar Kushwaha</span>
               </span>
             </div>
           </div>

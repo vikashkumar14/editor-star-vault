@@ -63,7 +63,7 @@ const Materials = () => {
   if (materialsLoading || categoriesLoading) {
     return (
       <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex items-center justify-center min-h-[60vh] pt-16">
             <div className="text-center">
@@ -82,25 +82,25 @@ const Materials = () => {
   if (materialsError && !materialsLoading) {
     return (
       <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex items-center justify-center min-h-[60vh] pt-16">
             <div className="text-center max-w-md mx-auto px-4">
-              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-destructive mb-2">
+              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-6 dark:bg-red-950/20 dark:border-red-800/30">
+                <h3 className="text-lg font-semibold text-destructive mb-2 dark:text-red-400">
                   Connection Error
                 </h3>
-                <p className="text-destructive/80 mb-4">
+                <p className="text-destructive/80 mb-4 dark:text-red-300/80">
                   {materialsError.includes('timeout') ? 'Request timed out. Server may be overloaded.' : materialsError}
                 </p>
                 <div className="space-y-2">
                   <Button 
                     onClick={retry}
-                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground w-full"
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground w-full dark:bg-red-600 dark:hover:bg-red-700"
                   >
                     Retry Loading
                   </Button>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground dark:text-gray-400">
                     If the problem persists, try refreshing the page
                   </p>
                 </div>
@@ -115,7 +115,7 @@ const Materials = () => {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-16 py-4 md:py-8"> {/* Added pt-16 for fixed navbar */}
@@ -130,15 +130,27 @@ const Materials = () => {
 
           <div className="mb-4 md:mb-6">
             <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by title, category, tags, author, software type, description..."
-                  className="pl-10 pr-4 h-12 text-base"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+                <div className="flex-1 relative group">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Input
+                    placeholder="Search by title, description, category, author, technology..."
+                    className="pl-12 pr-4 h-14 text-base bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSearchTerm('')}
+                        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               
               {isMobile && (
                 <Button variant="outline" size="icon" onClick={() => setShowFilters(!showFilters)}>
