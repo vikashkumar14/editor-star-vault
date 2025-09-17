@@ -123,27 +123,32 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent"></div>
+      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+      <div className="absolute top-40 right-10 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-4000"></div>
+      <div className="relative z-10 w-full max-w-md space-y-6">
         {/* Back to home link */}
         <Link 
           to="/" 
-          className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          className="inline-flex items-center text-sm text-white/70 hover:text-white transition-colors backdrop-blur-sm bg-white/10 px-3 py-2 rounded-lg border border-white/20"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Link>
 
-        <Card className="w-full shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+        <Card className="w-full shadow-2xl border border-white/10 bg-white/10 backdrop-blur-xl">
           <CardHeader className="text-center space-y-4 pb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-              <Shield className="h-8 w-8 text-white" />
+            <div className="mx-auto w-20 h-20 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/25 animate-pulse">
+              <Shield className="h-10 w-10 text-white" />
             </div>
             <div>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <CardTitle className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
                 Admin Portal
               </CardTitle>
-              <CardDescription className="text-base mt-2">
+              <CardDescription className="text-lg mt-2 text-white/70">
                 Secure access to content management
               </CardDescription>
             </div>
@@ -151,8 +156,8 @@ const AdminLogin = () => {
           
           <CardContent className="space-y-6">
             {error && (
-              <Alert className="border-red-200 bg-red-50 dark:bg-red-950/20">
-                <AlertDescription className="text-red-700 dark:text-red-400">
+              <Alert className="border-red-400/50 bg-red-500/10 backdrop-blur-sm">
+                <AlertDescription className="text-red-200">
                   {error}
                 </AlertDescription>
               </Alert>
@@ -160,17 +165,17 @@ const AdminLogin = () => {
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-semibold text-white/90">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/60" />
                   <Input
                     type="email"
                     value={credentials.username}
                     onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                     placeholder="admin@example.com"
-                    className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 h-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-purple-400 focus:ring-purple-400/25 backdrop-blur-sm"
                     required
                     disabled={loading}
                   />
@@ -178,24 +183,24 @@ const AdminLogin = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-semibold text-white/90">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/60" />
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={credentials.password}
                     onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                     placeholder="Enter your password"
-                    className="pl-10 pr-12 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 pr-12 h-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-purple-400 focus:ring-purple-400/25 backdrop-blur-sm"
                     required
                     disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
                     disabled={loading}
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -205,7 +210,7 @@ const AdminLogin = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+                className="w-full h-12 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
                 disabled={loading}
               >
                 {loading ? (
@@ -222,12 +227,12 @@ const AdminLogin = () => {
               </Button>
             </form>
 
-            <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-center pt-4 border-t border-white/10">
+              <p className="text-sm text-white/70">
                 Need an account?{' '}
                 <Link 
                   to="/login" 
-                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                  className="text-purple-300 hover:text-purple-200 font-medium transition-colors"
                 >
                   Create Account
                 </Link>
@@ -237,7 +242,7 @@ const AdminLogin = () => {
         </Card>
 
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-white/50">
             Protected by advanced security protocols
           </p>
         </div>

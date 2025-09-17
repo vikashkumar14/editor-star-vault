@@ -387,6 +387,10 @@ export type Database = {
         Args: { content_uuid: string }
         Returns: undefined
       }
+      make_user_admin: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "creator" | "user"
