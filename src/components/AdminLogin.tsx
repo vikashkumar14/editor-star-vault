@@ -229,13 +229,7 @@ const AdminLogin = () => {
 
             <div className="text-center pt-4 border-t border-white/10">
               <p className="text-sm text-white/70">
-                Need an account?{' '}
-                <Link 
-                  to="/login" 
-                  className="text-purple-300 hover:text-purple-200 font-medium transition-colors"
-                >
-                  Create Account
-                </Link>
+                Authorized personnel only
               </p>
             </div>
           </CardContent>

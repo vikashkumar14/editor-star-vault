@@ -41,10 +41,10 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         query = query.eq('category', category);
       }
 
-      // Apply search filter (enhanced for better partial/full word matching)
+      // Apply search filter (enhanced comprehensive search across all relevant fields)
       if (search && search.trim()) {
         const searchTerm = search.trim().toLowerCase();
-        // Use multiple search patterns for better matching
+        // Enhanced search across all searchable fields including software compatibility
         query = query.or(`
           title.ilike.%${searchTerm}%,
           description.ilike.%${searchTerm}%,
@@ -52,7 +52,11 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
           content_type.ilike.%${searchTerm}%,
           file_type.ilike.%${searchTerm}%,
           author.ilike.%${searchTerm}%,
-          tags.cs.{${searchTerm}}
+          tags.cs.{${searchTerm}},
+          software_compatibility.cs.{${searchTerm}},
+          html_introduction.ilike.%${searchTerm}%,
+          css_introduction.ilike.%${searchTerm}%,
+          js_introduction.ilike.%${searchTerm}%
         `.replace(/\s+/g, ''));
       }
 
