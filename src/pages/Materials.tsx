@@ -1,355 +1,269 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Search, Filter, Grid, List, X, Menu } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import MaterialCard from "@/components/MaterialCard";
+import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 import { useMaterials } from "@/hooks/useMaterials";
 import { useCategories } from "@/hooks/useCategories";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useSearchParams } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Search, X, Loader2, Filter } from "lucide-react";
 
-const Materials = () => {
+interface MaterialsProps {
+  darkMode?: boolean;
+  toggleDarkMode?: () => void;
+}
+
+const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [darkMode, setDarkMode] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const isMobile = useIsMobile();
+  const [showFilters, setShowFilters] = useState(false);
   
-  const debouncedSearchTerm = useDebounce(searchTerm, 800);
+  const { categories } = useCategories();
   
-  const { materials, loading: materialsLoading, totalPages, totalCount, error: materialsError, retry } = useMaterials({ 
-    page: currentPage, 
-    limit: 6, 
+  const { materials, loading, error, totalPages, totalCount, retry } = useMaterials({
+    page: currentPage,
+    limit: 12,
     category: selectedCategory,
-    search: debouncedSearchTerm
+    search: searchQuery
   });
-  const { categories, loading: categoriesLoading } = useCategories();
 
-  // Show all available categories
-  const availableCategories = categories;
-
-  // Update URL when filters change
+  // Update URL params when search/category changes
   useEffect(() => {
-    const newParams = new URLSearchParams();
-    if (debouncedSearchTerm) newParams.set('search', debouncedSearchTerm);
-    if (selectedCategory) newParams.set('category', selectedCategory);
-    if (currentPage > 1) newParams.set('page', currentPage.toString());
-    setSearchParams(newParams);
-  }, [debouncedSearchTerm, selectedCategory, currentPage, setSearchParams]);
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    setSearchParams(params);
+  }, [searchQuery, selectedCategory, setSearchParams]);
 
-  // Reset page when search or category changes
+  // Reset to first page when search/category changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchTerm, selectedCategory]);
+  }, [searchQuery, selectedCategory]);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
   };
 
-  // Search is now handled server-side in the useMaterials hook
-  // No need for client-side filtering anymore since we're doing global search
-  const displayMaterials = materials || [];
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+  };
 
-  if (materialsLoading || categoriesLoading) {
-    return (
-      <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh] pt-16">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">Loading coding materials...</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">This may take a moment...</p>
-            </div>
-          </div>
-          <Footer />
-        </div>
-      </div>
-    );
-  }
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedCategory('');
+  };
 
-  // Handle error state with retry option
-  if (materialsError && !materialsLoading) {
-    return (
-      <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh] pt-16">
-            <div className="text-center max-w-md mx-auto px-4">
-              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-6 dark:bg-red-950/20 dark:border-red-800/30">
-                <h3 className="text-lg font-semibold text-destructive mb-2 dark:text-red-400">
-                  Connection Error
-                </h3>
-                <p className="text-destructive/80 mb-4 dark:text-red-300/80">
-                  {materialsError.includes('timeout') ? 'Request timed out. Server may be overloaded.' : materialsError}
-                </p>
-                <div className="space-y-2">
-                  <Button 
-                    onClick={retry}
-                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground w-full dark:bg-red-600 dark:hover:bg-red-700"
-                  >
-                    Retry Loading
-                  </Button>
-                  <p className="text-xs text-muted-foreground dark:text-gray-400">
-                    If the problem persists, try refreshing the page
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <Footer />
-        </div>
-      </div>
-    );
-  }
+  const clearCategory = () => {
+    setSelectedCategory('');
+  };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''} overflow-x-hidden`}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-        <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-16 py-4 md:py-8"> {/* Added pt-16 for fixed navbar */}
-          <div className="text-center mb-6 md:mb-12">
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
-              Professional Coding Materials
-            </h1>
-            <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-300">
-              Download high-quality coding resources, templates, and projects for your development journey
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      
+      <div className="pt-20 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-4">Coding Materials</h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Discover high-quality code snippets, templates, and components for your projects
             </p>
           </div>
 
-          <div className="mb-4 md:mb-6">
-            <div className="flex gap-2">
-                <div className="flex-1 relative group">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                  <Input
-                    placeholder="Search by title, description, category, author, technology..."
-                    className="pl-12 pr-4 h-14 text-base bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  {searchTerm && (
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSearchTerm('')}
-                        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              
-              {isMobile && (
-                <Button variant="outline" size="icon" onClick={() => setShowFilters(!showFilters)}>
-                  <Filter className="h-4 w-4" />
-                </Button>
-              )}
-
-              {isMobile && (
-                <Button variant="outline" size="icon" onClick={() => setShowMobileMenu(!showMobileMenu)}>
-                  <Menu className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {!isMobile && (
-            <Card className="mb-6 md:mb-8">
-              <CardContent className="p-4 md:p-6 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <label htmlFor="category-select-desktop" className="text-sm font-medium text-gray-700 dark:text-gray-300">Category:</label>
-                    <select
-                        id="category-select-desktop"
-                        className="px-4 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                        <option value="">All Categories</option>
-                        {availableCategories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                        ))}
-                    </select>
-                </div>
-                
-                <div className="flex gap-2">
-                    <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="icon" onClick={() => setViewMode('grid')} aria-label="Grid View">
-                        <Grid className="h-4 w-4" />
-                    </Button>
-                    <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="icon" onClick={() => setViewMode('list')} aria-label="List View">
-                        <List className="h-4 w-4" />
-                    </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {isMobile && showFilters && (
-            <Card className="mb-4">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium">Filter by Category</h3>
-                  <Button variant="ghost" size="icon" onClick={() => setShowFilters(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <select
-                  className="w-full px-3 py-2 border rounded-md bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600"
-                  value={selectedCategory}
-                  onChange={(e) => { setSelectedCategory(e.target.value); setShowFilters(false); }}
-                >
-                  <option value="">All Categories</option>
-                  {availableCategories.map((category) => ( <option key={category.id} value={category.name}> {category.name} </option> ))}
-                </select>
-              </CardContent>
-            </Card>
-          )}
-
-          {isMobile && showMobileMenu && (
-            <Card className="mb-4">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium">View Options</h3>
-                  <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => { setViewMode('grid'); setShowMobileMenu(false); }} className="flex-1">
-                    <Grid className="h-4 w-4 mr-2" /> Grid
-                  </Button>
-                  <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => { setViewMode('list'); setShowMobileMenu(false); }} className="flex-1">
-                    <List className="h-4 w-4 mr-2" /> List
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300">
-              {debouncedSearchTerm ? `Showing ${materials.length} results for "${debouncedSearchTerm}"` : `Showing ${totalCount} coding materials`} 
-              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
-            </p>
-            {(debouncedSearchTerm || selectedCategory) && (
-              <Button variant="outline" size="sm" onClick={() => { 
-                setSearchTerm(''); 
-                setSelectedCategory(''); 
-                setCurrentPage(1);
-              }}>
-                Clear Filters
-              </Button>
-            )}
-          </div>
-
-          <div className={`grid gap-4 md:gap-6 ${ viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1' }`}>
-            {displayMaterials.map((material) => (
-              <MaterialCard key={material.id} material={material} />
-            ))}
-          </div>
-
-          {displayMaterials.length === 0 && !materialsLoading && !materialsError && (
-            <div className="text-center py-12 col-span-full">
-              <div className="bg-accent/5 rounded-lg p-8 border border-accent/20">
-                <Search className="w-12 md:w-16 h-12 md:h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-300 text-sm md:text-lg mb-2 font-semibold">
-                  {debouncedSearchTerm || selectedCategory 
-                    ? `No results found for ${debouncedSearchTerm ? `"${debouncedSearchTerm}"` : selectedCategory}`
-                    : "No coding materials available yet."
-                  }
-                </p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mb-4">
-                  {debouncedSearchTerm || selectedCategory 
-                    ? "Try adjusting your search terms or clearing the filters."
-                    : "We're working on adding coding materials to the platform."
-                  }
-                </p>
-                {(debouncedSearchTerm || selectedCategory) && (
-                  <Button 
-                    onClick={() => { 
-                      setSearchTerm(''); 
-                      setSelectedCategory(''); 
-                      setCurrentPage(1);
-                    }}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+          {/* Enhanced Search & Filter Section */}
+          <div className="bg-card rounded-lg border p-6 mb-8 shadow-sm">
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Search materials, categories, authors..."
+                  className="pl-12 pr-12 h-12 text-base border-2 focus:border-primary"
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
-                    Clear All Filters
+                    <X className="w-4 h-4" />
                   </Button>
                 )}
               </div>
+
+              {/* Filters Toggle */}
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {(selectedCategory) && (
+                    <Badge variant="secondary" className="ml-2">
+                      1
+                    </Badge>
+                  )}
+                </Button>
+
+                {(searchQuery || selectedCategory) && (
+                  <Button variant="outline" onClick={clearSearch} className="flex items-center gap-2">
+                    <X className="w-4 h-4" />
+                    Clear All
+                  </Button>
+                )}
+              </div>
+
+              {/* Expandable Filters */}
+              {showFilters && (
+                <div className="border-t pt-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Category</label>
+                      <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Categories</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.name}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Active Filters */}
+              {(selectedCategory) && (
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-sm text-muted-foreground">Active filters:</span>
+                  {selectedCategory && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      Category: {selectedCategory}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearCategory}
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Results Info */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-sm text-muted-foreground">
+              {loading ? (
+                'Loading...'
+              ) : (
+                `Showing ${materials.length} materials${searchQuery ? ` for "${searchQuery}"` : ''}`
+              )}
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mr-2" />
+              <span className="text-muted-foreground">Loading materials...</span>
             </div>
           )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  {currentPage > 1 && (
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        className="cursor-pointer"
-                      />
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Page Numbers */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(pageNum)}
-                          isActive={currentPage === pageNum}
-                          className="cursor-pointer"
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
-                  
-                  {currentPage < totalPages && (
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                        className="cursor-pointer"
-                      />
-                    </PaginationItem>
-                  )}
-                </PaginationContent>
-              </Pagination>
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 max-w-md mx-auto">
+                <p className="text-destructive font-medium mb-2">Failed to load materials</p>
+                <p className="text-sm text-muted-foreground mb-4">{error}</p>
+                <Button onClick={retry} variant="outline" size="sm">
+                  Try Again
+                </Button>
+              </div>
             </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && materials.length === 0 && (
+            <div className="text-center py-12">
+              <Search className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No materials found</h3>
+              <p className="text-muted-foreground mb-6">
+                {searchQuery || selectedCategory
+                  ? "Try adjusting your search criteria or browse all materials"
+                  : "No materials are available at the moment"
+                }
+              </p>
+              {(searchQuery || selectedCategory) && (
+                <Button onClick={clearSearch} variant="outline">
+                  Clear Search
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Materials Grid */}
+          {!loading && !error && materials.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                {materials.map((material) => (
+                  <MaterialCard key={material.id} material={material} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  
+                  <span className="px-4 py-2 text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
-
-        <Footer />
       </div>
+      
+      <Footer />
+      <BackToTop />
     </div>
   );
 };

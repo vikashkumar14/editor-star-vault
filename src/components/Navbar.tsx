@@ -80,46 +80,38 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
             </form>
             
             {/* Login button - simplified on mobile */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex"
+            <Link
+              to="/login"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex items-center px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <User className="w-4 h-4 mr-2" />
               Login
-            </Button>
+            </Link>
 
             {/* Mobile login icon only */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden"
+            <Link
+              to="/login"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <User className="w-5 h-5" />
-            </Button>
+            </Link>
 
             {/* Admin button - simplified on mobile */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/admin-login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex"
+            <Link
+              to="/admin-login"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex items-center px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <Shield className="w-4 h-4 mr-2" />
               Admin
-            </Button>
+            </Link>
 
             {/* Mobile admin icon only */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/admin-login')}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden"
+            <Link
+              to="/admin-login"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <Shield className="w-5 h-5" />
-            </Button>
+            </Link>
             
             {/* Dark mode toggle */}
             <Button
