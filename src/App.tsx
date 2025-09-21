@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,28 +18,48 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/materials" element={<Materials />} />
-          <Route path="/preview/:id" element={<MaterialPreview />} />
-          <Route path="/material/:id" element={<MaterialDetail />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<UserLogin />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<ProtectedAdminRoute />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Check for saved dark mode preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', (!darkMode).toString());
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+              <Route path="/materials" element={<Materials />} />
+              <Route path="/preview/:id" element={<MaterialPreview />} />
+              <Route path="/material/:id" element={<MaterialDetail />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<UserLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/admin" element={<ProtectedAdminRoute />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -76,7 +76,7 @@ const CreatorsShowcase = () => {
             <span className="font-medium">Featured Creators</span>
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Meet Our Amazing Creators
+            Featured Code Contributors
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Talented individuals who make high-quality content available for the community

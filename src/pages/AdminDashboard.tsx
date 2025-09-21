@@ -352,17 +352,17 @@ const AdminDashboard = () => {
 
   if (loading && materials.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Admin Dashboard</h1>
           <Button 
             onClick={() => {
               resetForm();
@@ -383,15 +383,15 @@ const AdminDashboard = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+                    <TabsTrigger value="basic">Basic</TabsTrigger>
                     <TabsTrigger value="code">Code</TabsTrigger>
-                    <TabsTrigger value="introductions">Introductions</TabsTrigger>
+                    <TabsTrigger value="introductions">Info</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="basic" className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="title">Title *</Label>
                         <Input
