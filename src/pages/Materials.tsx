@@ -51,7 +51,8 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
   };
 
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+    const newCategory = value === 'all' ? '' : value;
+    setSelectedCategory(newCategory);
   };
 
   const clearSearch = () => {
@@ -131,12 +132,12 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Category</label>
-                      <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                      <Select value={selectedCategory || 'all'} onValueChange={handleCategoryChange}>
                         <SelectTrigger>
                           <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Categories</SelectItem>
+                          <SelectItem value="all">All Categories</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.name}>
                               {category.name}
