@@ -359,16 +359,16 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Admin Dashboard</h1>
+    <div className="min-h-screen bg-background p-2 sm:p-4 lg:p-6">
+      <div className="max-w-full sm:max-w-6xl mx-auto">
+        <div className="flex flex-col gap-4 mb-6">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Admin Dashboard</h1>
           <Button 
             onClick={() => {
               resetForm();
               setShowForm(true);
             }}
-            className="bg-red-500 hover:bg-red-600 text-white"
+            className="bg-red-500 hover:bg-red-600 text-white w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Material
@@ -383,32 +383,33 @@ const AdminDashboard = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-                    <TabsTrigger value="basic">Basic</TabsTrigger>
-                    <TabsTrigger value="code">Code</TabsTrigger>
-                    <TabsTrigger value="introductions">Info</TabsTrigger>
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+                    <TabsTrigger value="basic" className="text-xs sm:text-sm py-2">Basic</TabsTrigger>
+                    <TabsTrigger value="code" className="text-xs sm:text-sm py-2">Code</TabsTrigger>
+                    <TabsTrigger value="introductions" className="text-xs sm:text-sm py-2">Info</TabsTrigger>
+                    <TabsTrigger value="preview" className="text-xs sm:text-sm py-2">Preview</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="basic" className="space-y-4">
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="title">Title *</Label>
+                        <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
                         <Input
                           id="title"
                           value={formData.title}
                           onChange={(e) => setFormData({...formData, title: e.target.value})}
                           required
+                          className="mt-1"
                         />
                       </div>
                       
                       <div>
-                        <Label htmlFor="content_type">Content Type *</Label>
+                        <Label htmlFor="content_type" className="text-sm font-medium">Content Type *</Label>
                         <Select 
                           value={formData.content_type} 
                           onValueChange={(value) => setFormData({...formData, content_type: value})}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="mt-1">
                             <SelectValue placeholder="Select content type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -427,23 +428,24 @@ const AdminDashboard = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="description">Description</Label>
+                      <Label htmlFor="description" className="text-sm font-medium">Description</Label>
                       <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                         rows={3}
+                        className="mt-1"
                       />
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="category">Category</Label>
+                        <Label htmlFor="category" className="text-sm font-medium">Category</Label>
                         <Select 
                           value={formData.category} 
                           onValueChange={(value) => setFormData({...formData, category: value})}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="mt-1">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
@@ -457,31 +459,34 @@ const AdminDashboard = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="author">Author</Label>
+                        <Label htmlFor="author" className="text-sm font-medium">Author</Label>
                         <Input
                           id="author"
                           value={formData.author}
                           onChange={(e) => setFormData({...formData, author: e.target.value})}
+                          className="mt-1"
                         />
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="file_url">File URL</Label>
+                        <Label htmlFor="file_url" className="text-sm font-medium">File URL</Label>
                         <Input
                           id="file_url"
                           value={formData.file_url}
                           onChange={(e) => setFormData({...formData, file_url: e.target.value})}
+                          className="mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor="youtube_url">YouTube URL</Label>
+                        <Label htmlFor="youtube_url" className="text-sm font-medium">YouTube URL</Label>
                         <Input
                           id="youtube_url"
                           value={formData.youtube_url}
                           onChange={(e) => setFormData({...formData, youtube_url: e.target.value})}
+                          className="mt-1"
                         />
                       </div>
                     </div>
@@ -534,39 +539,41 @@ const AdminDashboard = () => {
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="tags">Tags (comma separated)</Label>
+                        <Label htmlFor="tags" className="text-sm font-medium">Tags (comma separated)</Label>
                         <Input
                           id="tags"
                           value={formData.tags}
                           onChange={(e) => setFormData({...formData, tags: e.target.value})}
                           placeholder="e.g., cinematic, moody, vintage"
+                          className="mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor="software_compatibility">Software Compatibility (comma separated)</Label>
+                        <Label htmlFor="software_compatibility" className="text-sm font-medium">Software Compatibility</Label>
                         <Input
                           id="software_compatibility"
                           value={formData.software_compatibility}
                           onChange={(e) => setFormData({...formData, software_compatibility: e.target.value})}
                           placeholder="e.g., premiere_pro, after_effects"
+                          className="mt-1"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Valid options: premiere_pro, after_effects, davinci_resolve, final_cut_pro, photoshop, other
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Valid: premiere_pro, after_effects, davinci_resolve, final_cut_pro, photoshop, other
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="flex items-center space-x-2">
                         <Switch
                           id="is_premium"
                           checked={formData.is_premium}
                           onCheckedChange={(checked) => setFormData({...formData, is_premium: checked})}
                         />
-                        <Label htmlFor="is_premium">Premium</Label>
+                        <Label htmlFor="is_premium" className="text-sm">Premium</Label>
                       </div>
 
                       <div className="flex items-center space-x-2">
@@ -575,18 +582,19 @@ const AdminDashboard = () => {
                           checked={formData.is_featured}
                           onCheckedChange={(checked) => setFormData({...formData, is_featured: checked})}
                         />
-                        <Label htmlFor="is_featured">Featured</Label>
+                        <Label htmlFor="is_featured" className="text-sm">Featured</Label>
                       </div>
 
                       {formData.is_premium && (
-                        <div>
-                          <Label htmlFor="price">Price (₹)</Label>
+                        <div className="w-full sm:w-auto">
+                          <Label htmlFor="price" className="text-sm font-medium">Price (₹)</Label>
                           <Input
                             id="price"
                             type="number"
                             value={formData.price}
                             onChange={(e) => setFormData({...formData, price: parseInt(e.target.value) || 0})}
                             min="0"
+                            className="mt-1 w-full sm:w-24"
                           />
                         </div>
                       )}
@@ -686,11 +694,11 @@ const AdminDashboard = () => {
                   </TabsContent>
                 </Tabs>
 
-                <div className="flex justify-end space-x-4">
-                  <Button type="button" variant="outline" onClick={resetForm}>
+                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
+                  <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={loading}>
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto">
                     {loading ? 'Saving...' : (editingMaterial ? 'Update' : 'Create')} Material
                   </Button>
                 </div>
@@ -700,15 +708,15 @@ const AdminDashboard = () => {
         )}
 
         {/* Materials List */}
-        <div className="grid gap-6">
+        <div className="grid gap-4">
           {materials.map((material) => (
-            <Card key={material.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex space-x-4">
+            <Card key={material.id} className="overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 flex-1 min-w-0">
                     {/* Thumbnail Display */}
                     {material.thumbnail_url && (
-                      <div className="w-24 h-24 flex-shrink-0">
+                      <div className="w-full sm:w-20 h-20 flex-shrink-0">
                         <img
                           src={material.thumbnail_url}
                           alt={material.title}
@@ -720,20 +728,23 @@ const AdminDashboard = () => {
                         />
                       </div>
                     )}
-                    <div>
-                      <CardTitle className="flex items-center space-x-2">
-                        <span>{material.title}</span>
-                        {material.is_featured && <Badge className="bg-yellow-500">Featured</Badge>}
-                        {material.is_premium && <Badge className="bg-purple-500">Premium</Badge>}
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-2 text-base sm:text-lg">
+                        <span className="truncate">{material.title}</span>
+                        <div className="flex gap-1 flex-wrap">
+                          {material.is_featured && <Badge className="bg-yellow-500 text-xs">Featured</Badge>}
+                          {material.is_premium && <Badge className="bg-purple-500 text-xs">Premium</Badge>}
+                        </div>
                       </CardTitle>
-                      <CardDescription>{material.description}</CardDescription>
+                      <CardDescription className="mt-1 text-sm line-clamp-2">{material.description}</CardDescription>
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2 self-start">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleEdit(material)}
+                      className="flex-shrink-0"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -741,18 +752,19 @@ const AdminDashboard = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleDelete(material.id)}
+                      className="flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                  <div>
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
+                  <div className="truncate">
                     <strong>Category:</strong> {material.category || 'N/A'}
                   </div>
-                  <div>
+                  <div className="truncate">
                     <strong>Type:</strong> {material.content_type}
                   </div>
                   <div>
@@ -763,13 +775,18 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 {material.tags && material.tags.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex flex-wrap gap-2">
-                      {material.tags.map((tag, idx) => (
+                  <div className="mt-3">
+                    <div className="flex flex-wrap gap-1">
+                      {material.tags.slice(0, 6).map((tag, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>
                       ))}
+                      {material.tags.length > 6 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{material.tags.length - 6} more
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 )}
@@ -780,30 +797,31 @@ const AdminDashboard = () => {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="mt-8 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-muted-foreground text-center sm:text-left">
               Showing {startIndex + 1} to {endIndex} of {totalMaterials} materials
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap justify-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
+                className="text-xs px-3"
               >
                 Previous
               </Button>
               
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
                 let pageNum;
-                if (totalPages <= 5) {
+                if (totalPages <= 3) {
                   pageNum = i + 1;
-                } else if (currentPage <= 3) {
+                } else if (currentPage <= 2) {
                   pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                } else if (currentPage >= totalPages - 1) {
+                  pageNum = totalPages - 2 + i;
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 1 + i;
                 }
                 
                 return (
@@ -812,6 +830,7 @@ const AdminDashboard = () => {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
+                    className="text-xs px-3 min-w-[36px]"
                   >
                     {pageNum}
                   </Button>
@@ -823,6 +842,7 @@ const AdminDashboard = () => {
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
+                className="text-xs px-3"
               >
                 Next
               </Button>
