@@ -10,6 +10,7 @@ import Materials from "./pages/Materials";
 import MaterialDetail from "./pages/MaterialDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Gallery from "./pages/Gallery";
 import AdminLogin from "./components/AdminLogin";
 import UserLogin from "./components/UserLogin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
@@ -46,6 +47,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
               <Route path="/materials" element={<Materials />} />
+              <Route path="/gallery" element={<Gallery />} />
               <Route path="/preview/:id" element={<MaterialPreview />} />
               <Route path="/material/:id" element={<MaterialDetail />} />
               <Route path="/about" element={<About />} />
