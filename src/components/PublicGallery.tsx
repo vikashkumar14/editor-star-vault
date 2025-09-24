@@ -49,23 +49,72 @@ const PublicGallery = () => {
     }
   };
 
+  const handleLike = async (image: GalleryImage) => {
+    try {
+      const { error } = await supabase
+        .from('material_interactions')
+        .insert([
+          {
+            material_id: image.id,
+            interaction_type: 'like',
+            user_ip: await fetch('https://api.ipify.org?format=json')
+              .then(res => res.json())
+              .then(data => data.ip)
+              .catch(() => 'unknown')
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Liked!",
+        description: "Image added to your likes"
+      });
+    } catch (error) {
+      console.error('Error liking image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to like image",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleShare = async (image: GalleryImage) => {
-    if (navigator.share) {
-      try {
+    try {
+      const shareUrl = `${window.location.origin}/gallery`;
+      
+      if (navigator.share) {
         await navigator.share({
           title: image.title,
           text: image.prompt || image.title,
-          url: window.location.href
+          url: shareUrl
         });
-      } catch (error) {
-        console.log('Share cancelled');
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied",
+          description: "Gallery link copied to clipboard"
+        });
       }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link copied",
-        description: "Gallery link copied to clipboard"
-      });
+
+      // Track share interaction
+      await supabase
+        .from('material_interactions')
+        .insert([
+          {
+            material_id: image.id,
+            interaction_type: 'share',
+            user_ip: await fetch('https://api.ipify.org?format=json')
+              .then(res => res.json())
+              .then(data => data.ip)
+              .catch(() => 'unknown')
+          }
+        ]);
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Share error:', error);
+      }
     }
   };
 
@@ -133,6 +182,16 @@ const PublicGallery = () => {
                               variant="secondary"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                handleLike(image);
+                              }}
+                            >
+                              <Heart className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 handleShare(image);
                               }}
                             >
@@ -193,6 +252,16 @@ const PublicGallery = () => {
                           variant="secondary"
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleLike(image);
+                          }}
+                        >
+                          <Heart className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handleShare(image);
                           }}
                         >
@@ -243,6 +312,14 @@ const PublicGallery = () => {
                   )}
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleLike(selectedImage)}
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    Like
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

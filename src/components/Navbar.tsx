@@ -57,6 +57,9 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
             <Link to="/materials" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
               Materials
             </Link>
+            <Link to="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
+              Gallery
+            </Link>
             <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
               About
             </Link>
@@ -166,6 +169,13 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 onClick={() => setIsOpen(false)}
               >
                 Materials
+              </Link>
+              <Link
+                to="/gallery"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                Gallery
               </Link>
               <Link
                 to="/about"
