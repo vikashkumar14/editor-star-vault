@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, Download } from "lucide-react";
+import { Heart, Share2, Download, Copy } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 
@@ -127,6 +127,23 @@ const PublicGallery = () => {
     document.body.removeChild(link);
   };
 
+  const handleCopyPrompt = async (prompt: string) => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      toast({
+        title: "Copied!",
+        description: "Prompt copied to clipboard"
+      });
+    } catch (error) {
+      console.error('Failed to copy prompt:', error);
+      toast({
+        title: "Error",
+        description: "Failed to copy prompt",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -180,6 +197,7 @@ const PublicGallery = () => {
                             <Button
                               size="sm"
                               variant="secondary"
+                              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleLike(image);
@@ -190,6 +208,7 @@ const PublicGallery = () => {
                             <Button
                               size="sm"
                               variant="secondary"
+                              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleShare(image);
@@ -200,6 +219,7 @@ const PublicGallery = () => {
                             <Button
                               size="sm"
                               variant="secondary"
+                              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDownload(image);
@@ -250,6 +270,7 @@ const PublicGallery = () => {
                         <Button
                           size="sm"
                           variant="secondary"
+                          className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleLike(image);
@@ -260,6 +281,7 @@ const PublicGallery = () => {
                         <Button
                           size="sm"
                           variant="secondary"
+                          className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleShare(image);
@@ -270,6 +292,7 @@ const PublicGallery = () => {
                         <Button
                           size="sm"
                           variant="secondary"
+                          className="backdrop-blur-sm bg-white/90 hover:bg-white text-black"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDownload(image);
@@ -300,22 +323,34 @@ const PublicGallery = () => {
           onClick={() => setSelectedImage(null)}
         >
           <div 
-            className="bg-background rounded-lg max-w-4xl max-h-[90vh] overflow-hidden"
+            className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold">{selectedImage.title}</h3>
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2">{selectedImage.title}</h3>
                   {selectedImage.prompt && (
-                    <p className="text-muted-foreground mt-1">{selectedImage.prompt}</p>
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground text-sm">{selectedImage.prompt}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCopyPrompt(selectedImage.prompt!)}
+                        className="w-full sm:w-auto"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy Prompt
+                      </Button>
+                    </div>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleLike(selectedImage)}
+                    className="flex-1 sm:flex-none"
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     Like
@@ -324,6 +359,7 @@ const PublicGallery = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleShare(selectedImage)}
+                    className="flex-1 sm:flex-none"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
@@ -332,6 +368,7 @@ const PublicGallery = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDownload(selectedImage)}
+                    className="flex-1 sm:flex-none"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
@@ -340,6 +377,7 @@ const PublicGallery = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setSelectedImage(null)}
+                    className="flex-1 sm:flex-none"
                   >
                     ✕
                   </Button>
