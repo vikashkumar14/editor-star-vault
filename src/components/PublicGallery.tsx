@@ -52,10 +52,10 @@ const PublicGallery = () => {
   const handleLike = async (image: GalleryImage) => {
     try {
       const { error } = await supabase
-        .from('material_interactions')
+        .from('gallery_interactions')
         .insert([
           {
-            material_id: image.id,
+            gallery_id: image.id,
             interaction_type: 'like',
             user_ip: await fetch('https://api.ipify.org?format=json')
               .then(res => res.json())
@@ -100,10 +100,10 @@ const PublicGallery = () => {
 
       // Track share interaction
       await supabase
-        .from('material_interactions')
+        .from('gallery_interactions')
         .insert([
           {
-            material_id: image.id,
+            gallery_id: image.id,
             interaction_type: 'share',
             user_ip: await fetch('https://api.ipify.org?format=json')
               .then(res => res.json())

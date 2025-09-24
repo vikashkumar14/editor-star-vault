@@ -292,6 +292,44 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_interactions: {
+        Row: {
+          comment_text: string | null
+          created_at: string
+          gallery_id: string
+          id: string
+          interaction_type: string
+          rating_value: number | null
+          user_ip: string | null
+        }
+        Insert: {
+          comment_text?: string | null
+          created_at?: string
+          gallery_id: string
+          id?: string
+          interaction_type: string
+          rating_value?: number | null
+          user_ip?: string | null
+        }
+        Update: {
+          comment_text?: string | null
+          created_at?: string
+          gallery_id?: string
+          id?: string
+          interaction_type?: string
+          rating_value?: number | null
+          user_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_interactions_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "gallery"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       "html java css": {
         Row: {
           "-- Add code columns to content table for HTML": string

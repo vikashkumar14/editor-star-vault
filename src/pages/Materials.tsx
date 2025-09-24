@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from "@/components/Navbar";
 import MaterialCard from "@/components/MaterialCard";
-import GallerySection from "@/components/GallerySection";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import { useMaterials } from "@/hooks/useMaterials";
@@ -172,9 +171,6 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
               )}
             </div>
           </div>
-
-          {/* Gallery Section */}
-          <GallerySection />
 
           {/* Results Info */}
           <div className="flex justify-between items-center mb-6">
