@@ -230,9 +230,21 @@ const PublicGallery = () => {
                           </div>
                         </div>
                         <div className="p-4">
-                          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{image.title}</h3>
+                          <h3 className="font-semibold text-lg mb-3 line-clamp-2">{image.title}</h3>
                           {image.prompt && (
-                            <p className="text-sm text-muted-foreground line-clamp-3">{image.prompt}</p>
+                            <div 
+                              className="cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors"
+                              onClick={() => setSelectedImage(image)}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-medium text-primary">Prompt</span>
+                                <div className="w-1 h-1 bg-primary rounded-full"></div>
+                                <span className="text-xs text-muted-foreground">Click to read full</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                {image.prompt}
+                              </p>
+                            </div>
                           )}
                         </div>
                       </CardContent>
@@ -303,9 +315,21 @@ const PublicGallery = () => {
                       </div>
                     </div>
                     <div className="p-3">
-                      <h3 className="font-medium text-sm mb-1 line-clamp-2">{image.title}</h3>
+                      <h3 className="font-medium text-sm mb-2 line-clamp-2">{image.title}</h3>
                       {image.prompt && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">{image.prompt}</p>
+                        <div 
+                          className="cursor-pointer hover:bg-muted/30 p-1.5 rounded transition-colors"
+                          onClick={() => setSelectedImage(image)}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span className="text-xs font-medium text-primary">Prompt</span>
+                            <div className="w-0.5 h-0.5 bg-primary rounded-full"></div>
+                            <span className="text-xs text-muted-foreground">Tap to read</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                            {image.prompt}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -316,97 +340,110 @@ const PublicGallery = () => {
         </>
       )}
 
-      {/* Modal for selected image */}
+      {/* Enhanced Modal for selected image */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div 
-            className="bg-background rounded-lg max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col"
+            className="bg-background rounded-xl max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl border border-border/20"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header with title and close button */}
-            <div className="flex justify-between items-center p-4 border-b bg-background">
-              <h3 className="text-xl font-semibold truncate pr-4">{selectedImage.title}</h3>
+            <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-background to-muted/10">
+              <div className="flex-1 pr-4">
+                <h3 className="text-2xl font-bold text-foreground mb-1">{selectedImage.title}</h3>
+                <p className="text-sm text-muted-foreground">AI Generated Image</p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedImage(null)}
-                className="shrink-0"
+                className="shrink-0 hover:bg-destructive/10 hover:text-destructive"
               >
-                ✕
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </Button>
             </div>
 
             {/* Scrollable content area */}
             <div className="flex-1 overflow-y-auto">
-              {/* Image */}
-              <div className="p-4 bg-muted/10">
-                <img
-                  src={selectedImage.image_url}
-                  alt={selectedImage.title}
-                  className="w-full h-auto max-h-[50vh] object-contain rounded mx-auto block"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder.svg';
-                  }}
-                />
+              {/* Image Container */}
+              <div className="p-6 bg-gradient-to-b from-muted/5 to-background">
+                <div className="relative rounded-xl overflow-hidden shadow-lg bg-muted/20">
+                  <img
+                    src={selectedImage.image_url}
+                    alt={selectedImage.title}
+                    className="w-full h-auto max-h-[55vh] object-contain mx-auto block"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
+                  />
+                </div>
               </div>
 
-              {/* Prompt section */}
+              {/* Enhanced Prompt Section */}
               {selectedImage.prompt && (
-                <div className="p-4 border-t">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <h4 className="font-semibold text-lg">Prompt</h4>
+                <div className="p-6 space-y-6">
+                  <div className="bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl p-6 border border-border/40">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-bold text-foreground">AI Prompt</h4>
+                          <p className="text-sm text-muted-foreground">The prompt used to generate this image</p>
+                        </div>
+                      </div>
                       <Button
-                        variant="outline"
-                        size="sm"
                         onClick={() => handleCopyPrompt(selectedImage.prompt!)}
-                        className="ml-auto"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 group"
                       >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
+                        <Copy className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                        Copy Prompt
                       </Button>
                     </div>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                        {selectedImage.prompt}
+                    
+                    <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border border-border/20 shadow-inner">
+                      <p className="text-base leading-relaxed text-foreground whitespace-pre-wrap break-words font-medium">
+                        "{selectedImage.prompt}"
                       </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Action buttons */}
-              <div className="p-4 border-t bg-background">
-                <div className="grid grid-cols-3 gap-2">
+              {/* Enhanced Action buttons */}
+              <div className="p-6 border-t bg-gradient-to-r from-background to-muted/5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-md mx-auto">
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => handleLike(selectedImage)}
-                    className="w-full"
+                    className="w-full hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-950 dark:hover:border-red-800 dark:hover:text-red-400 transition-colors group"
                   >
-                    <Heart className="w-4 h-4 mr-2" />
+                    <Heart className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Like
                   </Button>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => handleShare(selectedImage)}
-                    className="w-full"
+                    className="w-full hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:border-blue-800 dark:hover:text-blue-400 transition-colors group"
                   >
-                    <Share2 className="w-4 h-4 mr-2" />
+                    <Share2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Share
                   </Button>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => handleDownload(selectedImage)}
-                    className="w-full"
+                    className="w-full hover:bg-green-50 hover:border-green-200 hover:text-green-600 dark:hover:bg-green-950 dark:hover:border-green-800 dark:hover:text-green-400 transition-colors group"
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Download
                   </Button>
                 </div>
