@@ -319,38 +319,74 @@ const PublicGallery = () => {
       {/* Modal for selected image */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div 
-            className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-background rounded-lg max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b">
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold mb-2">{selectedImage.title}</h3>
-                  {selectedImage.prompt && (
-                    <div className="space-y-2">
-                      <p className="text-muted-foreground text-sm">{selectedImage.prompt}</p>
+            {/* Header with title and close button */}
+            <div className="flex justify-between items-center p-4 border-b bg-background">
+              <h3 className="text-xl font-semibold truncate pr-4">{selectedImage.title}</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedImage(null)}
+                className="shrink-0"
+              >
+                ✕
+              </Button>
+            </div>
+
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Image */}
+              <div className="p-4 bg-muted/10">
+                <img
+                  src={selectedImage.image_url}
+                  alt={selectedImage.title}
+                  className="w-full h-auto max-h-[50vh] object-contain rounded mx-auto block"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder.svg';
+                  }}
+                />
+              </div>
+
+              {/* Prompt section */}
+              {selectedImage.prompt && (
+                <div className="p-4 border-t">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <h4 className="font-semibold text-lg">Prompt</h4>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleCopyPrompt(selectedImage.prompt!)}
-                        className="w-full sm:w-auto"
+                        className="ml-auto"
                       >
                         <Copy className="w-4 h-4 mr-2" />
-                        Copy Prompt
+                        Copy
                       </Button>
                     </div>
-                  )}
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                        {selectedImage.prompt}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              )}
+
+              {/* Action buttons */}
+              <div className="p-4 border-t bg-background">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleLike(selectedImage)}
-                    className="flex-1 sm:flex-none"
+                    className="w-full"
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     Like
@@ -359,7 +395,7 @@ const PublicGallery = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleShare(selectedImage)}
-                    className="flex-1 sm:flex-none"
+                    className="w-full"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
@@ -368,32 +404,13 @@ const PublicGallery = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDownload(selectedImage)}
-                    className="flex-1 sm:flex-none"
+                    className="w-full"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedImage(null)}
-                    className="flex-1 sm:flex-none"
-                  >
-                    ✕
-                  </Button>
                 </div>
               </div>
-            </div>
-            <div className="p-4">
-              <img
-                src={selectedImage.image_url}
-                alt={selectedImage.title}
-                className="w-full h-auto max-h-[60vh] object-contain rounded"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg';
-                }}
-              />
             </div>
           </div>
         </div>
