@@ -1,8 +1,8 @@
 import React from 'react';
-import PublicGallery from '@/components/PublicGallery';
+import CategorizedGallery from '@/components/CategorizedGallery';
 
 const Gallery = () => {
-  return <PublicGallery />;
+  return <CategorizedGallery />;
 };
 
 export default Gallery;

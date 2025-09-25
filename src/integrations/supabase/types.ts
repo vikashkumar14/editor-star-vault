@@ -261,6 +261,7 @@ export type Database = {
       }
       gallery: {
         Row: {
+          category_id: string | null
           created_at: string
           id: string
           image_url: string
@@ -271,6 +272,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           id?: string
           image_url: string
@@ -281,6 +283,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           id?: string
           image_url?: string
@@ -290,7 +293,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gallery_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "image_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gallery_interactions: {
         Row: {
@@ -345,6 +356,39 @@ export type Database = {
           "-- Add code columns to content table for HTML"?: string
           "and JavaScript code storage"?: string
           CSS?: string
+        }
+        Relationships: []
+      }
+      image_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          style_config: Json | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          style_config?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          style_config?: Json | null
+          updated_at?: string
         }
         Relationships: []
       }

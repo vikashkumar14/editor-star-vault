@@ -16,6 +16,7 @@ import UserLogin from "./components/UserLogin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import MaterialPreview from "./pages/MaterialPreview";
 import NotFound from "./pages/NotFound";
+import AdminImageManagement from "./pages/AdminImageManagement";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/login" element={<UserLogin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedAdminRoute />} />
+              <Route path="/admin-image-management" element={<AdminImageManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
