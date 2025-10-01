@@ -20,11 +20,19 @@ interface GalleryImage {
   updated_at: string;
   is_featured: boolean;
   status: string;
+  category_id: string | null;
+}
+
+interface ImageCategory {
+  id: string;
+  name: string;
+  color: string;
 }
 
 const GalleryManager = () => {
   const { toast } = useToast();
   const [images, setImages] = useState<GalleryImage[]>([]);
+  const [categories, setCategories] = useState<ImageCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
@@ -33,12 +41,28 @@ const GalleryManager = () => {
     prompt: '',
     image_url: '',
     is_featured: false,
-    status: 'published'
+    status: 'published',
+    category_id: ''
   });
 
   useEffect(() => {
     fetchImages();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('image_categories')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchImages = async () => {
     try {
@@ -82,7 +106,8 @@ const GalleryManager = () => {
             prompt: formData.prompt || null,
             image_url: formData.image_url,
             is_featured: formData.is_featured,
-            status: formData.status
+            status: formData.status,
+            category_id: formData.category_id || null
           })
           .eq('id', editingImage.id);
 
@@ -99,7 +124,8 @@ const GalleryManager = () => {
             prompt: formData.prompt || null,
             image_url: formData.image_url,
             is_featured: formData.is_featured,
-            status: formData.status
+            status: formData.status,
+            category_id: formData.category_id || null
           });
 
         if (error) throw error;
@@ -128,7 +154,8 @@ const GalleryManager = () => {
       prompt: image.prompt || '',
       image_url: image.image_url,
       is_featured: image.is_featured,
-      status: image.status
+      status: image.status,
+      category_id: image.category_id || ''
     });
     setShowForm(true);
   };
@@ -164,7 +191,8 @@ const GalleryManager = () => {
       prompt: '',
       image_url: '',
       is_featured: false,
-      status: 'published'
+      status: 'published',
+      category_id: ''
     });
     setEditingImage(null);
     setShowForm(false);
@@ -214,17 +242,34 @@ const GalleryManager = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="category">Category</Label>
                   <select
-                    id="status"
-                    value={formData.status}
-                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                    id="category"
+                    value={formData.category_id}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
                     className="w-full mt-1 px-3 py-2 border border-input bg-background rounded-md"
                   >
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="status">Status</Label>
+                <select
+                  id="status"
+                  value={formData.status}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full mt-1 px-3 py-2 border border-input bg-background rounded-md"
+                >
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
               </div>
 
               <div>
