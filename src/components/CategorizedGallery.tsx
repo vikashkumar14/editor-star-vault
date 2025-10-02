@@ -206,85 +206,152 @@ const CategorizedGallery = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Image Gallery
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Browse images organized in categories
-        </p>
-      </div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-background">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-[1920px] mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+            Image Gallery
+          </h1>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Browse our curated collection organized in beautiful categories
+          </p>
+        </div>
 
-      {/* Category Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-        <Card className="text-center p-4 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-          <h3 className="font-semibold text-2xl text-primary">{images.length}</h3>
-          <p className="text-sm text-muted-foreground">Total Images</p>
-        </Card>
-        {categories.map((category) => {
-          const categoryImageCount = getImagesByCategory(category.id).length;
-          return (
-            <Card key={category.id} className="text-center p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <div 
-                  className="w-3 h-3 rounded-full" 
-                  style={{ backgroundColor: category.color }}
-                />
-                <h3 className="font-semibold text-lg">{categoryImageCount}</h3>
-              </div>
-              <p className="text-xs text-muted-foreground line-clamp-1">{category.name}</p>
-            </Card>
-          );
-        })}
-      </div>
+        {/* Category Statistics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 mb-10">
+          <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-primary/10 via-accent/5 to-accent/10 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+            <h3 className="font-bold text-2xl sm:text-3xl text-primary mb-1">{images.length}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total Images</p>
+          </Card>
+          {categories.map((category) => {
+            const categoryImageCount = getImagesByCategory(category.id).length;
+            return (
+              <Card key={category.id} className="text-center p-4 sm:p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 bg-gradient-to-br from-background to-muted/30 border-border/50 hover:border-primary/30">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div 
+                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-md" 
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <h3 className="font-bold text-lg sm:text-xl">{categoryImageCount}</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 font-medium">{category.name}</p>
+              </Card>
+            );
+          })}
+        </div>
 
-      {/* Category Folders */}
-      <div className="space-y-6">
-        {categories.map((category) => {
-          const categoryImages = getImagesByCategory(category.id);
-          if (categoryImages.length === 0) return null;
-          
-          return (
+        {/* Category Folders */}
+        <div className="space-y-6">
+          {categories.map((category) => {
+            const categoryImages = getImagesByCategory(category.id);
+            if (categoryImages.length === 0) return null;
+            
+            return (
+              <Collapsible
+                key={category.id}
+                open={openFolders[category.id]}
+                onOpenChange={() => toggleFolder(category.id)}
+                className="border-2 border-border/40 hover:border-primary/30 rounded-2xl overflow-hidden bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <CollapsibleTrigger asChild>
+                  <div 
+                    className="flex items-center justify-between p-5 sm:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-muted/50 hover:to-transparent transition-all duration-300 group"
+                    style={{ borderLeft: `6px solid ${category.color}` }}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <Folder className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: category.color }} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{category.name}</h2>
+                        {category.description && (
+                          <p className="text-sm sm:text-base text-muted-foreground">{category.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <Badge 
+                        variant="secondary" 
+                        className="px-3 py-1 text-xs sm:text-sm font-semibold shadow-md"
+                        style={{ backgroundColor: `${category.color}20`, color: category.color }}
+                      >
+                        {categoryImages.length} images
+                      </Badge>
+                      {openFolders[category.id] ? (
+                        <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                      )}
+                    </div>
+                </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="p-4 sm:p-6 bg-gradient-to-b from-muted/10 to-transparent">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                      {categoryImages.map((image) => (
+                        <ImageCard 
+                          key={image.id} 
+                          image={image} 
+                          categoryColor={category.color}
+                          categoryName={category.name}
+                          onImageClick={setSelectedImage}
+                          onLike={handleLike}
+                          onShare={() => {
+                            setSelectedImage(image);
+                            setShowShareMenu(true);
+                          }}
+                          onDownload={handleDownload}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })}
+
+          {/* Uncategorized Images */}
+          {uncategorizedImages.length > 0 && (
             <Collapsible
-              key={category.id}
-              open={openFolders[category.id]}
-              onOpenChange={() => toggleFolder(category.id)}
-              className="border rounded-lg overflow-hidden bg-card"
+              open={openFolders['uncategorized']}
+              onOpenChange={() => toggleFolder('uncategorized')}
+              className="border-2 border-border/40 hover:border-primary/30 rounded-2xl overflow-hidden bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300"
             >
               <CollapsibleTrigger asChild>
                 <div 
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                  style={{ borderLeft: `4px solid ${category.color}` }}
+                  className="flex items-center justify-between p-5 sm:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-muted/50 hover:to-transparent transition-all duration-300 group"
+                  style={{ borderLeft: '6px solid #6b7280' }}
                 >
-                  <div className="flex items-center gap-3">
-                    <Folder className="w-6 h-6" style={{ color: category.color }} />
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <Folder className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
+                    </div>
                     <div>
-                      <h2 className="text-xl font-bold">{category.name}</h2>
-                      {category.description && (
-                        <p className="text-sm text-muted-foreground">{category.description}</p>
-                      )}
+                      <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">Uncategorized</h2>
+                      <p className="text-sm sm:text-base text-muted-foreground">Images without a category</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary">{categoryImages.length} images</Badge>
-                    {openFolders[category.id] ? (
-                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <Badge variant="secondary" className="px-3 py-1 text-xs sm:text-sm font-semibold shadow-md">
+                      {uncategorizedImages.length} images
+                    </Badge>
+                    {openFolders['uncategorized'] ? (
+                      <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                      <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                     )}
                   </div>
-                </div>
+              </div>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="p-4 bg-muted/20">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {categoryImages.map((image) => (
+                <div className="p-4 sm:p-6 bg-gradient-to-b from-muted/10 to-transparent">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                    {uncategorizedImages.map((image) => (
                       <ImageCard 
                         key={image.id} 
                         image={image} 
-                        categoryColor={category.color}
-                        categoryName={category.name}
+                        categoryColor="#6b7280"
+                        categoryName="Uncategorized"
                         onImageClick={setSelectedImage}
                         onLike={handleLike}
                         onShare={() => {
@@ -298,96 +365,45 @@ const CategorizedGallery = () => {
                 </div>
               </CollapsibleContent>
             </Collapsible>
-          );
-        })}
+          )}
+        </div>
 
-        {/* Uncategorized Images */}
-        {uncategorizedImages.length > 0 && (
-          <Collapsible
-            open={openFolders['uncategorized']}
-            onOpenChange={() => toggleFolder('uncategorized')}
-            className="border rounded-lg overflow-hidden bg-card"
-          >
-            <CollapsibleTrigger asChild>
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                style={{ borderLeft: '4px solid #6b7280' }}
-              >
-                <div className="flex items-center gap-3">
-                  <Folder className="w-6 h-6 text-muted-foreground" />
-                  <div>
-                    <h2 className="text-xl font-bold">Uncategorized</h2>
-                    <p className="text-sm text-muted-foreground">Images without a category</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary">{uncategorizedImages.length} images</Badge>
-                  {openFolders['uncategorized'] ? (
-                    <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </div>
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="p-4 bg-muted/20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {uncategorizedImages.map((image) => (
-                    <ImageCard 
-                      key={image.id} 
-                      image={image} 
-                      categoryColor="#6b7280"
-                      categoryName="Uncategorized"
-                      onImageClick={setSelectedImage}
-                      onLike={handleLike}
-                      onShare={() => {
-                        setSelectedImage(image);
-                        setShowShareMenu(true);
-                      }}
-                      onDownload={handleDownload}
-                    />
-                  ))}
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+        {images.length === 0 && (
+          <div className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Folder className="w-20 h-20 mx-auto mb-6 text-muted-foreground opacity-50" />
+              <h3 className="text-2xl font-bold mb-3 text-foreground">No images yet</h3>
+              <p className="text-lg text-muted-foreground">Check back later for new content!</p>
+            </div>
+          </div>
+        )}
+
+        {/* Image Modal */}
+        {selectedImage && !showShareMenu && (
+          <ImageModal
+            image={selectedImage}
+            categoryColor={getCategoryColor(selectedImage.category_id)}
+            categoryName={getCategoryName(selectedImage.category_id)}
+            onClose={() => setSelectedImage(null)}
+            onLike={handleLike}
+            onShare={() => setShowShareMenu(true)}
+            onDownload={handleDownload}
+            onCopyPrompt={handleCopyPrompt}
+          />
+        )}
+
+        {/* Share Menu Modal */}
+        {showShareMenu && selectedImage && (
+          <ShareMenuModal
+            image={selectedImage}
+            onClose={() => {
+              setShowShareMenu(false);
+              setSelectedImage(null);
+            }}
+            onShare={handleSocialShare}
+          />
         )}
       </div>
-
-      {images.length === 0 && (
-        <div className="text-center py-12">
-          <Folder className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <h3 className="text-xl font-semibold mb-2">No images yet</h3>
-          <p className="text-muted-foreground">Check back later for new content!</p>
-        </div>
-      )}
-
-      {/* Image Modal */}
-      {selectedImage && !showShareMenu && (
-        <ImageModal 
-          image={selectedImage}
-          categoryColor={getCategoryColor(selectedImage.category_id)}
-          categoryName={getCategoryName(selectedImage.category_id)}
-          onClose={() => setSelectedImage(null)}
-          onLike={handleLike}
-          onShare={() => setShowShareMenu(true)}
-          onDownload={handleDownload}
-          onCopyPrompt={handleCopyPrompt}
-        />
-      )}
-
-      {/* Share Menu Modal */}
-      {showShareMenu && selectedImage && (
-        <ShareMenuModal
-          image={selectedImage}
-          onClose={() => {
-            setShowShareMenu(false);
-            setSelectedImage(null);
-          }}
-          onShare={handleSocialShare}
-        />
-      )}
     </div>
   );
 };
@@ -405,13 +421,13 @@ interface ImageCardProps {
 
 const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, onShare, onDownload }: ImageCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+    <Card className="overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group border-2 border-border/40 hover:border-primary/50 bg-card/90 backdrop-blur-sm">
       <CardContent className="p-0">
-        <div className="aspect-square relative overflow-hidden">
+        <div className="aspect-square relative overflow-hidden bg-muted/20">
           <img
             src={image.image_url}
             alt={image.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onClick={() => onImageClick(image)}
           />
           
@@ -436,46 +452,46 @@ const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, o
           )}
 
           {/* Action Buttons */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 flex gap-2">
             <Button
               size="sm"
               variant="secondary"
-              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black h-8 w-8 p-0"
+              className="backdrop-blur-md bg-white/95 hover:bg-white hover:scale-110 text-black h-9 w-9 p-0 shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 onLike(image);
               }}
             >
-              <Heart className="w-3 h-3" />
+              <Heart className="w-4 h-4" />
             </Button>
             <Button
               size="sm"
               variant="secondary"
-              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black h-8 w-8 p-0"
+              className="backdrop-blur-md bg-white/95 hover:bg-white hover:scale-110 text-black h-9 w-9 p-0 shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 onShare();
               }}
             >
-              <Share2 className="w-3 h-3" />
+              <Share2 className="w-4 h-4" />
             </Button>
             <Button
               size="sm"
               variant="secondary"
-              className="backdrop-blur-sm bg-white/90 hover:bg-white text-black h-8 w-8 p-0"
+              className="backdrop-blur-md bg-white/95 hover:bg-white hover:scale-110 text-black h-9 w-9 p-0 shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 onDownload(image);
               }}
             >
-              <Download className="w-3 h-3" />
+              <Download className="w-4 h-4" />
             </Button>
           </div>
         </div>
         
-        <div className="p-3">
-          <h3 className="font-medium text-sm mb-2 line-clamp-2">{image.title}</h3>
+        <div className="p-4">
+          <h3 className="font-semibold text-base mb-2 line-clamp-2 text-foreground">{image.title}</h3>
           {image.prompt && (
             <div 
               className="cursor-pointer hover:bg-muted/30 p-1.5 rounded transition-colors"

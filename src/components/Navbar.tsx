@@ -27,74 +27,83 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-lg dark:shadow-2xl transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-background/80 backdrop-blur-2xl border-b border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 sm:h-18">
           <div className="flex items-center">
             {/* Logo + Brand Name */}
-            <Link to="/" className="flex items-center space-x-2">
-              <img
-                src="https://i.ibb.co/XkjPcgsv/icon.jpg"
-                alt="Gyaan Repo Logo"
-                className="h-8 w-8 rounded-md"
-              />
-              <span className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <img
+                  src="https://i.ibb.co/XkjPcgsv/icon.jpg"
+                  alt="Gyaan Repo Logo"
+                  className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span className="font-bold text-xl sm:text-2xl bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
                 Gyaan Repo
               </span>
             </Link>
             
             {/* Developer Name - Hidden on mobile */}
-            <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-300 dark:border-gray-700">
-              <Code className="w-4 h-4 text-primary dark:text-blue-400 mr-2" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Developed by <span className="font-semibold text-primary dark:text-blue-400">Vikash Kumar Kushwaha</span>
-              </span>
+            <div className="hidden lg:flex items-center ml-8 pl-8 border-l-2 border-border/30">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                <Code className="w-4 h-4 text-primary animate-pulse" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  Developed by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span>
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/materials" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
-              Materials
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+            <Link to="/materials" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+              <span className="relative z-10">Materials</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
-              Gallery
+            <Link to="/gallery" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+              <span className="relative z-10">Gallery</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
-              About
+            <Link to="/about" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+              <span className="relative z-10">About</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium">
-              Contact
+            <Link to="/contact" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+              <span className="relative z-10">Contact</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center space-x-2 md:space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-3">
             {/* Search - hidden on mobile */}
             <form onSubmit={handleSearch} className="relative hidden sm:block">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search materials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-48 md:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary"
+                className="pl-10 w-48 md:w-64 h-10 bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary focus:border-primary rounded-lg shadow-sm transition-all duration-300"
               />
             </form>
             
             {/* Login button - simplified on mobile */}
             <Link
               to="/login"
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex items-center px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border border-primary/30 text-foreground hover:text-primary font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
             >
-              <User className="w-4 h-4 mr-2" />
+              <User className="w-4 h-4" />
               Login
             </Link>
 
             {/* Mobile login icon only */}
             <Link
               to="/login"
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="sm:hidden p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110"
             >
               <User className="w-5 h-5" />
             </Link>
@@ -102,16 +111,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
             {/* Admin button - simplified on mobile */}
             <Link
               to="/admin-login"
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 hidden sm:flex items-center px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-500/30 text-foreground hover:text-amber-600 dark:hover:text-amber-400 font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
             >
-              <Shield className="w-4 h-4 mr-2" />
+              <Shield className="w-4 h-4" />
               Admin
             </Link>
 
             {/* Mobile admin icon only */}
             <Link
               to="/admin-login"
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 sm:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="sm:hidden p-2 rounded-lg bg-muted/50 hover:bg-amber-500/10 border border-border/50 hover:border-amber-500/50 text-foreground hover:text-amber-600 transition-all duration-300 hover:scale-110"
             >
               <Shield className="w-5 h-5" />
             </Link>
@@ -121,9 +130,9 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={toggleDarkMode}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+              className="p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110 hover:rotate-12"
             >
-              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             {/* Mobile menu button - ALWAYS VISIBLE */}
@@ -131,9 +140,9 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 p-2"
+              className="md:hidden p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110"
             >
-              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
