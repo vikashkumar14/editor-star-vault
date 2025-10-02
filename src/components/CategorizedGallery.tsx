@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, Download, Copy, Folder, ChevronDown, ChevronUp } from "lucide-react";
+import { Heart, Share2, Download, Copy, Folder, ChevronDown, ChevronUp, Facebook, Twitter, MessageCircle, Send } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useThumbnailGeneration } from "@/hooks/useThumbnailGeneration";
 
 interface GalleryImage {
   id: string;
@@ -26,11 +27,13 @@ interface ImageCategory {
 
 const CategorizedGallery = () => {
   const { toast } = useToast();
+  const { shareOnWhatsApp, shareOnTelegram, shareOnTwitter, shareOnFacebook, copyToClipboard } = useThumbnailGeneration();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [categories, setCategories] = useState<ImageCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -136,28 +139,36 @@ const CategorizedGallery = () => {
     }
   };
 
-  const handleShare = async (image: GalleryImage) => {
-    try {
-      const shareUrl = `${window.location.origin}/gallery`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: image.title,
-          text: image.prompt || image.title,
-          url: shareUrl
-        });
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: "Link copied",
-          description: "Gallery link copied to clipboard"
-        });
-      }
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Share error:', error);
-      }
+  const handleShare = (image: GalleryImage) => {
+    setSelectedImage(image);
+    setShowShareMenu(true);
+  };
+
+  const handleSocialShare = (platform: string) => {
+    if (!selectedImage) return;
+    
+    const shareUrl = `${window.location.origin}/gallery`;
+    const title = selectedImage.title;
+    
+    switch(platform) {
+      case 'whatsapp':
+        shareOnWhatsApp(shareUrl, title);
+        break;
+      case 'telegram':
+        shareOnTelegram(shareUrl, title);
+        break;
+      case 'twitter':
+        shareOnTwitter(shareUrl, title);
+        break;
+      case 'facebook':
+        shareOnFacebook(shareUrl);
+        break;
+      case 'copy':
+        copyToClipboard(shareUrl);
+        break;
     }
+    
+    setShowShareMenu(false);
   };
 
   const handleDownload = (image: GalleryImage) => {
@@ -276,7 +287,10 @@ const CategorizedGallery = () => {
                         categoryName={category.name}
                         onImageClick={setSelectedImage}
                         onLike={handleLike}
-                        onShare={handleShare}
+                        onShare={() => {
+                          setSelectedImage(image);
+                          setShowShareMenu(true);
+                        }}
                         onDownload={handleDownload}
                       />
                     ))}
@@ -327,7 +341,10 @@ const CategorizedGallery = () => {
                       categoryName="Uncategorized"
                       onImageClick={setSelectedImage}
                       onLike={handleLike}
-                      onShare={handleShare}
+                      onShare={() => {
+                        setSelectedImage(image);
+                        setShowShareMenu(true);
+                      }}
                       onDownload={handleDownload}
                     />
                   ))}
@@ -347,16 +364,28 @@ const CategorizedGallery = () => {
       )}
 
       {/* Image Modal */}
-      {selectedImage && (
+      {selectedImage && !showShareMenu && (
         <ImageModal 
           image={selectedImage}
           categoryColor={getCategoryColor(selectedImage.category_id)}
           categoryName={getCategoryName(selectedImage.category_id)}
           onClose={() => setSelectedImage(null)}
           onLike={handleLike}
-          onShare={handleShare}
+          onShare={() => setShowShareMenu(true)}
           onDownload={handleDownload}
           onCopyPrompt={handleCopyPrompt}
+        />
+      )}
+
+      {/* Share Menu Modal */}
+      {showShareMenu && selectedImage && (
+        <ShareMenuModal
+          image={selectedImage}
+          onClose={() => {
+            setShowShareMenu(false);
+            setSelectedImage(null);
+          }}
+          onShare={handleSocialShare}
         />
       )}
     </div>
@@ -370,7 +399,7 @@ interface ImageCardProps {
   categoryName: string;
   onImageClick: (image: GalleryImage) => void;
   onLike: (image: GalleryImage) => void;
-  onShare: (image: GalleryImage) => void;
+  onShare: () => void;
   onDownload: (image: GalleryImage) => void;
 }
 
@@ -426,7 +455,7 @@ const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, o
               className="backdrop-blur-sm bg-white/90 hover:bg-white text-black h-8 w-8 p-0"
               onClick={(e) => {
                 e.stopPropagation();
-                onShare(image);
+                onShare();
               }}
             >
               <Share2 className="w-3 h-3" />
@@ -475,7 +504,7 @@ interface ImageModalProps {
   categoryName: string;
   onClose: () => void;
   onLike: (image: GalleryImage) => void;
-  onShare: (image: GalleryImage) => void;
+  onShare: () => void;
   onDownload: (image: GalleryImage) => void;
   onCopyPrompt: (prompt: string) => void;
 }
@@ -585,9 +614,7 @@ const ImageModal = ({ image, categoryColor, categoryName, onClose, onLike, onSha
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {
-                  onShare(image);
-                }}
+                onClick={onShare}
                 className="w-full hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:border-blue-800 dark:hover:text-blue-400 transition-colors group"
               >
                 <Share2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
@@ -605,6 +632,81 @@ const ImageModal = ({ image, categoryColor, categoryName, onClose, onLike, onSha
                 Download
               </Button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Share Menu Modal Component
+interface ShareMenuModalProps {
+  image: GalleryImage;
+  onClose: () => void;
+  onShare: (platform: string) => void;
+}
+
+const ShareMenuModal = ({ image, onClose, onShare }: ShareMenuModalProps) => {
+  const shareOptions = [
+    { id: 'whatsapp', name: 'WhatsApp', icon: MessageCircle, color: 'bg-green-500 hover:bg-green-600' },
+    { id: 'telegram', name: 'Telegram', icon: Send, color: 'bg-blue-500 hover:bg-blue-600' },
+    { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'bg-sky-500 hover:bg-sky-600' },
+    { id: 'facebook', name: 'Facebook', icon: Facebook, color: 'bg-blue-600 hover:bg-blue-700' },
+    { id: 'copy', name: 'Copy Link', icon: Copy, color: 'bg-gray-500 hover:bg-gray-600' },
+  ];
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-background rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-border/20 animate-scale-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b bg-gradient-to-r from-background to-muted/10">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xl font-bold text-foreground">Share Image</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="hover:bg-destructive/10 hover:text-destructive"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground line-clamp-2">{image.title}</p>
+        </div>
+
+        {/* Share Options Grid */}
+        <div className="p-6 space-y-3">
+          {shareOptions.map((option) => {
+            const Icon = option.icon;
+            return (
+              <Button
+                key={option.id}
+                onClick={() => onShare(option.id)}
+                className={`w-full ${option.color} text-white justify-start gap-3 h-14 text-base shadow-md hover:shadow-lg transition-all duration-200 group`}
+              >
+                <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span>{option.name}</span>
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Image Preview */}
+        <div className="px-6 pb-6">
+          <div className="relative rounded-lg overflow-hidden bg-muted/20 border border-border/40">
+            <img
+              src={image.image_url}
+              alt={image.title}
+              className="w-full h-32 object-cover"
+            />
           </div>
         </div>
       </div>

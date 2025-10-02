@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
 import FloatingChat from "@/components/FloatingChat";
 import BackToTop from "@/components/BackToTop";
+import ImageSlider from "@/components/ImageSlider";
 import { ArrowRight, Code, Palette, Zap, Download, Users, Star } from "lucide-react";
 
 interface IndexProps {
@@ -155,6 +156,7 @@ const Index = ({ darkMode, toggleDarkMode }: IndexProps) => {
 
         {/* Content Sections */}
         <div className="w-full">
+          <ImageSlider />
           <AnimatedStats />
           <div id="materials">
             <TrendingSection />
