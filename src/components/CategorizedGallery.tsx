@@ -207,32 +207,32 @@ const CategorizedGallery = () => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-background">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-[1920px] mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-[1920px] mx-auto">
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent animate-fade-in">
             Image Gallery
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Browse our curated collection organized in beautiful categories
           </p>
         </div>
 
         {/* Category Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 mb-10">
-          <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-primary/10 via-accent/5 to-accent/10 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-            <h3 className="font-bold text-2xl sm:text-3xl text-primary mb-1">{images.length}</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total Images</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 animate-fade-in">
+          <Card className="text-center p-3 sm:p-4 md:p-6 bg-gradient-to-br from-primary/10 via-accent/5 to-accent/10 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+            <h3 className="font-bold text-xl sm:text-2xl md:text-3xl text-primary mb-1">{images.length}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total</p>
           </Card>
           {categories.map((category) => {
             const categoryImageCount = getImagesByCategory(category.id).length;
             return (
-              <Card key={category.id} className="text-center p-4 sm:p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 bg-gradient-to-br from-background to-muted/30 border-border/50 hover:border-primary/30">
-                <div className="flex items-center justify-center gap-2 mb-2">
+              <Card key={category.id} className="text-center p-3 sm:p-4 md:p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 bg-gradient-to-br from-background to-muted/30 border-border/50 hover:border-primary/30">
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   <div 
-                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-md" 
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full shadow-md" 
                     style={{ backgroundColor: category.color }}
                   />
-                  <h3 className="font-bold text-lg sm:text-xl">{categoryImageCount}</h3>
+                  <h3 className="font-bold text-base sm:text-lg md:text-xl">{categoryImageCount}</h3>
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 font-medium">{category.name}</p>
               </Card>
@@ -241,7 +241,7 @@ const CategorizedGallery = () => {
         </div>
 
         {/* Category Folders */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {categories.map((category) => {
             const categoryImages = getImagesByCategory(category.id);
             if (categoryImages.length === 0) return null;
@@ -251,43 +251,43 @@ const CategorizedGallery = () => {
                 key={category.id}
                 open={openFolders[category.id]}
                 onOpenChange={() => toggleFolder(category.id)}
-                className="border-2 border-border/40 hover:border-primary/30 rounded-2xl overflow-hidden bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="border-2 border-border/40 hover:border-primary/30 rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-card/90 to-muted/20 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in"
               >
                 <CollapsibleTrigger asChild>
                   <div 
-                    className="flex items-center justify-between p-5 sm:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-muted/50 hover:to-transparent transition-all duration-300 group"
-                    style={{ borderLeft: `6px solid ${category.color}` }}
+                    className="flex items-center justify-between p-3 sm:p-4 md:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent transition-all duration-300 group"
+                    style={{ borderLeft: `4px sm:6px solid ${category.color}` }}
                   >
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <Folder className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: category.color }} />
+                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
+                      <div className="p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                        <Folder className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" style={{ color: category.color }} />
                       </div>
-                      <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{category.name}</h2>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 truncate">{category.name}</h2>
                         {category.description && (
-                          <p className="text-sm sm:text-base text-muted-foreground">{category.description}</p>
+                          <p className="text-xs sm:text-sm md:text-base text-muted-foreground truncate hidden sm:block">{category.description}</p>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
                       <Badge 
                         variant="secondary" 
-                        className="px-3 py-1 text-xs sm:text-sm font-semibold shadow-md"
+                        className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-semibold shadow-md"
                         style={{ backgroundColor: `${category.color}20`, color: category.color }}
                       >
-                        {categoryImages.length} images
+                        {categoryImages.length}
                       </Badge>
                       {openFolders[category.id] ? (
-                        <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                        <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                       )}
                     </div>
                 </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="p-4 sm:p-6 bg-gradient-to-b from-muted/10 to-transparent">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                  <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-b from-muted/10 to-transparent">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
                       {categoryImages.map((image) => (
                         <ImageCard 
                           key={image.id} 
@@ -421,21 +421,22 @@ interface ImageCardProps {
 
 const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, onShare, onDownload }: ImageCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group border-2 border-border/40 hover:border-primary/50 bg-card/90 backdrop-blur-sm">
+    <Card className="overflow-hidden hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 cursor-pointer group border border-border/40 hover:border-primary/50 bg-card/90 backdrop-blur-sm rounded-lg sm:rounded-xl">
       <CardContent className="p-0">
-        <div className="aspect-square relative overflow-hidden bg-muted/20">
+        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10">
           <img
             src={image.image_url}
             alt={image.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onClick={() => onImageClick(image)}
+            loading="lazy"
           />
           
           {/* Category Badge */}
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2">
             <Badge 
-              className="text-xs"
-              style={{ 
+              className="text-[10px] sm:text-xs px-1.5 py-0.5 sm:px-2 sm:py-1"
+              style={{
                 backgroundColor: categoryColor,
                 color: 'white'
               }}
