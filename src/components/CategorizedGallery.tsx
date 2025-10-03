@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, Download, Copy, Folder, ChevronDown, ChevronUp, Facebook, Twitter, MessageCircle, Send } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Heart, Share2, Download, Copy, Folder, ChevronDown, ChevronUp, Facebook, Twitter, MessageCircle, Send, Search, Grid3x3, LayoutList, SortAsc, Palette } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useThumbnailGeneration } from "@/hooks/useThumbnailGeneration";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface GalleryImage {
   id: string;
@@ -34,6 +36,10 @@ const CategorizedGallery = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured'>('newest');
+  const [currentTheme, setCurrentTheme] = useState<'default' | 'ocean' | 'sunset' | 'forest'>('default');
 
   useEffect(() => {
     fetchData();
@@ -91,10 +97,35 @@ const CategorizedGallery = () => {
   };
 
   const getImagesByCategory = (categoryId: string | null) => {
-    return images.filter(img => img.category_id === categoryId);
+    let filtered = images.filter(img => img.category_id === categoryId);
+    
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(img => 
+        img.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        img.prompt?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      if (sortBy === 'featured') {
+        if (a.is_featured && !b.is_featured) return -1;
+        if (!a.is_featured && b.is_featured) return 1;
+      }
+      if (sortBy === 'newest') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      if (sortBy === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+      return 0;
+    });
+    
+    return filtered;
   };
 
-  const uncategorizedImages = images.filter(img => !img.category_id);
+  const uncategorizedImages = getImagesByCategory(null);
 
   const getCategoryColor = (categoryId: string | null) => {
     if (!categoryId) return '#6b7280';
@@ -197,6 +228,23 @@ const CategorizedGallery = () => {
     }
   };
 
+  const changeTheme = (theme: 'default' | 'ocean' | 'sunset' | 'forest') => {
+    setCurrentTheme(theme);
+    const htmlElement = document.documentElement;
+    htmlElement.classList.remove('theme-ocean', 'theme-sunset', 'theme-forest');
+    if (theme !== 'default') {
+      htmlElement.classList.add(`theme-${theme}`);
+    }
+    localStorage.setItem('gallery-theme', theme);
+  };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('gallery-theme') as 'default' | 'ocean' | 'sunset' | 'forest';
+    if (savedTheme) {
+      changeTheme(savedTheme);
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -208,13 +256,87 @@ const CategorizedGallery = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-background">
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-[1920px] mx-auto">
-        <div className="text-center mb-8 sm:mb-10 md:mb-12">
+        <div className="text-center mb-6 sm:mb-8 md:mb-10">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent animate-fade-in">
             Image Gallery
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Browse our curated collection organized in beautiful categories
           </p>
+        </div>
+
+        {/* Enhanced Controls Bar */}
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4 animate-fade-in">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search images by title or prompt..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-card/50 backdrop-blur-sm border-border/50 focus:border-primary transition-all"
+              />
+            </div>
+
+            {/* Theme Selector */}
+            <Select value={currentTheme} onValueChange={(value: any) => changeTheme(value)}>
+              <SelectTrigger className="w-full sm:w-[140px] bg-card/50 backdrop-blur-sm border-border/50">
+                <Palette className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="ocean">Ocean</SelectItem>
+                <SelectItem value="sunset">Sunset</SelectItem>
+                <SelectItem value="forest">Forest</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            {/* Sort Options */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[140px] bg-card/50 backdrop-blur-sm border-border/50">
+                <SortAsc className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="featured">Featured</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* View Mode Toggle */}
+            <div className="flex bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-8 px-3"
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="h-8 px-3"
+              >
+                <LayoutList className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+              <span className="text-sm font-medium text-primary">{images.filter(img => {
+                if (!searchQuery) return true;
+                return img.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       img.prompt?.toLowerCase().includes(searchQuery.toLowerCase());
+              }).length} images</span>
+            </div>
+          </div>
         </div>
 
         {/* Category Statistics */}
@@ -255,8 +377,8 @@ const CategorizedGallery = () => {
               >
                 <CollapsibleTrigger asChild>
                   <div 
-                    className="flex items-center justify-between p-3 sm:p-4 md:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent transition-all duration-300 group"
-                    style={{ borderLeft: `4px sm:6px solid ${category.color}` }}
+                    className="flex items-center justify-between p-2 sm:p-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent transition-all duration-300 group"
+                    style={{ borderLeft: `4px solid ${category.color}` }}
                   >
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
                       <div className="p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
@@ -286,8 +408,10 @@ const CategorizedGallery = () => {
                 </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-b from-muted/10 to-transparent">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+                  <div className="p-3 sm:p-4 bg-gradient-to-b from-muted/10 to-transparent">
+                    <div className={viewMode === 'grid' 
+                      ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4" 
+                      : "flex flex-col gap-3 sm:gap-4"}>
                       {categoryImages.map((image) => (
                         <ImageCard 
                           key={image.id} 
@@ -301,6 +425,7 @@ const CategorizedGallery = () => {
                             setShowShareMenu(true);
                           }}
                           onDownload={handleDownload}
+                          viewMode={viewMode}
                         />
                       ))}
                     </div>
@@ -319,8 +444,8 @@ const CategorizedGallery = () => {
             >
               <CollapsibleTrigger asChild>
                 <div 
-                  className="flex items-center justify-between p-5 sm:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-muted/50 hover:to-transparent transition-all duration-300 group"
-                  style={{ borderLeft: '6px solid #6b7280' }}
+                  className="flex items-center justify-between p-2 sm:p-3 cursor-pointer hover:bg-gradient-to-r hover:from-muted/50 hover:to-transparent transition-all duration-300 group"
+                  style={{ borderLeft: '4px solid #6b7280' }}
                 >
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="p-3 rounded-xl bg-gradient-to-br from-background to-muted/50 border border-border/30 shadow-md group-hover:scale-110 transition-transform duration-300">
@@ -344,8 +469,10 @@ const CategorizedGallery = () => {
               </div>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="p-4 sm:p-6 bg-gradient-to-b from-muted/10 to-transparent">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                <div className="p-3 sm:p-4 bg-gradient-to-b from-muted/10 to-transparent">
+                  <div className={viewMode === 'grid' 
+                    ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4" 
+                    : "flex flex-col gap-3 sm:gap-4"}>
                     {uncategorizedImages.map((image) => (
                       <ImageCard 
                         key={image.id} 
@@ -359,6 +486,7 @@ const CategorizedGallery = () => {
                           setShowShareMenu(true);
                         }}
                         onDownload={handleDownload}
+                        viewMode={viewMode}
                       />
                     ))}
                   </div>
@@ -417,9 +545,55 @@ interface ImageCardProps {
   onLike: (image: GalleryImage) => void;
   onShare: () => void;
   onDownload: (image: GalleryImage) => void;
+  viewMode: 'grid' | 'list';
 }
 
-const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, onShare, onDownload }: ImageCardProps) => {
+const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, onShare, onDownload, viewMode }: ImageCardProps) => {
+  if (viewMode === 'list') {
+    return (
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group border border-border/40 hover:border-primary/50 bg-card/90 backdrop-blur-sm">
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4">
+            <div className="w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 relative overflow-hidden rounded-lg bg-gradient-to-br from-muted/30 to-muted/10">
+              <img
+                src={image.image_url}
+                alt={image.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onClick={() => onImageClick(image)}
+                loading="lazy"
+              />
+              <Badge 
+                className="absolute top-2 left-2 text-xs px-2 py-1"
+                style={{ backgroundColor: categoryColor, color: 'white' }}
+              >
+                {categoryName}
+              </Badge>
+            </div>
+            <div className="flex-1 min-w-0 flex flex-col justify-between">
+              <div>
+                <h3 className="font-semibold text-lg mb-2 line-clamp-1 text-foreground">{image.title}</h3>
+                {image.prompt && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{image.prompt}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onLike(image); }}>
+                  <Heart className="w-4 h-4 mr-1" /> Like
+                </Button>
+                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onShare(); }}>
+                  <Share2 className="w-4 h-4 mr-1" /> Share
+                </Button>
+                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDownload(image); }}>
+                  <Download className="w-4 h-4 mr-1" /> Download
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="overflow-hidden hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 cursor-pointer group border border-border/40 hover:border-primary/50 bg-card/90 backdrop-blur-sm rounded-lg sm:rounded-xl">
       <CardContent className="p-0">
