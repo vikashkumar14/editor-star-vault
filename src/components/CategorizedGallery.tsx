@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useThumbnailGeneration } from "@/hooks/useThumbnailGeneration";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface GalleryImage {
   id: string;
@@ -30,6 +31,7 @@ interface ImageCategory {
 const CategorizedGallery = () => {
   const { toast } = useToast();
   const { shareOnWhatsApp, shareOnTelegram, shareOnTwitter, shareOnFacebook, copyToClipboard } = useThumbnailGeneration();
+  const { t } = useLanguage();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [categories, setCategories] = useState<ImageCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -258,10 +260,10 @@ const CategorizedGallery = () => {
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-[1920px] mx-auto">
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent animate-fade-in">
-            Image Gallery
+            {t('imageGallery')}
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            Browse our curated collection organized in beautiful categories
+            {t('browseCollection')}
           </p>
         </div>
 
@@ -271,7 +273,7 @@ const CategorizedGallery = () => {
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search images..."
+              placeholder={t('searchImages')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-card/50 backdrop-blur-sm border-border/50 focus:border-primary transition-all h-11"
@@ -287,9 +289,9 @@ const CategorizedGallery = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-background border-border">
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="featured">Featured</SelectItem>
+                <SelectItem value="newest">{t('newest')}</SelectItem>
+                <SelectItem value="oldest">{t('oldest')}</SelectItem>
+                <SelectItem value="featured">{t('featured')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -333,7 +335,7 @@ const CategorizedGallery = () => {
                 if (!searchQuery) return true;
                 return img.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                        img.prompt?.toLowerCase().includes(searchQuery.toLowerCase());
-              }).length} images</span>
+              }).length} {t('images')}</span>
             </div>
           </div>
         </div>
@@ -342,7 +344,7 @@ const CategorizedGallery = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 animate-fade-in">
           <Card className="text-center p-3 sm:p-4 md:p-6 bg-gradient-to-br from-primary/10 via-accent/5 to-accent/10 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
             <h3 className="font-bold text-xl sm:text-2xl md:text-3xl text-primary mb-1">{images.length}</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total</p>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">{t('total')}</p>
           </Card>
           {categories.map((category) => {
             const categoryImageCount = getImagesByCategory(category.id).length;
@@ -451,8 +453,8 @@ const CategorizedGallery = () => {
                       <Folder className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
                     </div>
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">Uncategorized</h2>
-                      <p className="text-sm sm:text-base text-muted-foreground">Images without a category</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{t('uncategorized')}</h2>
+                      <p className="text-sm sm:text-base text-muted-foreground">{t('imagesWithoutCategory')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 sm:gap-4">
@@ -664,8 +666,8 @@ const ImageCard = ({ image, categoryColor, categoryName, onImageClick, onLike, o
           </div>
         </div>
         
-        <div className="p-4">
-          <h3 className="font-semibold text-base mb-2 line-clamp-2 text-foreground">{image.title}</h3>
+        <div className="p-3 sm:p-4 bg-gradient-to-b from-background to-muted/10">
+          <h3 className="font-bold text-sm sm:text-base mb-2 line-clamp-2 text-foreground leading-tight">{image.title}</h3>
           {image.prompt && (
             <div 
               className="cursor-pointer hover:bg-muted/30 p-1.5 rounded transition-colors"

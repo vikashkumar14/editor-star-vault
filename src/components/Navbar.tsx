@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Menu, X, User, Shield, Code } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, User, Shield, Code, Globe } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useLanguage } from "@/hooks/useLanguage";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -16,6 +18,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const { language, setLanguage, t, languages } = useLanguage();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,19 +63,19 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
             <Link to="/materials" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
-              <span className="relative z-10">Materials</span>
+              <span className="relative z-10">{t('materials')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
             <Link to="/gallery" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
-              <span className="relative z-10">Gallery</span>
+              <span className="relative z-10">{t('gallery')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
             <Link to="/about" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
-              <span className="relative z-10">About</span>
+              <span className="relative z-10">{t('about')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
             <Link to="/contact" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
-              <span className="relative z-10">Contact</span>
+              <span className="relative z-10">{t('contact')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
           </div>
@@ -84,7 +87,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search materials..."
+                placeholder={t('search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 w-48 md:w-64 h-10 bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary focus:border-primary rounded-lg shadow-sm transition-all duration-300"
@@ -97,7 +100,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border border-primary/30 text-foreground hover:text-primary font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
             >
               <User className="w-4 h-4" />
-              Login
+              {t('login')}
             </Link>
 
             {/* Mobile login icon only */}
@@ -114,7 +117,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-500/30 text-foreground hover:text-amber-600 dark:hover:text-amber-400 font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
             >
               <Shield className="w-4 h-4" />
-              Admin
+              {t('admin')}
             </Link>
 
             {/* Mobile admin icon only */}
@@ -157,18 +160,40 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder="Search materials..."
+                  placeholder={t('search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary"
                 />
               </form>
 
+              {/* Language Selector - Mobile Only */}
+              <div className="px-3 py-2 mb-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Select value={language} onValueChange={(value) => setLanguage(value as any)}>
+                    <SelectTrigger className="w-full h-9 bg-muted/50 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border max-h-[300px]">
+                      {languages.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          <span className="flex items-center gap-2">
+                            <span>{lang.flag}</span>
+                            <span>{lang.name}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {/* Developer info on mobile */}
               <div className="lg:hidden px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-3">
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                   <Code className="w-4 h-4 text-primary dark:text-primary mr-2" />
-                  <span>Developed by <span className="font-semibold text-primary dark:text-primary">Vikash Kumar Kushwaha</span></span>
+                  <span>{t('developerBy')} <span className="font-semibold text-primary dark:text-primary">Vikash Kumar Kushwaha</span></span>
                 </div>
               </div>
 
@@ -177,28 +202,28 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                Materials
+                {t('materials')}
               </Link>
               <Link
                 to="/gallery"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                Gallery
+                {t('gallery')}
               </Link>
               <Link
                 to="/about"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                About
+                {t('about')}
               </Link>
               <Link
                 to="/contact"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                Contact
+                {t('contact')}
               </Link>
               
               <Link
@@ -207,7 +232,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 onClick={() => setIsOpen(false)}
               >
                 <User className="w-4 h-4 inline mr-2" />
-                Login
+                {t('login')}
               </Link>
 
               <Link
@@ -216,7 +241,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 onClick={() => setIsOpen(false)}
               >
                 <Shield className="w-4 h-4 inline mr-2" />
-                Admin Login
+                {t('admin')}
               </Link>
             </div>
           </div>
