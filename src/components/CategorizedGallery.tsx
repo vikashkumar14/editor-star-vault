@@ -265,72 +265,71 @@ const CategorizedGallery = () => {
           </p>
         </div>
 
-        {/* Enhanced Controls Bar */}
-        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4 animate-fade-in">
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search images by title or prompt..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-card/50 backdrop-blur-sm border-border/50 focus:border-primary transition-all"
-              />
-            </div>
-
-            {/* Theme Selector */}
-            <Select value={currentTheme} onValueChange={(value: any) => changeTheme(value)}>
-              <SelectTrigger className="w-full sm:w-[140px] bg-card/50 backdrop-blur-sm border-border/50">
-                <Palette className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="ocean">Ocean</SelectItem>
-                <SelectItem value="sunset">Sunset</SelectItem>
-                <SelectItem value="forest">Forest</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Enhanced Controls Bar - Mobile Friendly */}
+        <div className="mb-6 sm:mb-8 animate-fade-in">
+          {/* Search Bar - Full Width on Mobile */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search images..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-card/50 backdrop-blur-sm border-border/50 focus:border-primary transition-all h-11"
+            />
           </div>
 
-          <div className="flex flex-wrap gap-2 sm:gap-3">
+          {/* Compact Controls Row */}
+          <div className="flex flex-wrap items-center gap-2">
             {/* Sort Options */}
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-[140px] bg-card/50 backdrop-blur-sm border-border/50">
-                <SortAsc className="h-4 w-4 mr-2" />
+              <SelectTrigger className="w-[110px] h-9 bg-card/50 backdrop-blur-sm border-border/50">
+                <SortAsc className="h-3.5 w-3.5 mr-1" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border">
                 <SelectItem value="newest">Newest</SelectItem>
                 <SelectItem value="oldest">Oldest</SelectItem>
                 <SelectItem value="featured">Featured</SelectItem>
               </SelectContent>
             </Select>
 
+            {/* Theme Selector */}
+            <Select value={currentTheme} onValueChange={(value: any) => changeTheme(value)}>
+              <SelectTrigger className="w-[110px] h-9 bg-card/50 backdrop-blur-sm border-border/50">
+                <Palette className="h-3.5 w-3.5 mr-1" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border">
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="ocean">Ocean</SelectItem>
+                <SelectItem value="sunset">Sunset</SelectItem>
+                <SelectItem value="forest">Forest</SelectItem>
+              </SelectContent>
+            </Select>
+
             {/* View Mode Toggle */}
-            <div className="flex bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-1">
+            <div className="flex bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-0.5">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
-                className="h-8 px-3"
+                className="h-8 w-8 p-0"
               >
-                <Grid3x3 className="h-4 w-4" />
+                <Grid3x3 className="h-3.5 w-3.5" />
               </Button>
               <Button
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
-                className="h-8 px-3"
+                className="h-8 w-8 p-0"
               >
-                <LayoutList className="h-4 w-4" />
+                <LayoutList className="h-3.5 w-3.5" />
               </Button>
             </div>
 
             {/* Results Count */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
-              <span className="text-sm font-medium text-primary">{images.filter(img => {
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary/10 rounded-lg border border-primary/20 ml-auto">
+              <span className="text-xs font-medium text-primary whitespace-nowrap">{images.filter(img => {
                 if (!searchQuery) return true;
                 return img.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                        img.prompt?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -408,9 +407,9 @@ const CategorizedGallery = () => {
                 </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="p-3 sm:p-4 bg-gradient-to-b from-muted/10 to-transparent">
+                  <div className="p-2 sm:p-3 md:p-4 bg-gradient-to-b from-muted/10 to-transparent">
                     <div className={viewMode === 'grid' 
-                      ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4" 
+                      ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4" 
                       : "flex flex-col gap-3 sm:gap-4"}>
                       {categoryImages.map((image) => (
                         <ImageCard 
