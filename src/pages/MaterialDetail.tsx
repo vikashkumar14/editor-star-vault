@@ -426,29 +426,29 @@ const MaterialDetail = () => {
                     </p>
                   </div>
 
-                  {isPremium ? (
+                   {isPremium ? (
                     <Button 
-                      className="w-full h-10 sm:h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-sm sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
+                      className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
                       onClick={handlePremiumDownload}
                     >
-                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      Purchase & Download ₹{price}
+                      <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
+                      <span className="truncate">Purchase & Download ₹{price}</span>
                     </Button>
                   ) : (
                     <Button 
-                      className="w-full h-10 sm:h-12 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white text-sm sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200"
+                      className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
                       onClick={handleDownload}
                       disabled={downloading}
                     >
                       {downloading ? (
-                        <span className="flex items-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Preparing...
+                        <span className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-b-2 border-white mr-1.5 sm:mr-2 flex-shrink-0"></div>
+                          <span className="truncate">Preparing...</span>
                         </span>
                       ) : (
                         <>
-                          <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                          Free Download
+                          <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
+                          <span className="truncate">Free Download</span>
                         </>
                       )}
                     </Button>

@@ -311,7 +311,20 @@ export const useLanguage = () => {
     localStorage.setItem('app-language', language);
     // Update HTML lang attribute
     document.documentElement.lang = language;
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('languageChange', { detail: language }));
   }, [language]);
+
+  // Listen for language changes from other components
+  useEffect(() => {
+    const handleLanguageChange = (event: CustomEvent) => {
+      setLanguage(event.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+  }, []);
 
   const t = (key: string): string => {
     return translations[key]?.[language] || key;

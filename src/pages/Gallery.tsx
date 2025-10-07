@@ -9,6 +9,8 @@ const Gallery = () => {
     return saved ? JSON.parse(saved) : true;
   });
 
+  const [key, setKey] = useState(0);
+
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
     if (darkMode) {
@@ -18,6 +20,16 @@ const Gallery = () => {
     }
   }, [darkMode]);
 
+  // Listen for language changes and force re-render
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setKey(prev => prev + 1);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
+  }, []);
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
@@ -25,7 +37,7 @@ const Gallery = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <main className="flex-1 pt-16 sm:pt-18">
+      <main className="flex-1 pt-16 sm:pt-18" key={key}>
         <CategorizedGallery />
       </main>
       <Footer />
