@@ -78,90 +78,90 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
             </p>
           </div>
 
-          {/* Enhanced Search & Filter Section */}
-          <div className="bg-card rounded-lg border p-6 mb-8 shadow-sm">
+          {/* Fresh Advanced Search System */}
+          <div className="bg-gradient-to-br from-card via-card to-muted/20 rounded-2xl border-2 border-border/50 p-4 sm:p-6 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300">
             <div className="space-y-4">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              {/* Main Search Bar with Icon */}
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                  <Search className="text-primary w-5 h-5 group-hover:scale-110 transition-transform" />
+                </div>
                 <Input
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  placeholder="Search materials, categories, authors..."
-                  className="pl-12 pr-12 h-12 text-base border-2 focus:border-primary"
+                  placeholder="Search anything... (title, content, author, category)"
+                  className="pl-12 pr-12 h-14 text-base border-2 focus:border-primary rounded-xl bg-background/80 backdrop-blur-sm shadow-inner hover:shadow-lg transition-all duration-300 font-medium"
                 />
                 {searchQuery && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-9 w-9 p-0 rounded-full hover:bg-destructive/20 hover:text-destructive hover:scale-110 transition-all"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </Button>
                 )}
               </div>
 
-              {/* Filters Toggle */}
-              <div className="flex justify-between items-center">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                  {(selectedCategory) && (
-                    <Badge variant="secondary" className="ml-2">
-                      1
-                    </Badge>
-                  )}
-                </Button>
+              {/* Quick Actions Row */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* Category Filter */}
+                <div className="flex-1 min-w-[200px]">
+                  <Select value={selectedCategory || 'all'} onValueChange={handleCategoryChange}>
+                    <SelectTrigger className="h-11 border-2 rounded-xl bg-background/80 backdrop-blur-sm hover:border-primary transition-all">
+                      <Filter className="w-4 h-4 mr-2 text-primary" />
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
+                {/* Clear All Button */}
                 {(searchQuery || selectedCategory) && (
-                  <Button variant="outline" onClick={clearSearch} className="flex items-center gap-2">
-                    <X className="w-4 h-4" />
+                  <Button 
+                    variant="outline" 
+                    onClick={clearSearch} 
+                    className="h-11 px-4 rounded-xl border-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all font-semibold"
+                  >
+                    <X className="w-4 h-4 mr-2" />
                     Clear All
                   </Button>
                 )}
               </div>
 
-              {/* Expandable Filters */}
-              {showFilters && (
-                <div className="border-t pt-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Category</label>
-                      <Select value={selectedCategory || 'all'} onValueChange={handleCategoryChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="All Categories" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Categories</SelectItem>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.name}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Active Filters */}
-              {(selectedCategory) && (
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-sm text-muted-foreground">Active filters:</span>
+              {/* Active Filters Display */}
+              {(searchQuery || selectedCategory) && (
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/30">
+                  <span className="text-sm font-semibold text-muted-foreground">Active filters:</span>
+                  {searchQuery && (
+                    <Badge variant="default" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 bg-primary/10 text-primary border border-primary/30">
+                      Search: "{searchQuery.substring(0, 30)}{searchQuery.length > 30 ? '...' : ''}"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSearchQuery('')}
+                        className="h-4 w-4 p-0 hover:bg-primary/20 rounded-full"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </Badge>
+                  )}
                   {selectedCategory && (
-                    <Badge variant="secondary" className="flex items-center gap-1">
+                    <Badge variant="default" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 bg-accent/10 text-accent-foreground border border-accent/30">
                       Category: {selectedCategory}
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={clearCategory}
-                        className="h-4 w-4 p-0 hover:bg-transparent"
+                        className="h-4 w-4 p-0 hover:bg-accent/20 rounded-full"
                       >
                         <X className="w-3 h-3" />
                       </Button>
@@ -169,18 +169,50 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
                   )}
                 </div>
               )}
+
+              {/* Search Hints */}
+              {!searchQuery && !selectedCategory && (
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-border/30">
+                  <span className="text-xs text-muted-foreground">Quick search:</span>
+                  {['HTML', 'CSS', 'JavaScript', 'React', 'Templates'].map((term) => (
+                    <Badge 
+                      key={term}
+                      variant="outline" 
+                      className="cursor-pointer hover:bg-primary/10 hover:border-primary hover:text-primary transition-all text-xs"
+                      onClick={() => setSearchQuery(term)}
+                    >
+                      {term}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Results Info */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="text-sm text-muted-foreground">
-              {loading ? (
-                'Loading...'
-              ) : (
-                `Showing ${materials.length} materials${searchQuery ? ` for "${searchQuery}"` : ''}`
-              )}
+          <div className="flex flex-wrap justify-between items-center gap-3 mb-6 p-4 bg-muted/30 rounded-xl border border-border/30">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+              <div className="text-sm font-semibold text-foreground">
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading materials...
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-primary text-lg">{materials.length}</span>
+                    <span className="text-muted-foreground"> materials found</span>
+                    {searchQuery && <span className="text-muted-foreground"> for "{searchQuery}"</span>}
+                  </>
+                )}
+              </div>
             </div>
+            {!loading && materials.length > 0 && (
+              <Badge variant="secondary" className="px-3 py-1.5 text-xs font-semibold">
+                Page {currentPage} of {totalPages}
+              </Badge>
+            )}
           </div>
 
           {/* Loading State */}

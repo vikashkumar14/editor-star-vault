@@ -175,7 +175,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                     <SelectTrigger className="w-full h-9 bg-muted/50 border-border/50">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border-border max-h-[300px]">
+                    <SelectContent className="z-[9999] bg-background border-border max-h-[300px]">
                       {languages.map((lang) => (
                         <SelectItem key={lang.code} value={lang.code}>
                           <span className="flex items-center gap-2">

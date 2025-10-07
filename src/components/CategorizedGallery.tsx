@@ -320,7 +320,9 @@ const CategorizedGallery = () => {
 
             {/* View Mode Toggle */}
             <div className="flex bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 p-0.5">
-              
+              <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('grid')} className="h-8 w-8 p-0">
+                <Grid3x3 className="h-3.5 w-3.5" />
+              </Button>
               <Button variant={viewMode === 'list' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('list')} className="h-8 w-8 p-0">
                 <LayoutList className="h-3.5 w-3.5" />
               </Button>
@@ -496,24 +498,27 @@ const ImageCard = ({
                 <h3 className="font-semibold text-lg mb-2 line-clamp-1 text-foreground">{image.title}</h3>
                 {image.prompt && <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{image.prompt}</p>}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button size="sm" variant="outline" onClick={e => {
                 e.stopPropagation();
                 onLike(image);
-              }}>
-                  <Heart className="w-4 h-4 mr-1" /> Like
+              }} className="flex-1 min-w-[80px]">
+                  <Heart className="w-4 h-4 mr-1 flex-shrink-0" /> 
+                  <span className="truncate">Like</span>
                 </Button>
                 <Button size="sm" variant="outline" onClick={e => {
                 e.stopPropagation();
                 onShare();
-              }}>
-                  <Share2 className="w-4 h-4 mr-1" /> Share
+              }} className="flex-1 min-w-[80px]">
+                  <Share2 className="w-4 h-4 mr-1 flex-shrink-0" /> 
+                  <span className="truncate">Share</span>
                 </Button>
                 <Button size="sm" variant="outline" onClick={e => {
                 e.stopPropagation();
                 onDownload(image);
-              }}>
-                  <Download className="w-4 h-4 mr-1" /> Download
+              }} className="flex-1 min-w-[90px]">
+                  <Download className="w-4 h-4 mr-1 flex-shrink-0" /> 
+                  <span className="truncate">Download</span>
                 </Button>
               </div>
             </div>
