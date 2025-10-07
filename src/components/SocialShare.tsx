@@ -80,12 +80,11 @@ const SocialShare = ({ materialId, title, fileUrl, fileName, fileType }: SocialS
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="gap-2"
+          className="w-full h-9 sm:h-10 gap-2 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center px-3"
           disabled={isGenerating}
         >
-          <Share2 className="h-4 w-4" />
-          {isGenerating ? 'Preparing...' : 'Share'}
+          <Share2 className="h-4 w-4 flex-shrink-0" />
+          <span className="truncate">{isGenerating ? 'Preparing...' : 'Share'}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

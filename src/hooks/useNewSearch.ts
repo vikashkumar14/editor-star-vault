@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Material } from '@/types/database';
 import { useDebounce } from './useDebounce';
@@ -65,8 +65,8 @@ export const useNewSearch = (options: UseNewSearchOptions = {}) => {
     }
   }, [category]);
 
-  // Perform search when debounced query changes
-  useMemo(() => {
+  // Perform search when debounced query changes (fixed to use useEffect instead of useMemo)
+  useEffect(() => {
     performSearch(debouncedQuery);
   }, [debouncedQuery, performSearch]);
 
