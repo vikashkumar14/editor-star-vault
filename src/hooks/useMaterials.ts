@@ -41,10 +41,10 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         query = query.eq('category', category);
       }
 
-      // Apply search filter (enhanced comprehensive search with safer enum handling)
+      // Apply search filter (enhanced comprehensive search)
       if (search && search.trim()) {
         const searchTerm = search.trim().toLowerCase();
-        // Enhanced search across text fields only - avoid enum issues
+        // Search across all relevant text fields
         query = query.or(`
           title.ilike.%${searchTerm}%,
           description.ilike.%${searchTerm}%,
@@ -56,11 +56,6 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
           css_introduction.ilike.%${searchTerm}%,
           js_introduction.ilike.%${searchTerm}%
         `.replace(/\s+/g, ''));
-        
-        // Separate search for array fields to avoid enum conflicts
-        if (searchTerm.length > 2) { // Only search arrays for longer terms
-          query = query.or(`tags.cs.{${searchTerm}}`);
-        }
       }
 
       // Apply ordering and pagination
