@@ -97,7 +97,7 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   // Check if material has code content
   const hasCodeContent = material.html_code || material.css_code || material.js_code;
 
-  // Generate code preview
+  // Generate code preview with enhanced support for all HTML structures
   const generateCodePreview = () => {
     if (!hasCodeContent) return '';
     
@@ -109,14 +109,34 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Live Preview</title>
         <style>
-          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+          /* Reset default styles */
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            width: 100%;
+            height: 100vh;
+            overflow: auto;
+          }
+          
+          /* User CSS */
           ${material.css_code || ''}
         </style>
       </head>
       <body>
         ${material.html_code || ''}
         <script>
-          ${material.js_code || ''}
+          try {
+            ${material.js_code || ''}
+          } catch (error) {
+            console.error('Preview error:', error);
+          }
         </script>
       </body>
       </html>
