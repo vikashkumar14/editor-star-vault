@@ -7,6 +7,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -33,8 +34,19 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const handleGalleryClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Play welcome message
+    // Show welcome popup
     const welcomeMessages: { [key: string]: string } = {
+      en: "Welcome to Gyaan Repo Gallery! 🎨",
+      hi: "ज्ञान रेपो गैलरी में आपका स्वागत है! 🎨",
+      es: "¡Bienvenido a la Galería de Gyaan Repo! 🎨",
+      fr: "Bienvenue dans la galerie Gyaan Repo ! 🎨",
+      de: "Willkommen in der Gyaan Repo Galerie! 🎨",
+      pt: "Bem-vindo à Galeria Gyaan Repo! 🎨",
+      ja: "Gyaan Repoギャラリーへようこそ！🎨",
+      zh: "欢迎来到 Gyaan Repo 画廊！🎨"
+    };
+
+    const voiceMessages: { [key: string]: string } = {
       en: "Welcome to Gyaan Repo Gallery! Explore our amazing collection of materials.",
       hi: "ज्ञान रेपो गैलरी में आपका स्वागत है! हमारे अद्भुत संग्रह का अन्वेषण करें।",
       es: "¡Bienvenido a la Galería de Gyaan Repo! Explora nuestra increíble colección de materiales.",
@@ -45,8 +57,20 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
       zh: "欢迎来到 Gyaan Repo 画廊！探索我们精彩的材料收藏。"
     };
 
-    const message = welcomeMessages[language] || welcomeMessages.en;
-    speak(message);
+    const popupMessage = welcomeMessages[language] || welcomeMessages.en;
+    const voiceMessage = voiceMessages[language] || voiceMessages.en;
+    
+    // Show popup notification
+    toast.success(popupMessage, {
+      duration: 3000,
+      position: 'top-center',
+    });
+    
+    // Try to play welcome message (gracefully handle if it fails)
+    speak(voiceMessage).catch(() => {
+      // Voice failed, but that's okay - we already showed the popup
+      console.log('Voice not available, continuing with visual notification');
+    });
     
     // Navigate after a short delay
     setTimeout(() => {

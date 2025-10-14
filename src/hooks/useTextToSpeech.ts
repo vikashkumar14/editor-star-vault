@@ -48,7 +48,6 @@ export const useTextToSpeech = () => {
         setIsPlaying(false);
         URL.revokeObjectURL(audioUrl);
         setCurrentAudio(null);
-        toast.error('Failed to play audio');
       };
 
       setCurrentAudio(audio);
@@ -57,7 +56,8 @@ export const useTextToSpeech = () => {
     } catch (error: any) {
       console.error('Text-to-speech error:', error);
       setIsPlaying(false);
-      toast.error('Failed to generate speech');
+      // Don't show error toast here - let caller handle it
+      throw error; // Re-throw so caller can handle gracefully
     }
   };
 

@@ -112,6 +112,14 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Preview</title>
+  
+  <!-- Common Libraries CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anime.js/3.2.1/anime.min.js"></script>
+  
   <style>
     /* Reset and base styles */
     * {
@@ -140,15 +148,18 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   ${cleanHTML}
   
   <script>
-    try {
-      // Wrap user code in IIFE to avoid global scope pollution
-      (function() {
-        ${material.js_code || ''}
-      })();
-    } catch (error) {
-      console.error('Preview JavaScript error:', error);
-      document.body.innerHTML += '<div style="position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;border-radius:5px;z-index:9999;">JS Error: ' + error.message + '</div>';
-    }
+    // Wait for libraries to load
+    window.addEventListener('load', function() {
+      try {
+        // Wrap user code in IIFE to avoid global scope pollution
+        (function() {
+          ${material.js_code || ''}
+        })();
+      } catch (error) {
+        console.error('Preview JavaScript error:', error);
+        document.body.innerHTML += '<div style="position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;border-radius:5px;z-index:9999;">JS Error: ' + error.message + '</div>';
+      }
+    });
   </script>
 </body>
 </html>`;
