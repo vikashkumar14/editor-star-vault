@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Moon, Sun, Menu, X, User, Shield, Code, Globe } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface NavbarProps {
@@ -19,6 +19,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const navigate = useNavigate();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { language, setLanguage, t, languages } = useLanguage();
+  const { speak, isPlaying } = useTextToSpeech();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +28,30 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
       setSearchQuery('');
       setIsOpen(false);
     }
+  };
+
+  const handleGalleryClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Play welcome message
+    const welcomeMessages: { [key: string]: string } = {
+      en: "Welcome to Gyaan Repo Gallery! Explore our amazing collection of materials.",
+      hi: "ज्ञान रेपो गैलरी में आपका स्वागत है! हमारे अद्भुत संग्रह का अन्वेषण करें।",
+      es: "¡Bienvenido a la Galería de Gyaan Repo! Explora nuestra increíble colección de materiales.",
+      fr: "Bienvenue dans la galerie Gyaan Repo ! Explorez notre incroyable collection de matériaux.",
+      de: "Willkommen in der Gyaan Repo Galerie! Erkunden Sie unsere erstaunliche Materialsammlung.",
+      pt: "Bem-vindo à Galeria Gyaan Repo! Explore nossa incrível coleção de materiais.",
+      ja: "Gyaan Repoギャラリーへようこそ！素晴らしいコレクションをお楽しみください。",
+      zh: "欢迎来到 Gyaan Repo 画廊！探索我们精彩的材料收藏。"
+    };
+
+    const message = welcomeMessages[language] || welcomeMessages.en;
+    speak(message);
+    
+    // Navigate after a short delay
+    setTimeout(() => {
+      navigate('/gallery');
+    }, 300);
   };
 
   return (
@@ -66,10 +91,14 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               <span className="relative z-10">{t('materials')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/gallery" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+            <a 
+              href="/gallery" 
+              onClick={handleGalleryClick}
+              className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group cursor-pointer"
+            >
               <span className="relative z-10">{t('gallery')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </Link>
+            </a>
             <Link to="/about" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
               <span className="relative z-10">{t('about')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -204,13 +233,16 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               >
                 {t('materials')}
               </Link>
-              <Link
-                to="/gallery"
+              <a
+                href="/gallery"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  setIsOpen(false);
+                  handleGalleryClick(e);
+                }}
               >
                 {t('gallery')}
-              </Link>
+              </a>
               <Link
                 to="/about"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"

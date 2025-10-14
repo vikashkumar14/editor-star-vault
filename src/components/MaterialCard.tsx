@@ -101,46 +101,58 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
   const generateCodePreview = () => {
     if (!hasCodeContent) return '';
     
-    const combinedCode = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Live Preview</title>
-        <style>
-          /* Reset default styles */
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          
-          body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            width: 100%;
-            height: 100vh;
-            overflow: auto;
-          }
-          
-          /* User CSS */
-          ${material.css_code || ''}
-        </style>
-      </head>
-      <body>
-        ${material.html_code || ''}
-        <script>
-          try {
-            ${material.js_code || ''}
-          } catch (error) {
-            console.error('Preview error:', error);
-          }
-        </script>
-      </body>
-      </html>
-    `;
+    // Clean and normalize the HTML code
+    const cleanHTML = (material.html_code || '')
+      .replace(/class=/g, 'class=') // Ensure proper class attribute
+      .trim();
+    
+    const combinedCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Preview</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* User custom CSS */
+    ${material.css_code || ''}
+  </style>
+</head>
+<body>
+  ${cleanHTML}
+  
+  <script>
+    try {
+      // Wrap user code in IIFE to avoid global scope pollution
+      (function() {
+        ${material.js_code || ''}
+      })();
+    } catch (error) {
+      console.error('Preview JavaScript error:', error);
+      document.body.innerHTML += '<div style="position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;border-radius:5px;z-index:9999;">JS Error: ' + error.message + '</div>';
+    }
+  </script>
+</body>
+</html>`;
+    
     return combinedCode;
   };
 
