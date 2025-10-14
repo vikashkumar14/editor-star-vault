@@ -298,31 +298,34 @@ const MaterialCard = ({ material }: MaterialCardProps) => {
       
       <CardContent className="pt-0">
         {/* Action Buttons */}
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Button 
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            className="flex-1 min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={handleViewDetails}
           >
-            <Info className="w-4 h-4 mr-2" />
-            Download Material
+            <Info className="w-4 h-4 mr-1 flex-shrink-0" />
+            <span className="truncate">Download</span>
           </Button>
           
-          <SocialShare 
-            materialId={material.id}
-            title={material.title}
-            fileUrl={material.file_url}
-            fileName={material.file_name}
-            fileType={material.file_type}
-          />
+          <div className="flex-shrink-0">
+            <SocialShare 
+              materialId={material.id}
+              title={material.title}
+              fileUrl={material.file_url}
+              fileName={material.file_name}
+              fileType={material.file_type}
+            />
+          </div>
           
           {hasLivePreview && (
             <Button 
               variant="outline" 
               onClick={handleLivePreview}
-              className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
+              className="flex-shrink-0 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
             >
               <Eye className="w-4 h-4 mr-1" />
-              Preview
+              <span className="hidden sm:inline">Preview</span>
+              <span className="sm:hidden">View</span>
             </Button>
           )}
         </div>
