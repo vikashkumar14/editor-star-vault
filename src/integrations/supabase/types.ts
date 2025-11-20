@@ -430,6 +430,59 @@ export type Database = {
           },
         ]
       }
+      premium_purchases: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          id: string
+          material_id: string
+          payment_method: string | null
+          razorpay_order_id: string
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          material_id: string
+          payment_method?: string | null
+          razorpay_order_id: string
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          material_id?: string
+          payment_method?: string | null
+          razorpay_order_id?: string
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_purchases_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       table_name: {
         Row: {
           data: Json | null
@@ -490,6 +543,10 @@ export type Database = {
           material_id: string
           rating_value: number
         }[]
+      }
+      has_premium_access: {
+        Args: { _material_id: string; _user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {

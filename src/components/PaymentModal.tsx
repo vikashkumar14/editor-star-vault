@@ -1,10 +1,9 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CreditCard, Smartphone, X, CheckCircle, Copy } from "lucide-react";
+import { X, CheckCircle, Loader2 } from "lucide-react";
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -17,46 +16,170 @@ interface PaymentModalProps {
   };
 }
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 const PaymentModal = ({ isOpen, onClose, material }: PaymentModalProps) => {
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card'>('upi');
-  const [transactionId, setTransactionId] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
-  const upiId = 'vik657@axl';
-  const upiLink = `upi://pay?pa=${upiId}&pn=The Editor Star&am=${material.price}&cu=INR&tn=Payment for ${material.title}`;
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   const handlePayment = async () => {
-    if (paymentMethod === 'upi' && !transactionId.trim()) {
-      alert('Please enter transaction ID');
+    if (!razorpayLoaded) {
+      toast.error('Payment system is loading. Please wait...');
       return;
     }
 
     setIsProcessing(true);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setPaymentSuccess(true);
-      
-      // Auto download after successful payment
-      setTimeout(() => {
-        if (material.file_url) {
-          const link = document.createElement('a');
-          link.href = material.file_url;
-          link.download = `${material.title}.zip`;
-          link.target = '_blank';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }, 1000);
-    }, 3000);
-  };
 
-  const copyUpiId = () => {
-    navigator.clipboard.writeText(upiId);
-    alert('UPI ID copied to clipboard!');
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Please login to continue');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Create Razorpay order
+      const { data: orderData, error: orderError } = await supabase.functions.invoke(
+        'create-razorpay-order',
+        {
+          body: {
+            materialId: material.id,
+            amount: material.price
+          }
+        }
+      );
+
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        toast.error('Failed to create payment order');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Configure Razorpay options
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Gyaan Repo',
+        description: material.title,
+        order_id: orderData.orderId,
+        prefill: {
+          email: user.email
+        },
+        config: {
+          display: {
+            blocks: {
+              banks: {
+                name: 'Pay using UPI',
+                instruments: [
+                  {
+                    method: 'upi'
+                  }
+                ]
+              },
+              other: {
+                name: 'Other Payment Methods',
+                instruments: [
+                  {
+                    method: 'card'
+                  },
+                  {
+                    method: 'netbanking'
+                  },
+                  {
+                    method: 'wallet'
+                  }
+                ]
+              }
+            },
+            sequence: ['block.banks', 'block.other'],
+            preferences: {
+              show_default_blocks: false
+            }
+          }
+        },
+        handler: async function (response: any) {
+          // Verify payment
+          const { error: verifyError } = await supabase.functions.invoke(
+            'verify-razorpay-payment',
+            {
+              body: {
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                paymentMethod: 'upi'
+              }
+            }
+          );
+
+          if (verifyError) {
+            console.error('Payment verification error:', verifyError);
+            toast.error('Payment verification failed');
+            setIsProcessing(false);
+            return;
+          }
+
+          setPaymentSuccess(true);
+          toast.success('Payment successful! You now have premium access.');
+          
+          // Trigger download
+          setTimeout(() => {
+            if (material.file_url) {
+              const link = document.createElement('a');
+              link.href = material.file_url;
+              link.download = `${material.title}.zip`;
+              link.target = '_blank';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+            onClose();
+            setIsProcessing(false);
+            setPaymentSuccess(false);
+          }, 2000);
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            toast.info('Payment cancelled');
+          }
+        },
+        theme: {
+          color: '#3b82f6'
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Payment failed. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -66,7 +189,7 @@ const PaymentModal = ({ isOpen, onClose, material }: PaymentModalProps) => {
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Complete Payment</CardTitle>
+            <CardTitle>Buy Premium Access</CardTitle>
             <CardDescription>{material.title}</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -78,126 +201,75 @@ const PaymentModal = ({ isOpen, onClose, material }: PaymentModalProps) => {
           {!paymentSuccess ? (
             <>
               {/* Price */}
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600">₹{material.price}</div>
-                <p className="text-gray-600">One-time payment</p>
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">One-time payment</p>
+                <div className="text-4xl font-bold text-primary">₹{material.price}</div>
               </div>
 
-              {/* Payment Method Selection */}
-              <div className="space-y-3">
-                <h3 className="font-semibold">Payment Method</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant={paymentMethod === 'upi' ? 'default' : 'outline'}
-                    className="flex items-center space-x-2"
-                    onClick={() => setPaymentMethod('upi')}
-                  >
-                    <Smartphone className="h-4 w-4" />
-                    <span>UPI</span>
-                  </Button>
-                  <Button
-                    variant={paymentMethod === 'card' ? 'default' : 'outline'}
-                    className="flex items-center space-x-2"
-                    onClick={() => setPaymentMethod('card')}
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    <span>Card</span>
-                  </Button>
+              {/* Features */}
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span className="text-sm">Secure payment via Razorpay</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span className="text-sm">Instant download access</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span className="text-sm">UPI, Cards, Wallets accepted</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span className="text-sm">Google Pay, PhonePe, Paytm supported</span>
                 </div>
               </div>
-
-              {/* UPI Payment */}
-              {paymentMethod === 'upi' && (
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <h4 className="font-semibold mb-3">Scan QR Code or Pay via UPI</h4>
-                    
-                    {/* QR Code */}
-                    <div className="bg-white p-4 rounded-lg shadow-inner mb-4 inline-block">
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`}
-                        alt="UPI QR Code"
-                        className="w-48 h-48"
-                      />
-                    </div>
-                    
-                    {/* UPI ID */}
-                    <div className="flex items-center justify-center space-x-2 mb-4">
-                      <Badge variant="outline" className="text-lg px-4 py-2">
-                        {upiId}
-                      </Badge>
-                      <Button size="sm" variant="ghost" onClick={copyUpiId}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-4">
-                      Pay ₹{material.price} to the above UPI ID and enter transaction ID below
-                    </p>
-                  </div>
-                  
-                  {/* Transaction ID Input */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Transaction ID <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      placeholder="Enter 12-digit transaction ID"
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      maxLength={12}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      You'll receive this ID after successful payment
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Card Payment */}
-              {paymentMethod === 'card' && (
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <Input placeholder="Card Number" />
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input placeholder="MM/YY" />
-                      <Input placeholder="CVV" />
-                    </div>
-                    <Input placeholder="Cardholder Name" />
-                  </div>
-                </div>
-              )}
 
               {/* Payment Button */}
               <Button 
-                className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+                className="w-full" 
+                size="lg"
                 onClick={handlePayment}
-                disabled={isProcessing}
+                disabled={isProcessing || !razorpayLoaded}
               >
                 {isProcessing ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processing...</span>
-                  </div>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : !razorpayLoaded ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading Payment Gateway...
+                  </>
                 ) : (
-                  `Pay ₹${material.price}`
+                  'Proceed to Payment'
                 )}
               </Button>
+
+              <p className="text-xs text-center text-muted-foreground">
+                Powered by Razorpay • Test Mode • By proceeding, you agree to our Terms
+              </p>
             </>
           ) : (
-            /* Success Screen */
-            <div className="text-center space-y-4">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-              <h3 className="text-xl font-bold text-green-600">Payment Successful!</h3>
-              <p className="text-gray-600">
-                Your file download will start automatically.
-              </p>
-              <p className="text-sm text-gray-500">
-                Transaction ID: {transactionId || 'TXN' + Date.now()}
-              </p>
-              <Button onClick={onClose} className="w-full">
-                Close
-              </Button>
+            <div className="text-center py-8 space-y-4">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Payment Successful!</h3>
+                <p className="text-muted-foreground">You now have premium access.</p>
+                <p className="text-sm text-muted-foreground mt-1">Download starting...</p>
+              </div>
             </div>
           )}
         </CardContent>
