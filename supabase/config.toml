@@ -2,3 +2,6 @@ project_id = "vueagetqayqfyakhmolh"
 
 [functions.generate-thumbnail]
 verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false
