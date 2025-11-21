@@ -101,27 +101,53 @@ serve(async (req) => {
     const razorpayOrder = await razorpayResponse.json();
     console.log('Razorpay order created:', razorpayOrder.id);
 
-    // Store or update order in database (upsert to handle duplicate attempts)
-    const { error: upsertError } = await supabaseClient
+    // Check if user already has a purchase record for this material
+    const { data: existingPurchase } = await supabaseClient
       .from('premium_purchases')
-      .upsert({
-        user_id: user.id,
-        material_id: materialId,
-        razorpay_order_id: razorpayOrder.id,
-        amount: amount,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id,material_id',
-        ignoreDuplicates: false
-      });
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('material_id', materialId)
+      .single();
 
-    if (upsertError) {
-      console.error('Database upsert error:', upsertError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to record order' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (existingPurchase) {
+      // Update existing record
+      const { error: updateError } = await supabaseClient
+        .from('premium_purchases')
+        .update({
+          razorpay_order_id: razorpayOrder.id,
+          amount: amount,
+          status: 'pending',
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('material_id', materialId);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to update order' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } else {
+      // Insert new record
+      const { error: insertError } = await supabaseClient
+        .from('premium_purchases')
+        .insert({
+          user_id: user.id,
+          material_id: materialId,
+          razorpay_order_id: razorpayOrder.id,
+          amount: amount,
+          status: 'pending'
+        });
+
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to record order' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     return new Response(
