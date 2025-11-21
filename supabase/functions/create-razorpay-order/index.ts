@@ -101,19 +101,23 @@ serve(async (req) => {
     const razorpayOrder = await razorpayResponse.json();
     console.log('Razorpay order created:', razorpayOrder.id);
 
-    // Store order in database
-    const { error: insertError } = await supabaseClient
+    // Store or update order in database (upsert to handle duplicate attempts)
+    const { error: upsertError } = await supabaseClient
       .from('premium_purchases')
-      .insert({
+      .upsert({
         user_id: user.id,
         material_id: materialId,
         razorpay_order_id: razorpayOrder.id,
         amount: amount,
-        status: 'pending'
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,material_id',
+        ignoreDuplicates: false
       });
 
-    if (insertError) {
-      console.error('Database insert error:', insertError);
+    if (upsertError) {
+      console.error('Database upsert error:', upsertError);
       return new Response(
         JSON.stringify({ error: 'Failed to record order' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
