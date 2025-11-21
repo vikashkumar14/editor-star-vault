@@ -70,7 +70,7 @@ serve(async (req) => {
     const orderData = {
       amount: amount * 100, // Razorpay expects amount in paise
       currency: 'INR',
-      receipt: `receipt_${materialId}_${Date.now()}`,
+      receipt: `rcpt_${Date.now().toString().slice(-8)}`,
       notes: {
         material_id: materialId,
         user_id: user.id,
