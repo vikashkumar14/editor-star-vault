@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyB1sX2JDb3FPy0xY0B_2ORQsg8faRl6LaY';
+const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,97 +17,136 @@ serve(async (req) => {
     const { message, history = [] } = await req.json();
     
     console.log('Received message:', message);
-    console.log('Using API key:', geminiApiKey ? 'API key present' : 'No API key');
+    console.log('Using Lovable AI key:', lovableApiKey ? 'API key present' : 'No API key');
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+    if (!lovableApiKey) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [
+        model: 'google/gemini-2.5-flash',
+        messages: [
           {
-            parts: [
-              {
-                text: `You are "WebsiteDocBot" — a helpful, concise and complete website information assistant. When asked about this website or any website information, provide comprehensive details following this structure:
+            role: 'system',
+            content: `You are a helpful AI assistant for a creative materials and resources platform. You help users understand and use the website effectively.
 
-**OUTPUT FORMAT:**
+**WEBSITE FEATURES:**
 
-1. **Website name & primary URL**
-2. **One-line summary** (purpose)
-3. **Target users / audience**
-4. **Main pages** (list: page name → 1-line purpose + 3 key items present on that page)
-5. **Core features** (bullet list with short description each)
-6. **Signup / Login flow** (stepwise)
-7. **Pricing & Plans** (list; if free say "Free", if paid list tiers + what each includes)
-8. **Supported platforms / tech** (web, PWA, Android, iOS, desktop apps; any known frameworks)
-9. **Integration & APIs** (public endpoints, auth method, docs link)
-10. **Admin / dashboard features** (if applicable)
-11. **Security & privacy** (login protections, cookie policy, GDPR/CCPA links)
-12. **Contact & support** (email/forms/phone/chat hours)
-13. **Common user tasks** (3–6 tasks and short how-to for each)
-14. **Known limitations & missing features** (3 bullets)
-15. **Quick start** (3 steps for a new user to get value fast)
-16. **Useful links** (privacy, terms, docs, status page, changelog)
-17. **Suggested improvements** (3–6 product/design/SEO suggestions)
+**1. Materials & Downloads**
+- Free and Premium materials available (overlays, LUTs, presets, SFX, transitions, templates)
+- How to download: Click on any material card → Click "Download" button → File downloads automatically
+- Premium materials require payment via Razorpay
+- All downloads are tracked
+
+**2. AI Gallery & Images**
+- Browse AI-generated images by category
+- View prompts used to generate each image
+- Download images for inspiration
+- Featured images showcased on homepage
+
+**3. Code Snippets & Tutorials**
+- HTML, CSS, JavaScript code examples
+- Copy code directly from code preview
+- Tutorials with step-by-step instructions
+- Software compatibility info (Premiere Pro, After Effects, DaVinci Resolve, etc.)
+
+**4. User Features**
+- Create account/login to access premium content
+- Track download history
+- Like, comment, and rate materials
+- Share materials on social media
+
+**5. Search & Filter**
+- Search materials by title, description, tags
+- Filter by category (overlays, LUTs, presets, etc.)
+- Filter by software compatibility
+- View featured and trending materials
+
+**COMMON USER QUESTIONS:**
+
+**Q: How to download materials?**
+A: 1) Browse materials on homepage or Materials page
+   2) Click on any material card to view details
+   3) Click "Download" button (free materials) or "Purchase" (premium materials)
+   4) File downloads automatically
+
+**Q: How to download image prompts?**
+A: 1) Go to Gallery page
+   2) Click on any image
+   3) View the prompt text displayed
+   4) Copy the prompt or download the image
+
+**Q: How to purchase premium materials?**
+A: 1) Click on premium material
+   2) Click "Purchase" button
+   3) Complete payment via Razorpay
+   4) Download becomes available after successful payment
+
+**Q: How to search for specific materials?**
+A: Use the search bar at the top of the page or on Materials page, type keywords, and filter by category
+
+**Q: What software is supported?**
+A: Premiere Pro, After Effects, DaVinci Resolve, Final Cut Pro, Photoshop, and more
 
 **FORMATTING RULES:**
-- Use **bold** for headings and key points
-- Use bullet lists and short steps (keep each paragraph ≤ 3 lines)
+- Use **bold** for important headings and key points
 - Use \`code\` for inline code snippets
-- Use \`\`\`language for code blocks
-- Use numbered lists for step-by-step instructions
-- Provide example UI text like button names or menu items when possible
-- If any information is unknown, mark it as "(unknown / needs more info)"
-- Always fill every heading
-- Keep language simple, professional, and actionable
-
-**CONTEXT:**
-This is a creative materials and resources platform for developers and creators. The website provides:
-- Free and premium materials (overlays, LUTs, presets, SFX, transitions, templates)
-- AI-powered gallery with various image categories
-- Code snippets and tutorials (HTML, CSS, JavaScript)
-- User authentication and premium content purchases
-- Download tracking and material interactions
-- Admin dashboard for content management
-
-User question: ${message}`
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.8,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-          candidateCount: 1
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+- Use \`\`\`language for code blocks (like \`\`\`javascript, \`\`\`python, etc.)
+- Use numbered lists (1. 2. 3.) for step-by-step instructions
+- Use bullet points (-) for lists
+- Break your answer into clear sections with headings
+- Keep paragraphs short and readable
+- Always respond in the same language the user asks in (Hindi, English, etc.)`
           },
           {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            role: 'user',
+            content: message
           }
-        ]
+        ],
+        temperature: 0.7,
+        max_tokens: 2048
       }),
     });
 
-    console.log('Gemini API response status:', response.status);
+    console.log('Lovable AI response status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
-      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+      console.error('Lovable AI error response:', errorText);
+      
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ 
+          reply: "Rate limit exceeded. Please try again later.",
+          error: "rate_limit"
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ 
+          reply: "Payment required. Please add credits to your workspace.",
+          error: "payment_required"
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      throw new Error(`Lovable AI error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Gemini API response data:', JSON.stringify(data, null, 2));
+    console.log('Lovable AI response data:', JSON.stringify(data, null, 2));
     
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't process your message. Please try again.";
+    const generatedText = data.choices?.[0]?.message?.content || "Sorry, I couldn't process your message. Please try again.";
 
     return new Response(JSON.stringify({ 
       reply: generatedText,
@@ -118,13 +157,12 @@ User question: ${message}`
   } catch (error) {
     console.error('Error in chat-with-gemini function:', error);
     
-    // Return a helpful error response
     return new Response(JSON.stringify({ 
-      reply: "मुझे खुशी होगी आपकी मदद करने में! कृपया अपना सवाल दोबारा पूछिए। I'm here to help with editing materials, downloads, and any questions you have!",
-      error: error.message,
+      reply: "Sorry, I encountered an error. Please try again.",
+      error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString()
     }), {
-      status: 200, // Return 200 instead of 500 to avoid frontend errors
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
