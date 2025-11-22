@@ -123,6 +123,10 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               <span className="relative z-10">{t('gallery')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </a>
+            <Link to="/faq" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+              <span className="relative z-10">FAQ</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            </Link>
             <Link to="/about" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
               <span className="relative z-10">{t('about')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -267,6 +271,13 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               >
                 {t('gallery')}
               </a>
+              <Link
+                to="/faq"
+                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                FAQ
+              </Link>
               <Link
                 to="/about"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
