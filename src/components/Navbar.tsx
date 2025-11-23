@@ -82,26 +82,29 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-background/80 backdrop-blur-2xl border-b border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-18">
-          <div className="flex items-center">
+          <div className="flex items-center gap-3 min-w-0">
             {/* Logo + Brand Name */}
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="relative">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
+              <div className="relative flex-shrink-0">
                 <img
                   src="https://i.ibb.co/XkjPcgsv/icon.jpg"
-                  alt="Gyaan Repo Logo"
-                  className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110"
+                  alt="Gyaan Repo"
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png';
+                  }}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <span className="font-bold text-xl sm:text-2xl bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
+              <span className="font-bold text-lg sm:text-xl whitespace-nowrap bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
                 Gyaan Repo
               </span>
             </Link>
             
-            {/* Developer Name - Hidden on mobile */}
-            <div className="hidden lg:flex items-center ml-8 pl-8 border-l-2 border-border/30">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                <Code className="w-4 h-4 text-primary animate-pulse" />
+            {/* Developer Name - Hidden on mobile and tablets */}
+            <div className="hidden xl:flex items-center ml-4 pl-4 border-l-2 border-border/30 flex-shrink-0">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 whitespace-nowrap">
+                <Code className="w-4 h-4 text-primary animate-pulse flex-shrink-0" />
                 <span className="text-sm font-medium text-muted-foreground">
                   Developed by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span>
                 </span>
