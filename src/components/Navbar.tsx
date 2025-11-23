@@ -81,10 +81,10 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-background/80 backdrop-blur-2xl border-b border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-18">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Logo + Brand Name */}
-            <Link to="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
+        <div className="flex justify-between items-center h-16 sm:h-18 gap-4">
+          {/* Left Section - Logo & Brand */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <Link to="/" className="flex items-center gap-2 group">
               <div className="relative flex-shrink-0">
                 <img
                   src="https://i.ibb.co/XkjPcgsv/icon.jpg"
@@ -96,52 +96,42 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <span className="font-bold text-lg sm:text-xl whitespace-nowrap bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
+              <span className="hidden sm:block font-bold text-lg whitespace-nowrap bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
                 Gyaan Repo
               </span>
             </Link>
-            
-            {/* Developer Name - Hidden on mobile and tablets */}
-            <div className="hidden xl:flex items-center ml-4 pl-4 border-l-2 border-border/30 flex-shrink-0">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 whitespace-nowrap">
-                <Code className="w-4 h-4 text-primary animate-pulse flex-shrink-0" />
-                <span className="text-sm font-medium text-muted-foreground">
-                  Developed by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span>
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-            <Link to="/materials" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+          {/* Desktop Navigation - Center */}
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-1 justify-center max-w-2xl">
+            <Link to="/materials" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
               <span className="relative z-10">{t('materials')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
             <a 
               href="/gallery" 
               onClick={handleGalleryClick}
-              className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group cursor-pointer"
+              className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group cursor-pointer whitespace-nowrap"
             >
               <span className="relative z-10">{t('gallery')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </a>
-            <Link to="/faq" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+            <Link to="/faq" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
               <span className="relative z-10">FAQ</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/about" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+            <Link to="/about" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
               <span className="relative z-10">{t('about')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
-            <Link to="/contact" className="relative px-4 py-2 text-sm lg:text-base font-semibold text-foreground hover:text-primary transition-all duration-300 group">
+            <Link to="/contact" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
               <span className="relative z-10">{t('contact')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </Link>
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center space-x-2 md:space-x-3">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             {/* Search - hidden on mobile */}
             <form onSubmit={handleSearch} className="relative hidden sm:block">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -250,10 +240,12 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
               </div>
 
               {/* Developer info on mobile */}
-              <div className="lg:hidden px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-3">
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                  <Code className="w-4 h-4 text-primary dark:text-primary mr-2" />
-                  <span>{t('developerBy')} <span className="font-semibold text-primary dark:text-primary">Vikash Kumar Kushwaha</span></span>
+              <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 mb-3 bg-gradient-to-r from-primary/5 to-accent/5">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Code className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="leading-tight">
+                    Developed by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span>
+                  </span>
                 </div>
               </div>
 
