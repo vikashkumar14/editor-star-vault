@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import AnimatedStats from "@/components/AnimatedStats";
 import TrendingSection from "@/components/TrendingSection";
 import FeaturedMaterials from "@/components/FeaturedMaterials";
-import CreatorsShowcase from "@/components/CreatorsShowcase";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
@@ -164,7 +163,6 @@ const Index = ({ darkMode, toggleDarkMode }: IndexProps) => {
             <TrendingSection />
             <FeaturedMaterials />
           </div>
-          <CreatorsShowcase />
           <Testimonials />
           <Newsletter />
           <Footer />

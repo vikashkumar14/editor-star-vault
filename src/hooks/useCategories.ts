@@ -24,14 +24,16 @@ export const useCategories = () => {
           console.error('Error fetching categories:', dbError);
         }
 
-        // Get unique categories from database
+        // Get unique categories from database and filter out video editing related ones
+        const videoEditingKeywords = ['video', 'overlay', 'lut', 'color', 'grading', 'effect', 'transition', 'preset', 'sfx', 'sound', 'audio', 'premiere', 'after effects', 'davinci', 'final cut'];
         const uniqueDbCategories = dbCategories 
           ? [...new Set(dbCategories.map(item => item.category).filter(Boolean))]
+              .filter(cat => !videoEditingKeywords.some(keyword => cat.toLowerCase().includes(keyword)))
           : [];
 
-        // Combine database categories with coding categories
+        // Combine database categories with coding categories only
         const allCategories: Category[] = [
-          // Coding categories
+          // Coding categories only
           { id: 'html', name: 'HTML', description: 'HTML Templates and Components', icon: null, created_at: new Date().toISOString() },
           { id: 'css', name: 'CSS', description: 'CSS Animations and Styles', icon: null, created_at: new Date().toISOString() },
           { id: 'javascript', name: 'JavaScript', description: 'JavaScript Libraries and Frameworks', icon: null, created_at: new Date().toISOString() },
@@ -42,7 +44,7 @@ export const useCategories = () => {
           { id: 'python', name: 'Python', description: 'Python Scripts and Applications', icon: null, created_at: new Date().toISOString() },
           { id: 'webdev', name: 'Web Development', description: 'Full Stack Web Development', icon: null, created_at: new Date().toISOString() },
           { id: 'api', name: 'API', description: 'REST APIs and GraphQL', icon: null, created_at: new Date().toISOString() },
-          // Database categories  
+          // Filtered database categories  
           ...uniqueDbCategories.map((cat, index) => ({
             id: `db-${index}`,
             name: cat,
