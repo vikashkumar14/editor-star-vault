@@ -1,27 +1,10 @@
 
-"use client";
-
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Youtube, Instagram, Twitter, Facebook, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-
-  const footerLinks = {
-    Materials: ["Video Overlays", "Color LUTs", "Sound Effects", "Transitions", "Presets", "Templates"],
-    Resources: ["Tutorials", "Blog", "FAQ", "Support", "Downloads", "Updates"],
-    Community: ["YouTube Channel", "Discord", "Newsletter", "Feedback", "Contributors", "Showcase"],
-    Legal: ["Privacy Policy", "Terms of Service", "License", "Refund Policy", "DMCA", "Contact"]
-  };
-
-  const socialLinks = [
-    { icon: Youtube, href: "https://youtube.com/@theeditorstar12?si=P4bDpQeIH7o3U3wb", label: "YouTube", color: "hover:text-red-500" },
-    { icon: Instagram, href: "https://www.instagram.com/the__editor___boy12?igsh=MW0ydDgxaWNlZnhoMA==", label: "Instagram", color: "hover:text-pink-500" },
-    { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-blue-500" },
-    { icon: Facebook, href: "https://www.facebook.com/share/1V897i7BiX/", label: "Facebook", color: "hover:text-blue-600" }
-  ];
 
   // Inject ad script after render
   useEffect(() => {
@@ -36,79 +19,44 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-8 sm:py-12 lg:py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-6">
             {/* Brand Section */}
-            <div className="sm:col-span-2 lg:col-span-2 mb-6 sm:mb-0">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 mb-4 sm:mb-6">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="flex items-center space-x-3">
                 <img
                   src="https://i.ibb.co/XkjPcgsv/icon.jpg"
                   alt="Gyaan Repo Logo"
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover"
                 />
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold">Gyaan Repo</h3>
-                  <p className="text-gray-400 text-xs sm:text-sm">
+                  <h3 className="text-xl sm:text-2xl font-bold">Gyaan Repo</h3>
+                  <p className="text-gray-400 text-sm sm:text-base">
                     Free, Reliable & Developer-Ready Source Code
                   </p>
                 </div>
               </div>
 
-              <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
-                Gyaan Repo - Unlock Free, Reliable & Developer-Ready Source Code to help developers
-                create amazing projects. Join our community of 50K+ developers worldwide.
+              <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                Gyaan Repo is your ultimate destination for free, high-quality source code and coding resources. 
+                We provide HTML, CSS, JavaScript, React, Vue, Angular, Node.js, Python, and full-stack web development 
+                materials. Whether you're building web applications, creating interactive UI components, or developing 
+                REST APIs, our platform offers reliable, developer-ready code snippets, templates, and comprehensive 
+                tutorials. Join our thriving community of 50K+ developers worldwide and accelerate your coding journey 
+                with production-ready solutions.
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                <div className="flex items-center space-x-3 text-gray-400 text-sm sm:text-base">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-gray-400 text-sm sm:text-base">
+                <div className="flex items-center justify-center space-x-2">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span className="break-all">contact@GyaanRepo.com</span>
+                  <span>contact@GyaanRepo.com</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-400 text-sm sm:text-base">
+                <div className="flex items-center justify-center space-x-2">
                   <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span>Bihar, India</span>
                 </div>
               </div>
-
-              {/* Social Links */}
-              <div className="flex flex-wrap gap-3 sm:gap-4 justify-start sm:justify-start">
-                {socialLinks.map((social, index) => {
-                  const IconComponent = social.icon;
-                  return (
-                    <Button
-                      key={index}
-                      variant="ghost"
-                      size="icon"
-                      className={`text-gray-400 ${social.color} transition-colors h-9 w-9 sm:h-10 sm:w-10`}
-                      asChild
-                    >
-                      <a href={social.href} aria-label={social.label}>
-                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </a>
-                    </Button>
-                  );
-                })}
-              </div>
             </div>
-
-            {/* Footer Links */}
-            {Object.entries(footerLinks).map(([category, links]) => (
-              <div key={category} className="mb-6 sm:mb-0">
-                <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-6">{category}</h4>
-                <ul className="space-y-2 sm:space-y-3">
-                  {links.map((link, index) => (
-                    <li key={index}>
-                      <a
-                        href="#"
-                        className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base block py-1"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
         </div>
 
