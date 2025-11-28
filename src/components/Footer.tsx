@@ -56,6 +56,19 @@ const Footer = () => {
                   <span>Bihar, India</span>
                 </div>
               </div>
+
+              {/* Policy Links */}
+              <div className="flex flex-wrap justify-center gap-3 text-sm text-gray-400 mt-4">
+                <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+                <span>•</span>
+                <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+                <span>•</span>
+                <a href="/refund" className="hover:text-white transition-colors">Refund Policy</a>
+                <span>•</span>
+                <a href="/shipping" className="hover:text-white transition-colors">Shipping Policy</a>
+                <span>•</span>
+                <a href="/delivery" className="hover:text-white transition-colors">Delivery Timeline</a>
+              </div>
             </div>
           </div>
         </div>
@@ -74,9 +87,9 @@ const Footer = () => {
               © {currentYear} Gyaan Repo. All rights reserved.
             </div>
             <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors py-1">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors py-1">Terms</a>
-              <a href="#" className="hover:text-white transition-colors py-1">Cookies</a>
+              <a href="/privacy" className="hover:text-white transition-colors py-1">Privacy Policy</a>
+              <a href="/terms" className="hover:text-white transition-colors py-1">Terms of Service</a>
+              <a href="/refund" className="hover:text-white transition-colors py-1">Refund Policy</a>
             </div>
           </div>
         </div>

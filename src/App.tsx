@@ -18,6 +18,11 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import MaterialPreview from "./pages/MaterialPreview";
 import NotFound from "./pages/NotFound";
 import AdminImageManagement from "./pages/AdminImageManagement";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import DeliveryTimeline from "./pages/DeliveryTimeline";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +60,11 @@ const App = () => {
               <Route path="/material/:id" element={<MaterialDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/shipping" element={<ShippingPolicy />} />
+              <Route path="/delivery" element={<DeliveryTimeline />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedAdminRoute />} />
