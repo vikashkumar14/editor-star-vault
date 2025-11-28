@@ -46,11 +46,12 @@ const UserLogin = () => {
           navigate('/');
         }
       } else {
-        // For signup, we'll disable email confirmation to avoid captcha issues
+        // Signup with proper redirect
         const { data, error } = await supabase.auth.signUp({
           email: emailForm.email,
           password: emailForm.password,
           options: {
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               name: emailForm.name,
             },

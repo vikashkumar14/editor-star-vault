@@ -216,28 +216,26 @@ const Contact = () => {
                     <Mail className="w-6 h-6 text-red-500 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
-                      <p className="text-gray-600 dark:text-gray-300">vikashkumar13228@gmail.com</p>
-                      <p className="text-gray-600 dark:text-gray-300">support@theeditorstar.com</p>
+                      <p className="text-gray-600 dark:text-gray-300">contact@GyaanRepo.com</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Primary support email</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-4">
                     <Phone className="w-6 h-6 text-red-500 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Response Time</h3>
-                      <p className="text-gray-600 dark:text-gray-300">Usually within 24 hours</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">We respond to all messages personally</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Phone Support</h3>
+                      <p className="text-gray-600 dark:text-gray-300">+91 7903072632</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Mon-Sat: 10 AM - 6 PM IST</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-4">
                     <MapPin className="w-6 h-6 text-red-500 mt-1" />
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Community</h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        Join our growing community of<br />
-                        creators and developers
-                      </p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Location</h3>
+                      <p className="text-gray-600 dark:text-gray-300">Bihar, India</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Response Time: Within 24 hours</p>
                     </div>
                   </div>
                 </CardContent>
