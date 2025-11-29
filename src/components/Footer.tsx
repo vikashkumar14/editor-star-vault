@@ -49,7 +49,11 @@ const Footer = () => {
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-gray-400 text-sm sm:text-base">
                 <div className="flex items-center justify-center space-x-2">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span>contact@GyaanRepo.com</span>
+                  <span>gyaanrepo@gmail.com</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span>+91 9904032356</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2">
                   <MapPin className="w-4 h-4 flex-shrink-0" />

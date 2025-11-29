@@ -33,47 +33,74 @@ const UserLogin = () => {
 
     try {
       if (isLogin) {
-        // Login
+        // Login with better validation
+        if (!emailForm.email || !emailForm.password) {
+          toast.error('Please enter both email and password');
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: emailForm.email,
+          email: emailForm.email.trim(),
           password: emailForm.password,
         });
 
         if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success('Login successful!');
-          navigate('/');
+          if (error.message.includes('Invalid login credentials')) {
+            toast.error('Invalid email or password. Please try again.');
+          } else {
+            toast.error(error.message);
+          }
+        } else if (data.session) {
+          toast.success('Login successful! Redirecting...');
+          // Small delay to show the success message
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 500);
         }
       } else {
-        // Signup with proper redirect
+        // Signup with validation
+        if (!emailForm.name || !emailForm.email || !emailForm.password) {
+          toast.error('Please fill in all fields');
+          setLoading(false);
+          return;
+        }
+
+        if (emailForm.password.length < 6) {
+          toast.error('Password must be at least 6 characters');
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
-          email: emailForm.email,
+          email: emailForm.email.trim(),
           password: emailForm.password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
-              name: emailForm.name,
+              name: emailForm.name.trim(),
             },
           },
         });
 
         if (error) {
-          // Handle captcha error specifically
           if (error.message.includes('captcha')) {
-            toast.error('Signup is temporarily disabled due to security settings. Please contact admin or try social login.');
+            toast.error('Signup is temporarily disabled. Please try social login (Google/GitHub).');
+          } else if (error.message.includes('already registered')) {
+            toast.error('This email is already registered. Please login instead.');
+            setIsLogin(true);
           } else {
             toast.error(error.message);
           }
-        } else {
-          toast.success('Account created! You can now login.');
+        } else if (data.user) {
+          toast.success('Account created successfully! Please check your email to verify.');
           setEmailForm({ email: '', password: '', name: '' });
           setIsLogin(true);
         }
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      toast.error('An error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

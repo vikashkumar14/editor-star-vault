@@ -224,13 +224,13 @@ const MaterialDetail = () => {
                     </div>
                   )}
                   <div className="absolute top-4 right-4">
-                    {isPremium ? (
-                      <Badge className="bg-yellow-500 text-white border-0 shadow-lg">
-                        Premium ₹{price}
+                  {isPremium ? (
+                      <Badge className="bg-yellow-500 text-white border-0 shadow-lg text-base px-4 py-2">
+                        Premium ₹{price} INR
                       </Badge>
                     ) : (
-                      <Badge className="bg-green-500 text-white border-0 shadow-lg">
-                        Free
+                      <Badge className="bg-green-500 text-white border-0 shadow-lg text-base px-4 py-2">
+                        Free Download
                       </Badge>
                     )}
                   </div>
@@ -408,7 +408,9 @@ const MaterialDetail = () => {
             <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
               <Card className="shadow-xl border-2 border-blue-200 dark:border-blue-800 sticky top-4">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3 sm:p-4 lg:p-6">
-                  <CardTitle className="text-base sm:text-lg lg:text-xl font-bold">Download Material</CardTitle>
+                  <CardTitle className="text-base sm:text-lg lg:text-xl font-bold">
+                    {isPremium ? 'Premium Material' : 'Free Download'}
+                  </CardTitle>
                   {material.file_size && (
                     <CardDescription className="text-xs sm:text-sm">
                       File size: {(material.file_size / 1024 / 1024).toFixed(2)} MB
@@ -426,32 +428,58 @@ const MaterialDetail = () => {
                     </p>
                   </div>
 
-                   {isPremium ? (
-                    <Button 
-                      className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
-                      onClick={handlePremiumDownload}
-                    >
-                      <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
-                      <span className="truncate">Purchase & Download ₹{price}</span>
-                    </Button>
+                  {isPremium ? (
+                    <>
+                      <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-3 sm:p-4 rounded-lg border-2 border-yellow-500">
+                        <div className="text-center mb-2">
+                          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">₹{price} INR</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-center text-green-600 dark:text-green-400 font-bold">
+                          ✓ Instant digital download after payment
+                        </p>
+                        <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-1">
+                          One-time payment • Lifetime access
+                        </p>
+                      </div>
+                      <Button 
+                        className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
+                        onClick={handlePremiumDownload}
+                      >
+                        <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
+                        <span className="truncate">Buy Now - Secure Payment</span>
+                      </Button>
+                      <p className="text-xs text-center text-muted-foreground">
+                        💳 Pay via UPI, Cards, or NetBanking
+                      </p>
+                    </>
                   ) : (
-                    <Button 
-                      className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
-                      onClick={handleDownload}
-                      disabled={downloading}
-                    >
-                      {downloading ? (
-                        <span className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-b-2 border-white mr-1.5 sm:mr-2 flex-shrink-0"></div>
-                          <span className="truncate">Preparing...</span>
-                        </span>
-                      ) : (
-                        <>
-                          <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
-                          <span className="truncate">Free Download</span>
-                        </>
-                      )}
-                    </Button>
+                    <>
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 sm:p-4 rounded-lg border-2 border-green-500">
+                        <p className="text-xs sm:text-sm text-center text-green-600 dark:text-green-400 font-bold">
+                          ✓ 100% FREE • Instant digital download
+                        </p>
+                        <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-1">
+                          No payment required
+                        </p>
+                      </div>
+                      <Button 
+                        className="w-full h-10 sm:h-12 text-xs sm:text-sm lg:text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-200 px-3"
+                        onClick={handleDownload}
+                        disabled={downloading}
+                      >
+                        {downloading ? (
+                          <span className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-b-2 border-white mr-1.5 sm:mr-2 flex-shrink-0"></div>
+                            <span className="truncate">Preparing...</span>
+                          </span>
+                        ) : (
+                          <>
+                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" />
+                            <span className="truncate">Free Download</span>
+                          </>
+                        )}
+                      </Button>
+                    </>
                   )}
                   
                   {/* Social Share Button */}
