@@ -115,9 +115,9 @@ const TermsOfService = () => {
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   If you have any questions about these Terms, please contact us at:
                   <br />
-                  Email: contact@GyaanRepo.com
+                  Email: gyaanrepo@gmail.com
                   <br />
-                  Phone: +91 7903072632
+                  Phone: +91 9904032356
                   <br />
                   Address: Bihar, India
                 </p>

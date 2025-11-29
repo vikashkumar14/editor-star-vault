@@ -112,7 +112,7 @@ const PrivacyPolicy = () => {
                   <li>Lodge a complaint with a data protection authority</li>
                 </ul>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-3">
-                  To exercise these rights, please contact us at contact@GyaanRepo.com
+                  To exercise these rights, please contact us at gyaanrepo@gmail.com
                 </p>
               </section>
 
@@ -142,9 +142,9 @@ const PrivacyPolicy = () => {
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   If you have any questions about this Privacy Policy, please contact us:
                   <br />
-                  Email: contact@GyaanRepo.com
+                  Email: gyaanrepo@gmail.com
                   <br />
-                  Phone: +91 7903072632
+                  Phone: +91 9904032356
                   <br />
                   Address: Bihar, India
                 </p>

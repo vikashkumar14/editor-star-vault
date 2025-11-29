@@ -116,7 +116,7 @@ const ShippingPolicy = () => {
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
                   <li><strong>Payment Processed but No Download:</strong> Check your spam folder for email, or log into your account dashboard</li>
-                  <li><strong>Download Link Not Working:</strong> Contact support immediately at contact@GyaanRepo.com</li>
+                  <li><strong>Download Link Not Working:</strong> Contact support immediately at gyaanrepo@gmail.com</li>
                   <li><strong>Corrupted Files:</strong> We'll provide fresh download links within 24 hours</li>
                   <li><strong>Payment Failed:</strong> Your money will be automatically refunded by Razorpay within 5-7 business days</li>
                 </ul>
@@ -166,9 +166,9 @@ const ShippingPolicy = () => {
                   Need help with delivery or downloads?
                   <br />
                   <br />
-                  <strong>Email:</strong> contact@GyaanRepo.com
+                  <strong>Email:</strong> gyaanrepo@gmail.com
                   <br />
-                  <strong>Phone:</strong> +91 7903072632
+                  <strong>Phone:</strong> +91 9904032356
                   <br />
                   <strong>Response Time:</strong> Within 24 hours (usually faster)
                   <br />

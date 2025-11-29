@@ -71,7 +71,7 @@ const RefundPolicy = () => {
                   To request a refund, please follow these steps:
                 </p>
                 <ol className="list-decimal pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-                  <li>Contact us at contact@GyaanRepo.com or call +91 7903072632</li>
+                  <li>Contact us at gyaanrepo@gmail.com or call +91 9904032356</li>
                   <li>Provide your order number and transaction ID</li>
                   <li>Explain the reason for your refund request</li>
                   <li>Provide screenshots or evidence (if applicable)</li>
@@ -155,9 +155,9 @@ const RefundPolicy = () => {
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   For refund inquiries, please contact:
                   <br />
-                  Email: contact@GyaanRepo.com
+                  Email: gyaanrepo@gmail.com
                   <br />
-                  Phone: +91 7903072632
+                  Phone: +91 9904032356
                   <br />
                   Response Time: Within 24-48 hours
                   <br />

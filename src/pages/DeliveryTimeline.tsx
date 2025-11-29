@@ -208,8 +208,8 @@ const DeliveryTimeline = () => {
                     If you experience any delays or issues with accessing your downloads:
                   </p>
                   <div className="space-y-2 text-gray-700 dark:text-gray-300">
-                    <p><strong>📧 Email:</strong> contact@GyaanRepo.com</p>
-                    <p><strong>📞 Phone:</strong> +91 7903072632</p>
+                    <p><strong>📧 Email:</strong> gyaanrepo@gmail.com</p>
+                    <p><strong>📞 Phone:</strong> +91 9904032356</p>
                     <p><strong>⏰ Response Time:</strong> Within 24 hours (usually faster)</p>
                     <p><strong>📍 Location:</strong> Bihar, India</p>
                   </div>

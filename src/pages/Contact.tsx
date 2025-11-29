@@ -216,7 +216,7 @@ const Contact = () => {
                     <Mail className="w-6 h-6 text-red-500 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
-                      <p className="text-gray-600 dark:text-gray-300">contact@GyaanRepo.com</p>
+                      <p className="text-gray-600 dark:text-gray-300">gyaanrepo@gmail.com</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Primary support email</p>
                     </div>
                   </div>
@@ -225,7 +225,7 @@ const Contact = () => {
                     <Phone className="w-6 h-6 text-red-500 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">Phone Support</h3>
-                      <p className="text-gray-600 dark:text-gray-300">+91 7903072632</p>
+                      <p className="text-gray-600 dark:text-gray-300">+91 9904032356</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Mon-Sat: 10 AM - 6 PM IST</p>
                     </div>
                   </div>
