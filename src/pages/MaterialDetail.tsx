@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -190,8 +191,35 @@ const MaterialDetail = () => {
   const price = material.price || 0;
   const isPremium = material.is_premium || price > 0;
 
+  const pageUrl = `https://gyaanrepo.com/material/${material.id}`;
+  const thumbnailUrl = material.thumbnail_url || 'https://i.ibb.co/XkjPcgsv/icon.jpg';
+  const pageTitle = `${material.title} - Gyaan Repo`;
+  const pageDescription = material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`;
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        
+        {/* Open Graph / Facebook / WhatsApp */}
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={thumbnailUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Gyaan Repo" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={thumbnailUrl} />
+      </Helmet>
+      
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
