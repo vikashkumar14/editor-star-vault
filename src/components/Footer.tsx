@@ -1,7 +1,7 @@
-
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -30,17 +30,29 @@ const Footer = () => {
               <h3 className="text-2xl font-bold text-white">Gyaan Repo</h3>
             </div>
 
-            {/* Policy Links */}
+            {/* Contact Details */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-300">
+              <a href="mailto:gyaanrepo@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail className="w-4 h-4" />
+                gyaanrepo@gmail.com
+              </a>
+              <a href="tel:+919904032356" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Phone className="w-4 h-4" />
+                +91 9904032356
+              </a>
+            </div>
+
+            {/* Policy Links - Using React Router Link */}
             <div className="flex flex-wrap justify-center gap-3 text-sm text-gray-400">
-              <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
               <span>•</span>
-              <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <span>•</span>
-              <a href="/refund" className="hover:text-white transition-colors">Refund Policy</a>
+              <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
               <span>•</span>
-              <a href="/shipping" className="hover:text-white transition-colors">Shipping Policy</a>
+              <Link to="/shipping" className="hover:text-white transition-colors">Shipping Policy</Link>
               <span>•</span>
-              <a href="/delivery" className="hover:text-white transition-colors">Delivery Timeline</a>
+              <Link to="/delivery" className="hover:text-white transition-colors">Delivery Timeline</Link>
             </div>
           </div>
         </div>
