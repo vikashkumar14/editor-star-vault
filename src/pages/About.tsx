@@ -60,8 +60,8 @@ const About = () => {
             <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
               <CardContent className="p-6">
                 <Globe className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Web3 & Blockchain</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">DeFi, Smart Contracts</p>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">API & Database</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">REST APIs, PostgreSQL</p>
               </CardContent>
             </Card>
             
