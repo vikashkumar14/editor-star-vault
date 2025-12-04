@@ -21,6 +21,7 @@ const SocialShare = ({ materialId, title, fileUrl, fileName, fileType }: SocialS
   const [isOpen, setIsOpen] = useState(false);
   const {
     generateShareableLink,
+    generateDirectLink,
     copyToClipboard,
     shareOnWhatsApp,
     shareOnTelegram,
@@ -30,47 +31,34 @@ const SocialShare = ({ materialId, title, fileUrl, fileName, fileType }: SocialS
     isGenerating
   } = useThumbnailGeneration();
 
-  const handleShare = async () => {
-    // Generate thumbnail if not already generated
-    if (fileUrl && fileName && fileType) {
-      try {
-        await generateThumbnail(fileUrl, fileName, fileType, materialId);
-      } catch (error) {
-        console.error('Failed to generate thumbnail:', error);
-        // Continue with sharing even if thumbnail generation fails
-      }
-    }
-
-    const shareableLink = generateShareableLink(materialId);
-    return shareableLink;
-  };
-
   const handleCopyLink = async () => {
-    const link = await handleShare();
+    // Use direct link for copying to clipboard
+    const link = generateDirectLink(materialId);
     copyToClipboard(link);
     setIsOpen(false);
   };
 
   const handleWhatsAppShare = async () => {
-    const link = await handleShare();
+    // Use OG edge function link for WhatsApp (shows proper thumbnail)
+    const link = generateShareableLink(materialId);
     shareOnWhatsApp(link, title);
     setIsOpen(false);
   };
 
   const handleTelegramShare = async () => {
-    const link = await handleShare();
+    const link = generateShareableLink(materialId);
     shareOnTelegram(link, title);
     setIsOpen(false);
   };
 
   const handleTwitterShare = async () => {
-    const link = await handleShare();
+    const link = generateShareableLink(materialId);
     shareOnTwitter(link, title);
     setIsOpen(false);
   };
 
   const handleFacebookShare = async () => {
-    const link = await handleShare();
+    const link = generateShareableLink(materialId);
     shareOnFacebook(link);
     setIsOpen(false);
   };

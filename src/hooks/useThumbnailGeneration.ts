@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Edge function URL for OG meta tags
+const OG_FUNCTION_URL = 'https://vueagetqayqfyakhmolh.supabase.co/functions/v1/og-image';
+
 export const useThumbnailGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -47,9 +50,16 @@ export const useThumbnailGeneration = () => {
     }
   };
 
+  // Generate shareable link that uses OG edge function for proper social media previews
   const generateShareableLink = (materialId: string) => {
+    // Use the OG edge function URL - this will show proper thumbnails on social media
+    return `${OG_FUNCTION_URL}?id=${materialId}`;
+  };
+
+  // Generate direct link to the material page (for copy to clipboard)
+  const generateDirectLink = (materialId: string) => {
     const baseUrl = window.location.origin;
-    return `${baseUrl}/preview/${materialId}`;
+    return `${baseUrl}/material/${materialId}`;
   };
 
   const copyToClipboard = async (text: string) => {
@@ -63,19 +73,18 @@ export const useThumbnailGeneration = () => {
   };
 
   const shareOnWhatsApp = (shareableLink: string, title: string) => {
-    const message = `Check out this amazing material: ${title} - ${shareableLink}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const message = `Check out: ${title}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message + ' ' + shareableLink)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const shareOnTelegram = (shareableLink: string, title: string) => {
-    const message = `Check out this amazing material: ${title} - ${shareableLink}`;
     const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareableLink)}&text=${encodeURIComponent(title)}`;
     window.open(telegramUrl, '_blank');
   };
 
   const shareOnTwitter = (shareableLink: string, title: string) => {
-    const message = `Check out this amazing material: ${title}`;
+    const message = `Check out: ${title}`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(shareableLink)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -88,6 +97,7 @@ export const useThumbnailGeneration = () => {
   return {
     generateThumbnail,
     generateShareableLink,
+    generateDirectLink,
     copyToClipboard,
     shareOnWhatsApp,
     shareOnTelegram,
