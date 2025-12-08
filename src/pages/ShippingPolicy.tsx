@@ -168,8 +168,6 @@ const ShippingPolicy = () => {
                   <br />
                   <strong>Email:</strong> gyaanrepo@gmail.com
                   <br />
-                  <strong>Phone:</strong> +91 9904032356
-                  <br />
                   <strong>Response Time:</strong> Within 24 hours (usually faster)
                   <br />
                   <strong>Working Hours:</strong> Monday - Saturday, 10 AM - 6 PM IST

@@ -117,8 +117,6 @@ const TermsOfService = () => {
                   <br />
                   Email: gyaanrepo@gmail.com
                   <br />
-                  Phone: +91 9904032356
-                  <br />
                   Address: Bihar, India
                 </p>
               </section>
