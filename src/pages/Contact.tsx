@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, Phone, Send, MessageSquare, Code, Palette } from "lucide-react";
+import { Mail, MapPin, Send, MessageSquare, Code, Palette } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -218,15 +218,6 @@ const Contact = () => {
                       <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
                       <p className="text-gray-600 dark:text-gray-300">gyaanrepo@gmail.com</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Primary support email</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4">
-                    <Phone className="w-6 h-6 text-red-500 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Phone Support</h3>
-                      <p className="text-gray-600 dark:text-gray-300">+91 9904032356</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Mon-Sat: 10 AM - 6 PM IST</p>
                     </div>
                   </div>
 
