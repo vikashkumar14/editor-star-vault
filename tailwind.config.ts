@@ -68,22 +68,26 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+				mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+			},
+			boxShadow: {
+				'glow': '0 0 20px hsl(var(--primary) / 0.3)',
+				'glow-lg': '0 0 40px hsl(var(--primary) / 0.4)',
+				'glow-accent': '0 0 20px hsl(var(--accent) / 0.3)',
+				'3d': '0 10px 40px -10px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)',
+				'3d-lg': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+				'inner-glow': 'inset 0 2px 4px 0 hsl(var(--primary) / 0.1)',
+			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
 				},
 				fadeIn: {
 					'0%': { opacity: '0', transform: 'translateY(20px)' },
@@ -118,6 +122,18 @@ export default {
 				'loader-ring-4': {
 					'0%': { transform: 'rotateX(70deg) rotateZ(270deg)' },
 					'100%': { transform: 'rotateX(70deg) rotateZ(630deg)' }
+				},
+				shimmer: {
+					'0%': { backgroundPosition: '-200% 0' },
+					'100%': { backgroundPosition: '200% 0' }
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-20px)' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' },
+					'50%': { boxShadow: '0 0 40px hsl(var(--primary) / 0.6)' }
 				}
 			},
 			animation: {
@@ -130,10 +146,14 @@ export default {
 				'loader-ring-1': 'loader-ring-1 2s linear infinite',
 				'loader-ring-2': 'loader-ring-2 2s linear infinite',
 				'loader-ring-3': 'loader-ring-3 2s linear infinite',
-				'loader-ring-4': 'loader-ring-4 2s linear infinite'
+				'loader-ring-4': 'loader-ring-4 2s linear infinite',
+				'shimmer': 'shimmer 2s infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-glow': 'pulse-glow 3s ease-in-out infinite'
 			},
-			fontFamily: {
-				sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
 			}
 		}
 	},
