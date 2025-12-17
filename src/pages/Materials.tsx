@@ -4,13 +4,14 @@ import Navbar from "@/components/Navbar";
 import MaterialCard from "@/components/MaterialCard";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
+import Loader from "@/components/Loader";
 import { useMaterials } from "@/hooks/useMaterials";
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, Loader2, Filter } from "lucide-react";
+import { Search, X, Filter, Code, Sparkles } from "lucide-react";
 
 interface MaterialsProps {
   darkMode?: boolean;
@@ -65,14 +66,27 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground animate-page-enter">
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      
+      {/* Background elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div className="orb orb-primary w-96 h-96 -top-48 -left-48 animate-float-slow" />
+        <div className="orb orb-accent w-80 h-80 top-1/3 -right-40 animate-float-delayed" />
+        <div className="bg-grid absolute inset-0 opacity-30" />
+      </div>
       
       <div className="pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Coding Materials</h1>
+          <div className="text-center mb-12 animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Code className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Developer Resources</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="gradient-text-animated">Coding Materials</span>
+            </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Discover high-quality code snippets, templates, and components for your projects
             </p>
@@ -196,7 +210,7 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
               <div className="text-sm font-semibold text-foreground">
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Sparkles className="w-4 h-4 animate-pulse text-primary" />
                     Loading materials...
                   </span>
                 ) : (
@@ -217,9 +231,8 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
 
           {/* Loading State */}
           {loading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mr-2" />
-              <span className="text-muted-foreground">Loading materials...</span>
+            <div className="flex items-center justify-center py-16">
+              <Loader size="md" text="Loading materials..." />
             </div>
           )}
 
@@ -259,8 +272,14 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
           {!loading && !error && materials.length > 0 && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                {materials.map((material) => (
-                  <MaterialCard key={material.id} material={material} />
+                {materials.map((material, index) => (
+                  <div 
+                    key={material.id} 
+                    className="animate-zoom-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <MaterialCard material={material} />
+                  </div>
                 ))}
               </div>
 

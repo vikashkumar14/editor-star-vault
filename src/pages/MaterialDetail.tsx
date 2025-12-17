@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft, Play, CreditCard, Code, FileText, Palette, Eye, EyeOff, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Loader from "@/components/Loader";
 import MaterialInteractions from "@/components/MaterialInteractions";
 import PaymentModal from "@/components/PaymentModal";
 import CodePreview from "@/components/CodePreview";
@@ -157,10 +158,10 @@ const MaterialDetail = () => {
   if (loading) {
     return (
       <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="min-h-screen bg-background">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="flex items-center justify-center min-h-[60vh] pt-16"> {/* Added pt-16 for fixed navbar */}
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+          <div className="flex items-center justify-center min-h-[60vh] pt-16">
+            <Loader size="lg" text="Loading material..." />
           </div>
           <Footer />
         </div>
@@ -197,7 +198,7 @@ const MaterialDetail = () => {
   const pageDescription = material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`;
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${darkMode ? 'dark' : ''} animate-page-enter`}>
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
@@ -220,7 +221,13 @@ const MaterialDetail = () => {
         <meta name="twitter:image" content={thumbnailUrl} />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen bg-background relative">
+        {/* Background elements */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="orb orb-primary w-96 h-96 -top-48 -right-48 animate-float-slow" />
+          <div className="orb orb-accent w-64 h-64 bottom-1/4 -left-32 animate-float-delayed" />
+          <div className="bg-dots absolute inset-0 opacity-20" />
+        </div>
         <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         
         <div className="max-w-6xl mx-auto px-4 pt-16 py-4 sm:py-8"> {/* Added pt-16 for fixed navbar */}
@@ -235,7 +242,7 @@ const MaterialDetail = () => {
 
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
-              <Card className="overflow-hidden shadow-xl">
+              <Card className="overflow-hidden premium-card animate-zoom-fade-in">
                 <div 
                   className="h-40 sm:h-48 lg:h-64 bg-cover bg-center relative"
                   style={{ 
