@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Menu, X, User, Shield, Code, Globe } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, User, Shield, Code, Globe, Sparkles } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
@@ -18,9 +18,10 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { language, setLanguage, t, languages } = useLanguage();
-  const { speak, isPlaying } = useTextToSpeech();
+  const { speak } = useTextToSpeech();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,196 +34,188 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
 
   const handleGalleryClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
-    // Show welcome popup
     const welcomeMessages: { [key: string]: string } = {
       en: "Welcome to Gyaan Repo Gallery! 🎨",
       hi: "ज्ञान रेपो गैलरी में आपका स्वागत है! 🎨",
-      es: "¡Bienvenido a la Galería de Gyaan Repo! 🎨",
-      fr: "Bienvenue dans la galerie Gyaan Repo ! 🎨",
-      de: "Willkommen in der Gyaan Repo Galerie! 🎨",
-      pt: "Bem-vindo à Galeria Gyaan Repo! 🎨",
-      ja: "Gyaan Repoギャラリーへようこそ！🎨",
-      zh: "欢迎来到 Gyaan Repo 画廊！🎨"
     };
-
     const voiceMessages: { [key: string]: string } = {
-      en: "Welcome to Gyaan Repo Gallery! Explore our amazing collection of materials.",
-      hi: "ज्ञान रेपो गैलरी में आपका स्वागत है! हमारे अद्भुत संग्रह का अन्वेषण करें।",
-      es: "¡Bienvenido a la Galería de Gyaan Repo! Explora nuestra increíble colección de materiales.",
-      fr: "Bienvenue dans la galerie Gyaan Repo ! Explorez notre incroyable collection de matériaux.",
-      de: "Willkommen in der Gyaan Repo Galerie! Erkunden Sie unsere erstaunliche Materialsammlung.",
-      pt: "Bem-vindo à Galeria Gyaan Repo! Explore nossa incrível coleção de materiais.",
-      ja: "Gyaan Repoギャラリーへようこそ！素晴らしいコレクションをお楽しみください。",
-      zh: "欢迎来到 Gyaan Repo 画廊！探索我们精彩的材料收藏。"
+      en: "Welcome to Gyaan Repo Gallery!",
+      hi: "ज्ञान रेपो गैलरी में आपका स्वागत है!",
     };
-
-    const popupMessage = welcomeMessages[language] || welcomeMessages.en;
-    const voiceMessage = voiceMessages[language] || voiceMessages.en;
-    
-    // Show popup notification
-    toast.success(popupMessage, {
-      duration: 3000,
-      position: 'top-center',
-    });
-    
-    // Try to play welcome message (gracefully handle if it fails)
-    speak(voiceMessage).catch(() => {
-      // Voice failed, but that's okay - we already showed the popup
-      console.log('Voice not available, continuing with visual notification');
-    });
-    
-    // Navigate after a short delay
-    setTimeout(() => {
-      navigate('/gallery');
-    }, 300);
+    toast.success(welcomeMessages[language] || welcomeMessages.en, { duration: 3000 });
+    speak(voiceMessages[language] || voiceMessages.en).catch(() => {});
+    setTimeout(() => navigate('/gallery'), 300);
   };
 
+  const isActive = (path: string) => location.pathname === path;
+
+  const navLinks = [
+    { to: '/materials', label: t('materials'), onClick: undefined },
+    { to: '/gallery', label: t('gallery'), onClick: handleGalleryClick },
+    { to: '/faq', label: 'FAQ', onClick: undefined },
+    { to: '/about', label: t('about'), onClick: undefined },
+    { to: '/contact', label: t('contact'), onClick: undefined },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-background/80 backdrop-blur-2xl border-b border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
+    <nav className="fixed top-0 left-0 right-0 z-[100] glass border-b border-border/30">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-18 gap-4">
-          {/* Left Section - Logo & Brand */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="relative flex-shrink-0">
-                <img
-                  src="https://i.ibb.co/XkjPcgsv/icon.jpg"
-                  alt="Gyaan Repo"
-                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = '/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png';
-                  }}
-                />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <span className="hidden sm:block font-bold text-lg whitespace-nowrap bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-primary transition-all duration-300">
+          {/* Logo & Brand */}
+          <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+              <img
+                src="https://i.ibb.co/XkjPcgsv/icon.jpg"
+                alt="Gyaan Repo"
+                className="relative h-10 w-10 rounded-xl shadow-lg group-hover:shadow-glow transition-all duration-300 group-hover:scale-105 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/lovable-uploads/8fdfe09d-657a-4222-9c71-abd89c2ef864.png';
+                }}
+              />
+            </div>
+            <div className="hidden sm:flex flex-col">
+              <span className="font-bold text-lg gradient-text-animated">
                 Gyaan Repo
               </span>
-            </Link>
+              <span className="text-[10px] text-muted-foreground font-medium -mt-1">
+                Developer Resources
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1 flex-1 justify-center max-w-xl">
+            {navLinks.map((link) => (
+              link.onClick ? (
+                <a
+                  key={link.to}
+                  href={link.to}
+                  onClick={link.onClick}
+                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg group
+                    ${isActive(link.to) 
+                      ? 'text-primary' 
+                      : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  {isActive(link.to) && (
+                    <span className="absolute inset-0 bg-primary/10 rounded-lg" />
+                  )}
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-accent/0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                </a>
+              ) : (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg group
+                    ${isActive(link.to) 
+                      ? 'text-primary' 
+                      : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  {isActive(link.to) && (
+                    <span className="absolute inset-0 bg-primary/10 rounded-lg" />
+                  )}
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-accent/0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              )
+            ))}
           </div>
 
-          {/* Desktop Navigation - Center */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-1 justify-center max-w-2xl">
-            <Link to="/materials" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
-              <span className="relative z-10">{t('materials')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </Link>
-            <a 
-              href="/gallery" 
-              onClick={handleGalleryClick}
-              className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group cursor-pointer whitespace-nowrap"
-            >
-              <span className="relative z-10">{t('gallery')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </a>
-            <Link to="/faq" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
-              <span className="relative z-10">FAQ</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </Link>
-            <Link to="/about" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
-              <span className="relative z-10">{t('about')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </Link>
-            <Link to="/contact" className="relative px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-all duration-300 group whitespace-nowrap">
-              <span className="relative z-10">{t('contact')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </Link>
-          </div>
-
-          {/* Right side buttons */}
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            {/* Search - hidden on mobile */}
+          {/* Right Actions */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Search */}
             <form onSubmit={handleSearch} className="relative hidden sm:block">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder={t('search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-48 md:w-64 h-10 bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary focus:border-primary rounded-lg shadow-sm transition-all duration-300"
+                className="pl-10 w-48 lg:w-56 h-9 bg-secondary/50 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 rounded-lg transition-all"
               />
             </form>
             
-            {/* Login button - simplified on mobile */}
+            {/* Login Button - Gradient Pill */}
             <Link
               to="/login"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border border-primary/30 text-foreground hover:text-primary font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm btn-3d hover:shadow-glow transition-all duration-300"
             >
               <User className="w-4 h-4" />
               {t('login')}
             </Link>
 
-            {/* Mobile login icon only */}
+            {/* Mobile login */}
             <Link
               to="/login"
-              className="sm:hidden p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+              className="sm:hidden p-2 rounded-lg bg-secondary/50 hover:bg-primary/10 border border-border/50 text-foreground hover:text-primary transition-all"
             >
               <User className="w-5 h-5" />
             </Link>
 
-            {/* Admin button - simplified on mobile */}
+            {/* Admin Button */}
             <Link
               to="/admin-login"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-500/30 text-foreground hover:text-amber-600 dark:hover:text-amber-400 font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-primary/30 text-muted-foreground hover:text-foreground font-medium text-sm transition-all duration-300"
             >
               <Shield className="w-4 h-4" />
               {t('admin')}
             </Link>
 
-            {/* Mobile admin icon only */}
+            {/* Mobile admin */}
             <Link
               to="/admin-login"
-              className="sm:hidden p-2 rounded-lg bg-muted/50 hover:bg-amber-500/10 border border-border/50 hover:border-amber-500/50 text-foreground hover:text-amber-600 transition-all duration-300 hover:scale-110"
+              className="sm:hidden p-2 rounded-lg bg-secondary/50 hover:bg-primary/10 border border-border/50 text-muted-foreground hover:text-primary transition-all"
             >
               <Shield className="w-5 h-5" />
             </Link>
             
-            {/* Dark mode toggle */}
+            {/* Dark Mode Toggle */}
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110 hover:rotate-12"
+              className="p-2 rounded-lg bg-secondary/50 hover:bg-primary/10 border border-border/50 hover:border-primary/30 text-muted-foreground hover:text-primary transition-all duration-300 hover:rotate-12"
             >
               {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
-            {/* Mobile menu button - ALWAYS VISIBLE */}
+            {/* Mobile Menu */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-lg bg-muted/50 hover:bg-primary/10 border border-border/50 hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+              className="md:hidden p-2 rounded-lg bg-secondary/50 hover:bg-primary/10 border border-border/50 text-foreground transition-all"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Dropdown */}
         {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-              
-              {/* Mobile search */}
+          <div className="md:hidden animate-slide-up">
+            <div className="px-2 pt-2 pb-4 space-y-1 glass-card rounded-xl mt-2 mb-2">
+              {/* Mobile Search */}
               <form onSubmit={handleSearch} className="relative mb-3 sm:hidden">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder={t('search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary"
+                  className="pl-10 w-full bg-secondary/50 border-border/50"
                 />
               </form>
 
-              {/* Language Selector - Mobile Only */}
-              <div className="px-3 py-2 mb-3 border-b border-gray-200 dark:border-gray-700">
+              {/* Language Selector */}
+              <div className="px-3 py-2 mb-2 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-primary flex-shrink-0" />
                   <Select value={language} onValueChange={(value) => setLanguage(value as any)}>
-                    <SelectTrigger className="w-full h-9 bg-muted/50 border-border/50">
+                    <SelectTrigger className="w-full h-9 bg-secondary/50 border-border/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="z-[9999] bg-background border-border max-h-[300px]">
@@ -239,85 +232,70 @@ const Navbar = ({ darkMode, toggleDarkMode }: NavbarProps) => {
                 </div>
               </div>
 
-              {/* Developer info on mobile */}
-              <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 mb-3 bg-gradient-to-r from-primary/5 to-accent/5">
+              {/* Developer Badge */}
+              <div className="px-3 py-3 border-b border-border/50 mb-2 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Code className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="leading-tight">
-                    Developed by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span>
-                  </span>
+                  <span>by <span className="font-bold text-primary">Vikash Kumar Kushwaha</span></span>
                 </div>
               </div>
 
-              <Link
-                to="/materials"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('materials')}
-              </Link>
-              <a
-                href="/gallery"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={(e) => {
-                  setIsOpen(false);
-                  handleGalleryClick(e);
-                }}
-              >
-                {t('gallery')}
-              </a>
-              <Link
-                to="/faq"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                FAQ
-              </Link>
-              <Link
-                to="/about"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('about')}
-              </Link>
-              <Link
-                to="/contact"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('contact')}
-              </Link>
+              {/* Nav Links */}
+              {navLinks.map((link) => (
+                link.onClick ? (
+                  <a
+                    key={link.to}
+                    href={link.to}
+                    className={`block px-4 py-3 text-base font-medium rounded-lg transition-all
+                      ${isActive(link.to) 
+                        ? 'text-primary bg-primary/10' 
+                        : 'text-foreground hover:text-primary hover:bg-primary/5'
+                      }`}
+                    onClick={(e) => {
+                      setIsOpen(false);
+                      link.onClick(e);
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`block px-4 py-3 text-base font-medium rounded-lg transition-all
+                      ${isActive(link.to) 
+                        ? 'text-primary bg-primary/10' 
+                        : 'text-foreground hover:text-primary hover:bg-primary/5'
+                      }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              ))}
               
-              <Link
-                to="/login"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                <User className="w-4 h-4 inline mr-2" />
-                {t('login')}
-              </Link>
-
-              <Link
-                to="/admin-login"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                <Shield className="w-4 h-4 inline mr-2" />
-                {t('admin')}
-              </Link>
+              <div className="pt-2 border-t border-border/50 space-y-1">
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 px-4 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <User className="w-4 h-4" />
+                  {t('login')}
+                </Link>
+                <Link
+                  to="/admin-login"
+                  className="flex items-center gap-2 px-4 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Shield className="w-4 h-4" />
+                  {t('admin')}
+                </Link>
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Search hint */}
-      {searchQuery && (
-        <div className="absolute left-4 right-4 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
-          <p className="px-4 py-2 text-gray-700 dark:text-gray-300">
-            Press Enter to search for "{searchQuery}"
-          </p>
-        </div>
-      )}
     </nav>
   );
 };
