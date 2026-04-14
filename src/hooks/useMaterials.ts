@@ -26,9 +26,12 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
       setError(null);
       
       // Build base query - start with all published content, then apply filters
+      // Select only columns needed for listing - exclude large code columns to prevent timeouts
+      const listingColumns = 'id,title,description,category,content_type,file_type,file_name,file_size,file_url,thumbnail_url,generated_thumbnail_url,youtube_url,author,status,is_featured,is_premium,price,rating,downloads_count,tags,software_compatibility,created_at,updated_at,thumbnail_auto_generated,html_introduction,css_introduction,js_introduction';
+      
       let query = supabase
         .from('content')
-        .select('*', { count: 'exact' })
+        .select(listingColumns, { count: 'exact' })
         .eq('status', 'published');
 
       // Apply featured filter
