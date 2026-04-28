@@ -38,11 +38,38 @@ serve(async (req) => {
       return new Response("Material not found", { status: 404 });
     }
 
-    const title = `${material.title} - Gyaan Repo`;
-    const description = material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`;
-    const imageUrl = material.thumbnail_url || "https://i.ibb.co/XkjPcgsv/icon.jpg";
-    const pageUrl = `https://gyaanrepo.netlify.app/material/${material.id}`;
-    const priceText = material.is_premium ? `₹${material.price || 0} INR` : "Free";
+    const escapeHtml = (s: string) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const isSafeImageUrl = (u: string) => {
+      try {
+        const url = new URL(u);
+        if (url.protocol !== 'https:') return false;
+        const allowedHosts = [
+          'i.ibb.co',
+          'vueagetqayqfyakhmolh.supabase.co',
+        ];
+        return allowedHosts.some((h) => url.hostname === h || url.hostname.endsWith('.' + h));
+      } catch {
+        return false;
+      }
+    };
+
+    const fallbackImage = 'https://i.ibb.co/XkjPcgsv/icon.jpg';
+    const rawImage = material.thumbnail_url || fallbackImage;
+    const safeImageUrl = isSafeImageUrl(rawImage) ? rawImage : fallbackImage;
+
+    const title = escapeHtml(`${material.title} - Gyaan Repo`);
+    const description = escapeHtml(material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`);
+    const imageUrl = escapeHtml(safeImageUrl);
+    const pageUrl = escapeHtml(`https://gyaanrepo.netlify.app/material/${material.id}`);
+    const priceText = escapeHtml(material.is_premium ? `₹${material.price || 0} INR` : 'Free');
+    const priceAmount = escapeHtml(String(material.price || 0));
 
     // Return HTML with proper OG tags for social media crawlers
     const html = `<!DOCTYPE html>
@@ -62,7 +89,7 @@ serve(async (req) => {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Gyaan Repo">
-  <meta property="product:price:amount" content="${material.price || 0}">
+  <meta property="product:price:amount" content="${priceAmount}">
   <meta property="product:price:currency" content="INR">
   
   <!-- Twitter -->
@@ -77,10 +104,10 @@ serve(async (req) => {
   <link rel="canonical" href="${pageUrl}">
 </head>
 <body>
-  <h1>${material.title}</h1>
+  <h1>${escapeHtml(material.title)}</h1>
   <p>${description}</p>
   <p>Price: ${priceText}</p>
-  <img src="${imageUrl}" alt="${material.title}">
+  <img src="${imageUrl}" alt="${escapeHtml(material.title)}">
   <p>Redirecting to <a href="${pageUrl}">Gyaan Repo</a>...</p>
 </body>
 </html>`;

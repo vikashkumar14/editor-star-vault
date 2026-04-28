@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -17,31 +18,56 @@ interface FeedbackEmailRequest {
   message: string;
 }
 
+const escapeHtml = (s: string) =>
+  String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // NOTE: Public contact form — auth not required, but strict input validation
+    // is enforced below to mitigate spam/abuse.
+
     const { name, email, subject, message }: FeedbackEmailRequest = await req.json();
+
+    // Validate input
+    const isStr = (v: unknown) => typeof v === 'string';
+    if (
+      !isStr(name) || !isStr(email) || !isStr(subject) || !isStr(message) ||
+      name.trim().length === 0 || name.length > 100 ||
+      email.trim().length === 0 || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      subject.trim().length === 0 || subject.length > 200 ||
+      message.trim().length === 0 || message.length > 5000
+    ) {
+      return new Response(JSON.stringify({ error: 'Invalid feedback input' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     console.log("Sending feedback email:", { name, email, subject });
 
     const emailResponse = await resend.emails.send({
       from: "The Editor Star <onboarding@resend.dev>",
       to: ["vikashkumar13228@gmail.com"],
-      subject: `Feedback: ${subject}`,
+      subject: `Feedback: ${subject.slice(0, 200)}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #dc2626;">New Feedback from The Editor Star</h2>
           <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
+            <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+            <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
           </div>
           <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
             <h3 style="color: #374151; margin-top: 0;">Message:</h3>
-            <p style="line-height: 1.6; color: #4b5563;">${message.replace(/\n/g, '<br>')}</p>
+            <p style="line-height: 1.6; color: #4b5563;">${escapeHtml(message).replace(/\n/g, '<br>')}</p>
           </div>
           <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
             This email was sent from The Editor Star feedback form.
