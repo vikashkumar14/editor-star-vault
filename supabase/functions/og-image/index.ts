@@ -104,10 +104,10 @@ serve(async (req) => {
   <link rel="canonical" href="${pageUrl}">
 </head>
 <body>
-  <h1>${material.title}</h1>
+  <h1>${escapeHtml(material.title)}</h1>
   <p>${description}</p>
   <p>Price: ${priceText}</p>
-  <img src="${imageUrl}" alt="${material.title}">
+  <img src="${imageUrl}" alt="${escapeHtml(material.title)}">
   <p>Redirecting to <a href="${pageUrl}">Gyaan Repo</a>...</p>
 </body>
 </html>`;
