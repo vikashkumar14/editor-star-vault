@@ -55,6 +55,15 @@ serve(async (req) => {
       );
     }
 
+    // SECURITY: Always use the price from the database — never trust client input
+    const actualPrice = material.price;
+    if (!material.is_premium || !actualPrice || actualPrice <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'Material is not purchasable' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Create Razorpay order
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
@@ -68,7 +77,7 @@ serve(async (req) => {
     }
 
     const orderData = {
-      amount: amount * 100, // Razorpay expects amount in paise
+      amount: actualPrice * 100, // Razorpay expects amount in paise
       currency: 'INR',
       receipt: `rcpt_${Date.now().toString().slice(-8)}`,
       notes: {
