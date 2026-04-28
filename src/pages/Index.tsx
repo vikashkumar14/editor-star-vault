@@ -24,18 +24,6 @@ interface IndexProps {
 
 const Index = ({ darkMode, toggleDarkMode }: IndexProps) => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <Preloader />;
-  }
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">
