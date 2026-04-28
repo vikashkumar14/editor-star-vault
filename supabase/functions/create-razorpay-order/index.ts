@@ -12,12 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    const { materialId, amount } = await req.json();
-    
+    const { materialId } = await req.json();
+
     // Validate input
-    if (!materialId || !amount || amount <= 0) {
+    if (!materialId || typeof materialId !== 'string') {
       return new Response(
-        JSON.stringify({ error: 'Invalid material ID or amount' }),
+        JSON.stringify({ error: 'Invalid material ID' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
