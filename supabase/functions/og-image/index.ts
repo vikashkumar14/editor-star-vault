@@ -38,11 +38,38 @@ serve(async (req) => {
       return new Response("Material not found", { status: 404 });
     }
 
-    const title = `${material.title} - Gyaan Repo`;
-    const description = material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`;
-    const imageUrl = material.thumbnail_url || "https://i.ibb.co/XkjPcgsv/icon.jpg";
-    const pageUrl = `https://gyaanrepo.netlify.app/material/${material.id}`;
-    const priceText = material.is_premium ? `₹${material.price || 0} INR` : "Free";
+    const escapeHtml = (s: string) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const isSafeImageUrl = (u: string) => {
+      try {
+        const url = new URL(u);
+        if (url.protocol !== 'https:') return false;
+        const allowedHosts = [
+          'i.ibb.co',
+          'vueagetqayqfyakhmolh.supabase.co',
+        ];
+        return allowedHosts.some((h) => url.hostname === h || url.hostname.endsWith('.' + h));
+      } catch {
+        return false;
+      }
+    };
+
+    const fallbackImage = 'https://i.ibb.co/XkjPcgsv/icon.jpg';
+    const rawImage = material.thumbnail_url || fallbackImage;
+    const safeImageUrl = isSafeImageUrl(rawImage) ? rawImage : fallbackImage;
+
+    const title = escapeHtml(`${material.title} - Gyaan Repo`);
+    const description = escapeHtml(material.description || `Download ${material.title} - Professional coding material from Gyaan Repo. Instant digital download.`);
+    const imageUrl = escapeHtml(safeImageUrl);
+    const pageUrl = escapeHtml(`https://gyaanrepo.netlify.app/material/${material.id}`);
+    const priceText = escapeHtml(material.is_premium ? `₹${material.price || 0} INR` : 'Free');
+    const priceAmount = escapeHtml(String(material.price || 0));
 
     // Return HTML with proper OG tags for social media crawlers
     const html = `<!DOCTYPE html>
