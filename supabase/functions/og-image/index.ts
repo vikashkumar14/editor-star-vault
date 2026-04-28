@@ -89,7 +89,7 @@ serve(async (req) => {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Gyaan Repo">
-  <meta property="product:price:amount" content="${material.price || 0}">
+  <meta property="product:price:amount" content="${priceAmount}">
   <meta property="product:price:currency" content="INR">
   
   <!-- Twitter -->
