@@ -124,7 +124,7 @@ serve(async (req) => {
         .from('premium_purchases')
         .update({
           razorpay_order_id: razorpayOrder.id,
-          amount: amount,
+          amount: actualPrice,
           status: 'pending',
           updated_at: new Date().toISOString()
         })
@@ -146,7 +146,7 @@ serve(async (req) => {
           user_id: user.id,
           material_id: materialId,
           razorpay_order_id: razorpayOrder.id,
-          amount: amount,
+          amount: actualPrice,
           status: 'pending'
         });
 
