@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import Loader from "@/components/Loader";
 import { useMaterials } from "@/hooks/useMaterials";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,12 +27,13 @@ const Materials = ({ darkMode, toggleDarkMode }: MaterialsProps) => {
   const [showFilters, setShowFilters] = useState(false);
   
   const { categories } = useCategories();
+  const debouncedSearch = useDebounce(searchQuery, 400);
   
   const { materials, loading, error, totalPages, totalCount, retry } = useMaterials({
     page: currentPage,
     limit: 12,
     category: selectedCategory,
-    search: searchQuery
+    search: debouncedSearch
   });
 
   // Update URL params when search/category changes

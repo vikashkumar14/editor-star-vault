@@ -44,21 +44,12 @@ export const useMaterials = (options: UseMaterialsOptions = {}) => {
         query = query.eq('category', category);
       }
 
-      // Apply search filter (enhanced comprehensive search)
+      // Apply search filter (only on small indexed columns to keep it fast)
       if (search && search.trim()) {
-        const searchTerm = search.trim().toLowerCase();
-        // Search across all relevant text fields
-        query = query.or(`
-          title.ilike.%${searchTerm}%,
-          description.ilike.%${searchTerm}%,
-          category.ilike.%${searchTerm}%,
-          content_type.ilike.%${searchTerm}%,
-          file_type.ilike.%${searchTerm}%,
-          author.ilike.%${searchTerm}%,
-          html_introduction.ilike.%${searchTerm}%,
-          css_introduction.ilike.%${searchTerm}%,
-          js_introduction.ilike.%${searchTerm}%
-        `.replace(/\s+/g, ''));
+        const searchTerm = search.trim().replace(/[,()]/g, '');
+        query = query.or(
+          `title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`
+        );
       }
 
       // Apply ordering and pagination
